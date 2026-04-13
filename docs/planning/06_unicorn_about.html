@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유니콘클래스 — 회사소개</title>
+<link rel="stylesheet" href="./noto-sans.css" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+.tab-nav {border-bottom:2px solid var(--red);}
+/* ══════════════════════════════
+   A. 히어로
+══════════════════════════════ */
+.sec-hero {
+  background:#0a0a0a; min-height:520px; position:relative;
+  display:flex; align-items:center; overflow:hidden;
+}
+.hero-bg {
+  position:absolute; inset:0;
+  background: linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.75)),
+    repeating-linear-gradient(-45deg,#111 0,#111 20px,#161616 20px,#161616 40px);
+}
+.hero-diagonal {
+  position:absolute; top:20px; right:-20px;
+  font-size:80px; font-weight:900; line-height:0.85;
+  color:transparent; -webkit-text-stroke:1.5px rgba(255,255,255,0.09);
+  letter-spacing:-3px; text-align:right; pointer-events:none; user-select:none;
+}
+.hero-diagonal .rd { -webkit-text-stroke:2px rgba(231,76,60,0.35); }
+.hero-content {
+  position:relative; z-index:2;
+  max-width:1200px; margin:0 auto; padding:80px 24px; width:100%;
+}
+.hero-eyebrow { font-size:11px; font-weight:700; color:#e74c3c; letter-spacing:3px; text-transform:uppercase; margin-bottom:16px; }
+.hero-headline { font-size:44px; font-weight:900; color:#fff; line-height:1.2; letter-spacing:-1px; margin-bottom:20px; }
+.hero-headline em { color:#e74c3c; font-style:normal; }
+.hero-sub { font-size:15px; color:rgba(255,255,255,0.6); line-height:1.85; }
+
+/* ══════════════════════════════
+   B. 회사소개 STICKY (100vh)
+   좌: eyebrow + 대제목 + 3단 본문 + 서명
+   우: 대표 이미지
+══════════════════════════════ */
+.sec-intro {
+  position:sticky !important; top:92px;
+  height:calc(100vh - 92px);
+  background:#fff; z-index:10;
+  display:flex; overflow:hidden;
+}
+/* 좌측 텍스트 영역 */
+.intro-text-col {
+  width:45%; padding:52px 48px;
+  display:flex; flex-direction:column;
+  border-right:1px solid #eee;
+}
+.intro-eyebrow {
+  display:flex; align-items:center; gap:6px;
+  font-size:11px; font-weight:700; color:#e74c3c;
+  letter-spacing:1px; margin-bottom:12px;
+}
+.intro-eyebrow::before {
+  content:''; width:8px; height:8px; border-radius:50%;
+  background:#e74c3c; flex-shrink:0;
+}
+.intro-heading { font-size:28px; font-weight:900; color:#111; line-height:1.3; letter-spacing:-0.5px; margin-bottom:32px; }
+/* 3단 본문 */
+.intro-body-cols {
+  display:flex; flex-direction:column; gap:20px;
+  flex:1;
+}
+.intro-body-col { font-size:12px; color:#555; line-height:1.85; }
+/* 서명 */
+.intro-sign-area { margin-top:auto; padding-top:24px; border-top:1px solid #eee; text-align:right; }
+.intro-sign {
+  font-family:Georgia,serif; font-style:italic; font-size:26px; color:#1a3a5c;
+}
+.intro-sign-meta { font-family:inherit; font-style:normal; font-size:11px; color:#999; margin-top:4px; }
+/* 우측 이미지 */
+.intro-img-col {
+  width:55%; position:relative; overflow:hidden;
+}
+.intro-img-ph {
+  width:100%; height:100%;
+  background:linear-gradient(135deg,#dce8f4,#b0c8e0);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size:12px; color:#7a9ab5; font-weight:600; gap:8px;
+}
+.intro-logo-overlay {
+  position:absolute; top:20px; right:20px;
+  background:rgba(255,255,255,0.9); border-radius:6px; padding:8px 14px;
+  font-size:13px; font-weight:900; color:#1a3a5c;
+}
+
+/* ══════════════════════════════
+   C. 스탯 STICKY (100vh)
+══════════════════════════════ */
+.sec-stats {
+  position:sticky !important; top:92px;
+  height:calc(100vh - 92px);
+  background:#0f0f0f; z-index:20;
+  display:flex; align-items:center;
+}
+.sec-stats-inner { max-width:1200px; margin:0 auto; padding:0 24px; width:100%; }
+.stats-headline { font-size:28px; font-weight:900; color:#fff; text-align:center; line-height:1.55; margin-bottom:10px; }
+.stats-headline em { color:#e74c3c; font-style:normal; }
+.stats-sub { font-size:13px; color:#555; text-align:center; margin-bottom:52px; }
+.stats-grid {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  border-top:1px solid #222; border-left:1px solid #222;
+}
+.stat-item { padding:40px 20px; text-align:center; border-right:1px solid #222; border-bottom:1px solid #222; }
+.stat-num { font-size:52px; font-weight:900; color:#fff; line-height:1; letter-spacing:-2px; }
+.stat-num span { color:#e74c3c; }
+.stat-label { font-size:12px; color:#555; margin-top:8px; }
+
+/* ══════════════════════════════
+   D. CTA 레드 STICKY (100vh)
+══════════════════════════════ */
+.sec-cta-red {
+  position:sticky !important; top:92px;
+  height:calc(100vh - 92px);
+  background:#c0392b; z-index:30;
+  display:flex; align-items:center;
+}
+.sec-cta-red-inner {
+  max-width:1200px; margin:0 auto; padding:0 24px; width:100%;
+  display:flex; flex-direction:column; gap:64px; 
+}
+.cta-red-headline { font-size:26px; font-weight:900; color:#fff; line-height:1.6; }
+.cta-red-headline strong { display:block; }
+.cta-red-body { font-size:14px; color:rgba(255,255,255,0.7); line-height:1.5; }
+
+/* ══════════════════════════════
+   E. 비전 — 좌측만 STICKY
+   좌: 파란 테두리 박스 (heading + 본문)
+   우: 사진 + 4개 특징 리스트 (스크롤)
+══════════════════════════════ */
+.sec-vision-wrap {
+  display:flex; align-items:flex-start; background:#f8f8f8;position:relative;z-index:100;
+}
+/* 좌측 sticky */
+.vision-sticky-col {
+  position:sticky !important; top:60px;
+  width:42%; z-index:40;
+  display:flex; align-items:center; justify-content:center;
+  padding:48px 40px;
+}
+/* 파란 테두리 박스 */
+.vision-box {
+  border:2px solid #1a3a5c; padding:36px 32px;
+  width:100%; background:#fff;
+}
+.vision-box-eyebrow {
+  display:flex; align-items:center; gap:6px;
+  font-size:10px; font-weight:700; color:#1a3a5c;
+  letter-spacing:1.5px; margin-bottom:12px;
+}
+.vision-box-eyebrow::before {
+  content:''; width:7px; height:7px; border-radius:50%;
+  background:#e74c3c; flex-shrink:0;
+}
+.vision-box-heading { font-size:22px; font-weight:900; color:#111; line-height:1.35; margin-bottom:16px; letter-spacing:-0.3px; }
+.vision-box-body { font-size:13px; color:#555; line-height:1.85; }
+.vision-box-body p { margin-bottom:12px; }
+.vision-box-body p:last-child { margin-bottom:0; }
+/* 우측 스크롤 */
+.vision-scroll-col {
+  width:58%; background:#f8f8f8; padding:48px 40px 48px 0;
+}
+/* 사진 영역 */
+.vision-photo-area {
+  background:linear-gradient(135deg,#1a2534,#253545);
+  border-radius:6px; height:320px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size:12px; color:#444; gap:8px; margin-bottom:32px;
+}
+/* 4개 특징 리스트 */
+.vision-feature-list { display:flex; flex-direction:column; gap:0; }
+.vision-feature-item {
+  padding:18px 0; border-bottom:1px solid #e8e8e8;
+}
+.vision-feature-item:last-child { border-bottom:none; }
+.vf-title {
+  display:flex; align-items:center; gap:8px;
+  font-size:15px; font-weight:700; color:#e74c3c; margin-bottom:5px;
+}
+.vf-title::before { content:''; width:4px; height:14px; background:#e74c3c; border-radius:2px; flex-shrink:0; }
+.vf-desc { font-size:12px; color:#666; line-height:1.7; padding-left:12px; }
+
+/* ══════════════════════════════
+   F. 강사진 (카테고리별)
+══════════════════════════════ */
+.sec-instructors { background:#fff; padding:72px 24px; border-top:1px solid #eee; position:relative;z-index:100;}
+.sec-instructors-inner { max-width:1200px; margin:0 auto; }
+.sec-eyebrow { font-size:10px; font-weight:700; color:#e74c3c; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+.sec-heading { font-size:28px; font-weight:900; color:#111; letter-spacing:-0.5px; margin-bottom:6px; }
+.sec-sub { font-size:13px; color:#888; line-height:1.7; margin-bottom:40px; }
+.instr-category-block { margin-bottom:48px; }
+.instr-category-block:last-child { margin-bottom:0; }
+.instr-cat-label {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:11px; font-weight:700; color:#1a3a5c;
+  border:1.5px solid #1a3a5c; padding:4px 12px; border-radius:3px;
+  margin-bottom:16px; letter-spacing:0.5px;
+}
+.instructor-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.instructor-card {
+  background:#f9f9f9; border-radius:8px; overflow:hidden;
+  border:1px solid #eee; transition:transform .2s, box-shadow .2s; cursor:pointer;
+}
+.instructor-card:hover { transform:translateY(-3px); box-shadow:0 6px 16px rgba(0,0,0,0.08); }
+.instructor-card.empty { visibility:hidden; }
+.i-photo {
+  height:160px; background:linear-gradient(135deg,#dce8f4,#b8cfe4);
+  display:flex; align-items:center; justify-content:center; font-size:40px; color:rgba(0,0,0,0.1);
+}
+.i-info { padding:14px; }
+.i-name { font-size:14px; font-weight:700; color:#111; margin-bottom:3px; }
+.i-role { font-size:11px; color:#888; margin-bottom:7px; }
+.i-tag { background:#fef0ee; color:#e74c3c; font-size:10px; font-weight:700; padding:2px 7px; border-radius:2px; }
+.btn-more-row { display:flex; justify-content:center; margin-top:40px; }
+.btn-more { padding:12px 40px; border:2px solid #111; border-radius:4px; font-size:13px; font-weight:700; color:#111; transition:all .2s; }
+.btn-more:hover { background:#111; color:#fff; }
+
+/* ══════════════════════════════
+   G. 성과 — 좌측만 STICKY
+   좌: 파란 테두리 박스 (heading + 본문)
+   우: 인물사진 + 인용문 + 수치 (스크롤)
+══════════════════════════════ */
+.sec-result-wrap {
+  display:flex; align-items:flex-start; background:#f8f8f8; border-top:1px solid #eee;position:relative;z-index:100;
+}
+/* 좌측 sticky */
+.result-sticky-col {
+  position:sticky !important; top:60px;
+  width:38%; z-index:50;
+  display:flex; align-items:center; justify-content:center;
+  padding:48px 36px;
+}
+/* 파란 테두리 박스 (비전과 동일 구조) */
+.result-box {
+  border:2px solid #1a3a5c; padding:36px 32px;
+  width:100%; background:#fff;
+}
+.result-box-eyebrow {
+  display:flex; align-items:center; gap:6px;
+  font-size:10px; font-weight:700; color:#1a3a5c;
+  letter-spacing:1.5px; margin-bottom:12px;
+}
+.result-box-eyebrow::before {
+  content:''; width:7px; height:7px; border-radius:50%;
+  background:#e74c3c; flex-shrink:0;
+}
+.result-box-heading { font-size:22px; font-weight:900; color:#111; line-height:1.35; margin-bottom:16px; letter-spacing:-0.3px; }
+.result-box-body { font-size:13px; color:#555; line-height:1.85; }
+.result-box-body p { margin-bottom:12px; }
+.result-box-body p:last-child { margin-bottom:0; }
+/* 우측 스크롤 */
+.result-scroll-col {
+  width:62%; padding:48px 48px 48px 0;
+}
+/* 인물 사진 */
+.result-photo-area {
+  background:linear-gradient(135deg,#1a2534,#253545);
+  border-radius:6px; height:340px; margin-bottom:36px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size:12px; color:#444; gap:8px;
+}
+/* 인용문 */
+.result-quote-area { margin-bottom:40px; }
+.result-quote-headline { font-size:17px; font-weight:700; color:#111; line-height:1.5; margin-bottom:12px; }
+.result-quote-body { font-size:13px; color:#555; line-height:1.9; }
+/* 수치 */
+.result-stats { display:flex; flex-direction:column; gap:0; border-top:1px solid #e0e0e0; }
+.result-stat-item {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:20px 0; border-bottom:1px solid #e0e0e0;
+}
+.result-stat-info { }
+.result-stat-label { font-size:13px; font-weight:700; color:#111; margin-bottom:3px; }
+.result-stat-desc { font-size:11px; color:#aaa; }
+.result-stat-num { font-size:44px; font-weight:900; color:#111; letter-spacing:-1px; line-height:1; }
+
+/* ══════════════════════════════
+   H. 마무리 CTA
+══════════════════════════════ */
+.sec-final-cta { background:#e74c3c; padding:80px 24px; text-align:center; position:relative;z-index:100;}
+.final-headline { font-size:38px; font-weight:900; color:#fff; line-height:1.3; margin-bottom:14px; letter-spacing:-0.5px; }
+.final-sub { font-size:15px; color:rgba(255,255,255,0.7); margin-bottom:36px; }
+.btn-final { display:inline-block; padding:16px 52px; background:#fff; color:#e74c3c; border-radius:4px; font-size:15px; font-weight:900; cursor:pointer; transition:all .2s; }
+.btn-final:hover { background:#111; color:#fff; }
+
+#footer {position:relative;z-index:100;}
+</style>
+</head>
+<body>
+
+<!-- ── 기획서 헤더 ── -->
+<div class="doc-header">
+  <div>
+    <div class="doc-proj">Project — 유니콘클래스 기획서 v3.0</div>
+    <div class="doc-title">회사소개</div>
+  </div>
+</div>
+
+<!-- ══ 탭 네비게이션 ══ -->
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <div class="tab-btn" onclick="location.href='./'">메인</div>
+    <div class="tab-btn" onclick="location.href='./02_unicorn_login.html'">로그인 / 회원가입</div>
+    <div class="tab-btn" onclick="location.href='./03_unicorn_class_list.html'">클래스 리스트</div>
+    <div class="tab-btn" onclick="location.href='./04_unicorn_class_detail.html'">클래스 상세</div>
+	<div class="tab-btn" onclick="location.href='./05_unicorn_class_vimeo_player.html'">영상 화면</div>
+	<div class="tab-btn active" onclick="location.href='./06_unicorn_about.html'">회사소개</div>
+	<div class="tab-btn" onclick="location.href='./07_unicorn_instructor.html'">강사 리스트</div>
+	<div class="tab-btn" onclick="location.href='./08_unicorn_instructor_detail.html'">강사 상세</div>
+	<div class="tab-btn" onclick="location.href='./12_unicorn_instructor_apply.html'">강사 지원</div>
+	<div class="tab-btn" onclick="location.href='./09_unicorn_support.html'">고객센터</div>
+    <div class="tab-btn" onclick="location.href='./10_unicorn_mypage.html'">마이페이지</div>
+	<div class="tab-btn" onclick="location.href='./11_unicorn_search.html'">검색결과</div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+<div class="screen-wrap">
+
+  <!-- GNB -->
+    <div id="site-header" class="ann-host">
+    <div class="ann" onclick="activateAnn(1)" style="left:0;top:0"><div class="ann-bubble" id="ann-1">1</div></div>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-box"><span>UNICORN<br>CLASS</span></div>
+      </div>
+      <nav class="gnb">
+        <div class="gnb-item">클래스
+          <div class="gnb-dropdown"><a href="#">무료강의</a><a href="#">프리미엄강의</a></div>
+        </div>
+        <div class="gnb-item active">회사소개</div>
+        <div class="gnb-item">강사진</div>
+        <div class="gnb-item">고객센터
+          <div class="gnb-dropdown"><a href="#">공지사항</a><a href="#">FAQ</a></div>
+        </div>
+      </nav>
+      <div class="header-right">
+	  	<a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a>
+        <div class="search-box">
+          <input type="text" placeholder="강사 / 과정명을 입력해 주세요.">
+          <button>🔍</button>
+        </div>
+        <span class="login-btn">로그인</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── A. 히어로 배너 ─── -->
+  <div class="sec-hero ann-host">
+    <div class="ann" onclick="activateAnn(2)" style="left:0;"><div class="ann-bubble" id="ann-2">2</div></div>
+    <div class="hero-bg"></div>
+    <div class="hero-diagonal">WELCOME TO<br><span class="rd">UNICORN</span><br>CLASS</div>
+    <div class="hero-content ann-host" style="width:100%;">
+      <div class="ann" onclick="activateAnn(3)"><div class="ann-bubble" id="ann-3">3</div></div>
+      <div class="hero-eyebrow">ABOUT UNICORN CLASS</div>
+      <div class="hero-headline">당신의 <em>미래에</em> 우리가<br>한 발 더 가까워집니다.</div>
+      <div class="hero-sub">유니콘클래스는 실전 기반의 N잡 교육으로<br>누구나 원하는 수익을 만들 수 있도록 돕습니다.</div>
+    </div>
+  </div>
+
+  <!-- ─── B. 회사소개 STICKY ─── -->
+  <div class="sec-intro ann-host">
+    <div class="s-badge">📌 position:sticky · z-index:10 · 100vh</div>
+    <div class="ann" onclick="activateAnn(4)" style="left:0;"><div class="ann-bubble" id="ann-4">4</div></div>
+
+    <!-- 좌: 텍스트 -->
+    <div class="intro-text-col ann-host" style="position:relative;">
+      <div class="ann" onclick="activateAnn(5)" style="left:25px;top:40px;"><div class="ann-bubble" id="ann-5">5</div></div>
+      <div class="intro-eyebrow">대한민국 No.1</div>
+      <div class="intro-heading">수익화 교육 플랫폼</div>
+      <!-- 3단 본문 -->
+      <div class="intro-body-cols ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(6)" style="top:-11px;left:-11px;"><div class="ann-bubble" id="ann-6">6</div></div>
+        <div class="intro-body-col">
+          유니콘클래스는 강의를 중심으로 성장을 추구하는 교육 플랫폼입니다. 다년간 쌓은 노하우와 검증된 커리큘럼으로 수강생 한 명 한 명의 성공을 지원합니다.
+        </div>
+        <div class="intro-body-col">
+          타이탄클래스의 임직원들은 "수강생들이 삶에서 실제로 변화를 만들어낼 수 있도록" 매일 최선을 다하고 있습니다. 최고의 교육 환경을 만들어가고 있습니다.
+        </div>
+        <div class="intro-body-col">
+          No.1 수익화 교육 플랫폼으로서 지속적으로 성장하며, 강의를 통해 가능성을 열어드리는 유니콘클래스가 되겠습니다.
+        </div>
+      </div>
+      <!-- 서명 -->
+      <div class="intro-sign-area ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(7)" style="left:auto;right:0;"><div class="ann-bubble" id="ann-7">7</div></div>
+        <div class="intro-sign">홍길동</div>
+        <div class="intro-sign-meta">유니콘클래스 대표</div>
+      </div>
+    </div>
+
+    <!-- 우: 이미지 -->
+    <div class="intro-img-col ann-host">
+      <div class="ann" onclick="activateAnn(8)"><div class="ann-bubble" id="ann-8">8</div></div>
+      <div class="intro-img-ph">
+        📷<br>회의/강의 대표 사진<br><small style="font-size:10px;color:#aaa;">권장: 660×480px</small>
+      </div>
+      <div class="intro-logo-overlay">UNICORN CLASS</div>
+    </div>
+  </div>
+
+  <!-- ─── C. 스탯 STICKY ─── -->
+  <div class="sec-stats ann-host">
+    <div class="s-badge">📌 position:sticky · z-index:20 · 100vh</div>
+    <div class="ann" onclick="activateAnn(9)" style="left:0;"><div class="ann-bubble" id="ann-9">9</div></div>
+    <div class="sec-stats-inner">
+      <div class="stats-headline">
+        유니콘클래스는 <em>교육이 인생을 바꾼다</em>는 신념 아래,<br>
+        가치 있는 지식과 전문인을 누구나 함께 성공할 수 있도록 지원합니다.
+      </div>
+      <div class="stats-sub">누적 수강생 · 강의 수강 완료 · 교육 운영 연차 · 파트너 강사</div>
+      <div class="stats-grid ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(10)"><div class="ann-bubble" id="ann-10">10</div></div>
+        <div class="stat-item"><div class="stat-num">24만<span>+</span></div><div class="stat-label">누적 수강생</div></div>
+        <div class="stat-item"><div class="stat-num">4만<span>+</span></div><div class="stat-label">강의 수강 완료</div></div>
+        <div class="stat-item"><div class="stat-num">13년<span>+</span></div><div class="stat-label">교육 운영 연차</div></div>
+        <div class="stat-item"><div class="stat-num">50<span>+</span></div><div class="stat-label">파트너 강사</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── D. CTA 레드 STICKY ─── -->
+  <div class="sec-cta-red ann-host">
+    <div class="s-badge">📌 position:sticky · z-index:30 · 100vh</div>
+    <div class="ann" onclick="activateAnn(11)" style="left:0;"><div class="ann-bubble" id="ann-11">11</div></div>
+    <div class="sec-cta-red-inner">
+      <div class="cta-red-headline ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(12)" style="left:-11px;top:-11px;"><div class="ann-bubble" id="ann-12">12</div></div>
+        유니콘클래스는 일하면서 배우는!<br>
+        <strong>실전에서 쓰는 진짜 기술만 가르칩니다.</strong><br>
+        No.1 강의 교육 플랫폼으로서<br>
+        성장과 성취를 우리는 지원합니다.
+      </div>
+      <div class="cta-red-body ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(13)" style="left:-11px;top:-11px;"><div class="ann-bubble" id="ann-13">13</div></div>
+        강사진과 함께하는 실시간 웨비나부터 언제 어디서나 수강 가능한 VOD 강의까지,<br><br>
+        유니콘클래스는 수강생의 성공을 위해 모든 교육 환경을 최적화합니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── E. 비전 — 좌측만 STICKY ─── -->
+  <div class="sec-vision-wrap">
+    <!-- 좌: 파란 테두리 박스 sticky -->
+    <div class="vision-sticky-col ann-host">
+      <div class="s-badge">📌 position:sticky · z-index:40</div>
+      <div class="ann" onclick="activateAnn(14)" style="left:0;"><div class="ann-bubble" id="ann-14">14</div></div>
+      <div class="vision-box ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(15)"><div class="ann-bubble" id="ann-15">15</div></div>
+        <div class="vision-box-eyebrow">No.1 수익화 교육</div>
+        <div class="vision-box-heading">당신의 첫 수익화를<br>유니콘과 함께합니다</div>
+        <div class="vision-box-body">
+          <p>유니콘클래스는 창업과 사업활동도 경제적 자유를 얻을 수 있도록 최고의 교육을 제공합니다.</p>
+          <p>검증된 강사의 실전 노하우를 통해 수강생의 성공을 보장합니다.</p>
+        </div>
+      </div>
+    </div>
+    <!-- 우: 사진 + 4개 특징 리스트 (스크롤) -->
+    <div class="vision-scroll-col ann-host">
+      <div class="ann" onclick="activateAnn(16)"><div class="ann-bubble" id="ann-16">16</div></div>
+      <!-- 상단 사진 -->
+      <div class="vision-photo-area ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(17)"><div class="ann-bubble" id="ann-17">17</div></div>
+        📷 강의 현장 / 단체 사진<br><small style="font-size:10px;color:#555;">권장: 680×320px</small>
+      </div>
+      <!-- 하단 4개 특징 리스트 -->
+      <div class="vision-feature-list ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(18)"><div class="ann-bubble" id="ann-18">18</div></div>
+        <div class="vision-feature-item">
+          <div class="vf-title">검증된 커리큘럼</div>
+          <div class="vf-desc">실무 경험을 바탕으로 검증된 실전 수익화 커리큘럼</div>
+        </div>
+        <div class="vision-feature-item">
+          <div class="vf-title">전문 강사진</div>
+          <div class="vf-desc">각 분야 최고의 전문가가 직접 노하우를 전달</div>
+        </div>
+        <div class="vision-feature-item">
+          <div class="vf-title">맞춤형 케어 시스템</div>
+          <div class="vf-desc">수강생 개인별 수준에 맞는 1:1 맞춤 학습 지원 제공</div>
+        </div>
+        <div class="vision-feature-item">
+          <div class="vf-title">성장 지원 커뮤니티</div>
+          <div class="vf-desc">수강생 커뮤니티를 통해 지속적인 성장을 지원합니다</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── F. 강사진 (카테고리별) ─── -->
+  <div class="sec-instructors ann-host">
+    <div class="ann" onclick="activateAnn(19)" style="left:0;"><div class="ann-bubble" id="ann-19">19</div></div>
+    <div class="sec-instructors-inner">
+      <div style="margin-bottom:40px;">
+        <div class="sec-eyebrow">INSTRUCTORS</div>
+        <div class="sec-heading">유니콘 강사진</div>
+        <div class="sec-sub">각 분야 최고의 전문가들이 검증된 수익화 노하우를 직접 공개합니다.</div>
+      </div>
+
+      <div class="instr-category-block ann-host">
+        <div class="ann" onclick="activateAnn(20)"><div class="ann-bubble" id="ann-20">20</div></div>
+        <div class="instr-cat-label">AI 활용</div>
+        <div class="instructor-grid">
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 1</div><div class="i-role">AI 자동화 · 수익화</div><span class="i-tag">AI</span></div></div>
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 2</div><div class="i-role">ChatGPT 활용</div><span class="i-tag">AI</span></div></div>
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 3</div><div class="i-role">AI 이미지 · 디자인</div><span class="i-tag">AI</span></div></div>
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 4</div><div class="i-role">AI 콘텐츠 생성</div><span class="i-tag">AI</span></div></div>
+        </div>
+      </div>
+
+      <div class="instr-category-block ann-host">
+        <div class="ann" onclick="activateAnn(21)"><div class="ann-bubble" id="ann-21">21</div></div>
+        <div class="instr-cat-label">SNS 마케팅</div>
+        <div class="instructor-grid">
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 5</div><div class="i-role">인스타그램 · 릴스</div><span class="i-tag">SNS</span></div></div>
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 6</div><div class="i-role">유튜브 채널 운영</div><span class="i-tag">SNS</span></div></div>
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 7</div><div class="i-role">퍼스널 브랜딩</div><span class="i-tag">SNS</span></div></div>
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 8</div><div class="i-role">블로그 · 애드센스</div><span class="i-tag">SNS</span></div></div>
+        </div>
+      </div>
+
+      <div class="instr-category-block ann-host">
+        <div class="ann" onclick="activateAnn(22)"><div class="ann-bubble" id="ann-22">22</div></div>
+        <div class="instr-cat-label">커머스</div>
+        <div class="instructor-grid">
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 9</div><div class="i-role">쿠팡 로켓배송</div><span class="i-tag">커머스</span></div></div>
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 10</div><div class="i-role">스마트스토어</div><span class="i-tag">커머스</span></div></div>
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 11</div><div class="i-role">해외직구 · 셀링</div><span class="i-tag">커머스</span></div></div>
+          <div class="instructor-card empty"></div>
+        </div>
+      </div>
+
+      <div class="instr-category-block ann-host">
+        <div class="ann" onclick="activateAnn(23)"><div class="ann-bubble" id="ann-23">23</div></div>
+        <div class="instr-cat-label">디자인 / 영상</div>
+        <div class="instructor-grid">
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 12</div><div class="i-role">영상 편집 수익화</div><span class="i-tag">영상</span></div></div>
+          <div class="instructor-card"><div class="i-photo">👤</div><div class="i-info"><div class="i-name">강사명 13</div><div class="i-role">로고 · 썸네일 디자인</div><span class="i-tag">디자인</span></div></div>
+          <div class="instructor-card empty"></div>
+          <div class="instructor-card empty"></div>
+        </div>
+      </div>
+
+      <div class="btn-more-row">
+        <button class="btn-more">강사 전체 보기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── G. 성과 — 좌측만 STICKY ─── -->
+  <div class="sec-result-wrap">
+    <!-- 좌: 파란 테두리 박스 sticky -->
+    <div class="result-sticky-col ann-host">
+      <div class="s-badge">📌 position:sticky · z-index:50</div>
+      <div class="ann" onclick="activateAnn(24)" style="left:0;"><div class="ann-bubble" id="ann-24">24</div></div>
+      <div class="result-box ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(25)"><div class="ann-bubble" id="ann-25">25</div></div>
+        <div class="result-box-eyebrow">수강생 성과</div>
+        <div class="result-box-heading">실제로 변화를 만든<br>수강생들의 이야기</div>
+        <div class="result-box-body">
+          <p>타이탄클래스가 가는 길이 아니라 실제로 증명합니다.</p>
+          <p>초보부터 직장인, 자영업자까지 수강생들이 실제로 만들어낸 변화 성과들을 그대로 전해드립니다.</p>
+          <p>누구나 같은 길을 걸을 수 있는 가능성을 확인해보세요.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 우: 인물사진 + 인용문 + 수치 (스크롤) -->
+    <div class="result-scroll-col ann-host">
+      <div class="ann" onclick="activateAnn(26)"><div class="ann-bubble" id="ann-26">26</div></div>
+
+      <!-- 인물 사진 -->
+      <div class="result-photo-area ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(27)"><div class="ann-bubble" id="ann-27">27</div></div>
+        📷 수강생 인물 사진 (배경 없는 단독 컷 권장)<br>
+        <small style="font-size:10px;color:#555;">권장: 720×340px</small>
+      </div>
+
+      <!-- 인용문 -->
+      <div class="result-quote-area ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(28)" style="left:-11px;top:-11px;"><div class="ann-bubble" id="ann-28">28</div></div>
+        <div class="result-quote-headline">솔직히 불안했습니다. 나도 가능할까?<br>하지만 정확히 3개월 뒤, 안정적인 수익이 생기기 시작했어요.</div>
+        <div class="result-quote-body">
+          정말이지 저에게도 이런 날이 오다니요.<br>
+          이 일 보는 것, 아무도 믿을 수 없었을 거라 생각하지만,<br>
+          저도 했는데, "누구나 할 수 있습니다."
+        </div>
+      </div>
+
+      <!-- 수치 -->
+      <div class="result-stats ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(29)"><div class="ann-bubble" id="ann-29">29</div></div>
+        <div class="result-stat-item">
+          <div class="result-stat-info">
+            <div class="result-stat-label">누적 결제 수강생</div>
+            <div class="result-stat-desc">유니콘클래스를 선택한 수강생 수</div>
+          </div>
+          <div class="result-stat-num">4만</div>
+        </div>
+        <div class="result-stat-item">
+          <div class="result-stat-info">
+            <div class="result-stat-label">누적 강의 후기</div>
+            <div class="result-stat-desc">수강 후 직접 남긴 수강생 후기 수</div>
+          </div>
+          <div class="result-stat-num">3.7만</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── H. 마무리 CTA ─── -->
+  <div class="sec-final-cta ann-host">
+    <div class="ann" onclick="activateAnn(30)"><div class="ann-bubble" id="ann-30">30</div></div>
+    <div class="final-headline">모든 원하는 성취는,<br>지금 시작합니다.</div>
+    <div class="final-sub">강의를 둘러보고 지금 바로 첫 걸음을 내딛어보세요.</div>
+    <button class="btn-final">강의 보러가기</button>
+  </div>
+
+  <!-- 푸터 -->
+  <div id="footer">
+    <div class="footer-logo">UNICORN CLASS</div>
+    <div class="footer-info">
+      <strong>상호</strong>유니콘클래스&nbsp;&nbsp;
+      <strong>대표</strong>홍길동&nbsp;&nbsp;
+      <strong>사업자등록번호</strong>000-00-00000<br>
+      <strong>주소</strong>서울특별시 OO구 OO로 000&nbsp;&nbsp;
+      <strong>이메일</strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="375f525b477742595e54584559545b564444195458195c45">[email&#160;protected]</a>
+    </div>
+    <div class="footer-links">
+      <a href="#">이용약관</a>
+      <a href="#">개인정보처리방침</a>
+      <a href="#">회사소개</a>
+      <a href="#">고객센터</a>
+    </div>
+    <div class="footer-copy">© 2026 유니콘클래스. All rights reserved.</div>
+  </div>
+
+</div><!-- /screen-wrap -->
+
+<!-- Description 패널 -->
+<div class="desc-panel">
+  <div class="desc-panel-head">📋 화면 설명</div>
+
+  <div class="desc-item" id="desc-1" onclick="activateAnn(1)"><div class="desc-num">1</div><div><div class="desc-label">GNB — 다크 헤더</div><div class="desc-text">회사소개 전용 dark 테마. 회사소개 active. 비로그인 기준.</div><span class="desc-tag t-gray">하드코딩</span></div></div>
+
+  <div class="desc-item" id="desc-2" onclick="activateAnn(2)"><div class="desc-num">2</div><div><div class="desc-label">A. 히어로 — 배경</div><div class="desc-text">전체 배경 이미지 + 어두운 오버레이. "WELCOME TO UNICORN CLASS" 대각선 텍스트는 순수 CSS(-webkit-text-stroke).</div><span class="desc-tag t-red">배경 이미지 필요</span></div></div>
+
+  <div class="desc-item" id="desc-3" onclick="activateAnn(3)"><div class="desc-num">3</div><div><div class="desc-label">A. 히어로 — 헤드카피</div><div class="desc-text">메인 카피 + 서브카피. 하드코딩. 클라이언트 확정 후 교체.</div><span class="desc-tag t-red">카피 확정 필요</span></div></div>
+
+  <div class="desc-item" id="desc-4" onclick="activateAnn(4)"><div class="desc-num">4</div><div><div class="desc-label">B. 회사소개 — STICKY 전체</div><div class="desc-text">position:sticky / top:92px / height:100vh / z-index:10. 좌(45%): eyebrow+대제목+3단 본문+서명 / 우(55%): 대표 사진. 타이탄클래스 Image1 레이아웃과 동일.</div><span class="desc-tag t-sticky">position:sticky</span><span class="desc-tag t-blue">z-index:10</span></div></div>
+
+  <div class="desc-item" id="desc-5" onclick="activateAnn(5)"><div class="desc-num">5</div><div><div class="desc-label">B좌 — eyebrow + 대제목</div><div class="desc-text">빨간 원형 bullet + "대한민국 No.1" eyebrow. 아래 큰 제목 "수익화 교육 플랫폼". 내용 확정 필요.</div><span class="desc-tag t-red">내용 확정 필요</span></div></div>
+
+  <div class="desc-item" id="desc-6" onclick="activateAnn(6)"><div class="desc-num">6</div><div><div class="desc-label">B좌 — 3단 본문</div><div class="desc-text">좌측 영역 하단에 3열 그리드로 본문 텍스트 배치. 각 컬럼당 2~4줄. 하드코딩.</div><span class="desc-tag t-red">내용 확정 필요</span></div></div>
+
+  <div class="desc-item" id="desc-7" onclick="activateAnn(7)"><div class="desc-num">7</div><div><div class="desc-label">B좌 — 대표 서명</div><div class="desc-text">Georgia italic 서명체. 이름 + 직함. 우측 정렬. 3단 본문 아래 border-top으로 구분.</div><span class="desc-tag t-red">이름 확정 필요</span></div></div>
+
+  <div class="desc-item" id="desc-8" onclick="activateAnn(8)"><div class="desc-num">8</div><div><div class="desc-label">B우 — 대표 사진 + 로고</div><div class="desc-text">회의/강의 현장 사진. 우측 55% 전체 채움. 우상단에 유니콘클래스 로고 오버레이. 권장 660×480px.</div><span class="desc-tag t-red">사진 제공 필요</span></div></div>
+
+  <div class="desc-item" id="desc-9" onclick="activateAnn(9)"><div class="desc-num">9</div><div><div class="desc-label">C. 스탯 — STICKY</div><div class="desc-text">position:sticky / z-index:20 / height:100vh. 검정 배경. 헤드카피 + 4개 지표. B 위에 쌓임.</div><span class="desc-tag t-sticky">position:sticky</span><span class="desc-tag t-blue">z-index:20</span></div></div>
+
+  <div class="desc-item" id="desc-10" onclick="activateAnn(10)"><div class="desc-num">10</div><div><div class="desc-label">스탯 4개 지표</div><div class="desc-text">4열 그리드. 흰 숫자 + 빨간 + 기호. 실제 수치로 교체 필요.</div><span class="desc-tag t-red">수치 확정 필요</span></div></div>
+
+  <div class="desc-item" id="desc-11" onclick="activateAnn(11)"><div class="desc-num">11</div><div><div class="desc-label">D. CTA 레드 — STICKY</div><div class="desc-text">position:sticky / z-index:30 / height:100vh. 빨간 배경. 2열 (좌: 굵은 카피 / 우: 보조 설명). C 위에 쌓임.</div><span class="desc-tag t-sticky">position:sticky</span><span class="desc-tag t-blue">z-index:30</span></div></div>
+
+  <div class="desc-item" id="desc-12" onclick="activateAnn(12)"><div class="desc-num">12</div><div><div class="desc-label">CTA — 좌 강조 카피</div><div class="desc-text">굵은 핵심 메시지. 내용 확정 필요.</div><span class="desc-tag t-red">내용 확정 필요</span></div></div>
+
+  <div class="desc-item" id="desc-13" onclick="activateAnn(13)"><div class="desc-num">13</div><div><div class="desc-label">CTA — 우 보조 설명</div><div class="desc-text">서비스 특징 보조 설명. 하드코딩.</div><span class="desc-tag t-gray">하드코딩</span></div></div>
+
+  <div class="desc-item" id="desc-14" onclick="activateAnn(14)"><div class="desc-num">14</div><div><div class="desc-label">E. 비전 — 좌측 STICKY 컬럼</div><div class="desc-text">좌측 컬럼(42%)만 position:sticky / top:92px / height:100vh / z-index:40. 우측 이미지+리스트 스크롤하는 동안 고정.</div><span class="desc-tag t-sticky">position:sticky</span><span class="desc-tag t-blue">z-index:40</span></div></div>
+
+  <div class="desc-item" id="desc-15" onclick="activateAnn(15)"><div class="desc-num">15</div><div><div class="desc-label">비전 — 파란 테두리 박스</div><div class="desc-text">border:2px solid #1a3a5c. 박스 내부: 빨간 bullet eyebrow + 헤딩 + 본문 2단락. 타이탄클래스 Image2 좌측 박스와 동일 구조.</div><span class="desc-tag t-red">내용 확정 필요</span></div></div>
+
+  <div class="desc-item" id="desc-16" onclick="activateAnn(16)"><div class="desc-num">16</div><div><div class="desc-label">비전 — 우측 스크롤 영역</div><div class="desc-text">상단 사진 + 하단 4개 특징 리스트가 세로로 스크롤됨. 좌측 텍스트 박스 고정 상태에서 우측이 움직이는 구조.</div></div></div>
+
+  <div class="desc-item" id="desc-17" onclick="activateAnn(17)"><div class="desc-num">17</div><div><div class="desc-label">비전 우 — 대표 사진</div><div class="desc-text">강의 현장 또는 단체 사진. 권장 680×320px.</div><span class="desc-tag t-red">사진 제공 필요</span></div></div>
+
+  <div class="desc-item" id="desc-18" onclick="activateAnn(18)"><div class="desc-num">18</div><div><div class="desc-label">비전 우 — 4개 특징 리스트</div><div class="desc-text">검증된 커리큘럼 / 전문 강사진 / 맞춤형 케어 시스템 / 성장 지원 커뮤니티. 빨간 제목 + 설명. 타이탄클래스 Image2 우하단 구조.</div><span class="desc-tag t-red">내용 확정 필요</span></div></div>
+
+  <div class="desc-item" id="desc-19" onclick="activateAnn(19)"><div class="desc-num">19</div><div><div class="desc-label">F. 강사진 섹션</div><div class="desc-text">카테고리별 그룹 (AI / SNS / 커머스 / 디자인·영상). 카테고리당 최대 4명. 더보기 → /instructor.</div><span class="desc-tag t-blue">/instructor 이동</span></div></div>
+
+  <div class="desc-item" id="desc-20" onclick="activateAnn(20)"><div class="desc-num">20</div><div><div class="desc-label">강사 — AI 카테고리</div><div class="desc-text">4명. 카드: 인물사진+이름+분야+태그. DB: lc_instructor.</div><span class="desc-tag t-red">데이터 필요</span></div></div>
+  <div class="desc-item" id="desc-21" onclick="activateAnn(21)"><div class="desc-num">21</div><div><div class="desc-label">강사 — SNS 마케팅</div><div class="desc-text">최대 4명. 동일 카드 구조.</div><span class="desc-tag t-red">데이터 필요</span></div></div>
+  <div class="desc-item" id="desc-22" onclick="activateAnn(22)"><div class="desc-num">22</div><div><div class="desc-label">강사 — 커머스</div><div class="desc-text">3명 → 빈 카드 visibility:hidden 처리로 4열 유지.</div><span class="desc-tag t-gray">빈 자리 hidden</span></div></div>
+  <div class="desc-item" id="desc-23" onclick="activateAnn(23)"><div class="desc-num">23</div><div><div class="desc-label">강사 — 디자인/영상</div><div class="desc-text">2명 → 빈 카드 2개 hidden 처리.</div><span class="desc-tag t-gray">빈 자리 hidden</span></div></div>
+
+  <div class="desc-item" id="desc-24" onclick="activateAnn(24)"><div class="desc-num">24</div><div><div class="desc-label">G. 성과 — 좌측 STICKY 컬럼</div><div class="desc-text">좌측 컬럼(38%)만 position:sticky / top:92px / height:100vh / z-index:50. 비전 E섹션과 동일한 파란 테두리 박스 구조. 우측 후기 스크롤 동안 고정.</div><span class="desc-tag t-sticky">position:sticky</span><span class="desc-tag t-blue">z-index:50</span></div></div>
+
+  <div class="desc-item" id="desc-25" onclick="activateAnn(25)"><div class="desc-num">25</div><div><div class="desc-label">성과 — 파란 테두리 박스</div><div class="desc-text">비전과 동일한 border:2px solid #1a3a5c 박스. "실제로 변화를 만든 수강생들의 이야기" + 설명 3단락. 타이탄클래스 Image3 좌측 박스와 동일.</div><span class="desc-tag t-red">내용 확정 필요</span></div></div>
+
+  <div class="desc-item" id="desc-26" onclick="activateAnn(26)"><div class="desc-num">26</div><div><div class="desc-label">성과 — 우측 스크롤 영역</div><div class="desc-text">인물 사진 → 인용문 → 수치 2개 순서로 배치. 타이탄클래스 Image3 우측 구조.</div></div></div>
+
+  <div class="desc-item" id="desc-27" onclick="activateAnn(27)"><div class="desc-num">27</div><div><div class="desc-label">성과 우 — 인물 사진</div><div class="desc-text">수강생 또는 강사 인물 사진. 배경 없는 단독 컷 권장. 권장 720×340px.</div><span class="desc-tag t-red">사진 제공 필요</span></div></div>
+
+  <div class="desc-item" id="desc-28" onclick="activateAnn(28)"><div class="desc-num">28</div><div><div class="desc-label">성과 우 — 수강생 인용문</div><div class="desc-text">굵은 헤드라인 인용 + 본문 인용. 실제 수강생 후기 사용. 타이탄클래스 Image3 인용문 동일 구조.</div><span class="desc-tag t-red">실제 후기 필요</span></div></div>
+
+  <div class="desc-item" id="desc-29" onclick="activateAnn(29)"><div class="desc-num">29</div><div><div class="desc-label">성과 우 — 수치 2개 (4만 / 3.7만)</div><div class="desc-text">누적 결제 수강생 / 누적 강의 후기. 레이블+설명 좌측 / 큰 숫자 우측 정렬. 실제 수치로 교체 필요. 타이탄클래스 Image3 하단 수치 동일 구조.</div><span class="desc-tag t-red">수치 확정 필요</span></div></div>
+
+  <div class="desc-item" id="desc-30" onclick="activateAnn(30)"><div class="desc-num">30</div><div><div class="desc-label">H. 마무리 CTA</div><div class="desc-text">빨간 배경. 버튼 → /class. 하드코딩.</div><span class="desc-tag t-blue">/class 이동</span><span class="desc-tag t-gray">하드코딩</span></div></div>
+
+</div><!-- /desc-panel -->
+</div><!-- /page-wrap -->
+
+<script>
+function activateAnn(num) {
+  const bubble = document.getElementById('ann-' + num);
+  const isActive = bubble && bubble.classList.contains('active');
+
+  // 전체 초기화
+  document.querySelectorAll('.ann-bubble.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.ann-host.active-host').forEach(el => el.classList.remove('active-host'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+
+  if (isActive) return; // 토글 off
+
+  if (bubble) {
+    bubble.classList.add('active');
+    const host = bubble.closest('.ann-host');
+    if (host) {
+      host.classList.add('active-host');
+      const HEADER_H = 92;
+      const rect = host.getBoundingClientRect();
+      window.scrollTo({ top: window.scrollY + rect.top - HEADER_H - 24, behavior: 'smooth' });
+      host.style.outline = '2.5px solid #e74c3c';
+      host.style.outlineOffset = '4px';
+      host.style.borderRadius = '4px';
+      setTimeout(() => { host.style.outline = ''; host.style.outlineOffset = ''; }, 1800);
+    }
+  }
+
+  const descItem = document.getElementById('desc-' + num);
+  if (descItem) {
+    descItem.classList.add('active');
+    const panel = descItem.closest('.desc-panel');
+    if (panel) {
+      const headH = panel.querySelector('.desc-panel-head')?.offsetHeight || 0;
+      panel.scrollTo({ top: descItem.offsetTop - headH - 8, behavior: 'smooth' });
+    }
+  }
+}
+</script>
+</body>
+</html>

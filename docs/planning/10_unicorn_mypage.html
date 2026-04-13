@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유니콘클래스 — 마이페이지</title>
+<link rel="stylesheet" href="./noto-sans.css" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+/* ══ 마이페이지 공통 레이아웃 */
+.mp-wrap { display:flex; align-items:flex-start; min-height:600px; background:#f5f6f8; overflow:visible; }
+.mp-sidebar { width:220px; flex-shrink:0; background:#fff; border-right:1px solid #eee; padding:28px 0; overflow:visible; }
+.mp-user-area { padding:0 20px 20px; border-bottom:1px solid #f0f0f0; margin-bottom:8px; }
+.mp-user-avatar { width:48px; height:48px; border-radius:50%; background:#1a3a5c; display:flex; align-items:center; justify-content:center; font-size:18px; color:#fff; font-weight:700; margin-bottom:10px; }
+.mp-user-name { font-size:14px; font-weight:700; color:#111; margin-bottom:2px; }
+.mp-user-id { font-size:11px; color:#aaa; }
+.mp-nav { padding:0; }
+.mp-nav-item { display:flex; align-items:center; gap:8px; padding:11px 20px; font-size:13px; font-weight:500; color:#555; cursor:pointer; transition:all .15s; border-left:3px solid transparent; }
+.mp-nav-item:hover { background:#f9f9f9; color:#c0392b; }
+.mp-nav-item.active { background:#fff5f5; color:#c0392b; font-weight:700; border-left-color:#c0392b; }
+.mp-nav-icon { font-size:14px; width:18px; text-align:center; }
+.mp-nav-divider { height:1px; background:#f0f0f0; margin:8px 0; }
+.mp-nav-logout { color:#999 !important; }
+.mp-nav-badge { margin-left:auto; background:#c0392b; color:#fff; font-size:9px; font-weight:700; padding:1px 6px; border-radius:10px; }
+.mp-content { flex:1; min-width:0; padding:28px 32px; overflow:visible; }
+.mp-content-title { font-size:18px; font-weight:800; color:#111; margin-bottom:24px; padding-bottom:16px; border-bottom:2px solid #111; display:flex; align-items:center; justify-content:space-between; }
+.mp-content-title span { font-size:12px; font-weight:400; color:#aaa; }
+
+/* ══ 나의강의 */
+.my-class-tabs { display:flex; gap:0; margin-bottom:20px; border-bottom:2px solid #eee; overflow:visible; }
+.my-class-tab { padding:0 16px; height:40px; font-size:13px; font-weight:500; color:#999; border-bottom:2px solid transparent; margin-bottom:-2px; cursor:pointer; }
+.my-class-tab.active { color:#c0392b; font-weight:700; border-bottom-color:#c0392b; }
+.class-card-list { display:flex; flex-direction:column; gap:20px; }
+.class-card { background:#fff; border-radius:10px; border:1px solid #eee; display:flex; gap:0; transition:box-shadow .15s; overflow:visible; }
+.class-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); }
+.class-card-thumb-wrap { width:160px; height:110px; flex-shrink:0; border-radius:10px 0 0 10px; overflow:hidden; position:relative; background:linear-gradient(135deg,#1a2534,#2d4060); display:flex; align-items:center; justify-content:center; font-size:28px; color:rgba(255,255,255,0.3); }
+.thumb-badge { position:absolute; top:8px; left:8px; background:#c0392b; color:#fff; font-size:9px; font-weight:700; padding:2px 7px; border-radius:3px; z-index:1; }
+.thumb-badge.free { background:#27ae60; }
+.class-card-body { flex:1; padding:14px 18px; display:flex; flex-direction:column; gap:6px; }
+.class-card-title { font-size:14px; font-weight:700; color:#111; line-height:1.4; }
+.class-card-instructor { font-size:11px; color:#aaa; }
+.class-card-progress { margin-top:4px; }
+.progress-label { display:flex; justify-content:space-between; font-size:11px; color:#888; margin-bottom:4px; }
+.progress-bar { height:4px; background:#f0f0f0; border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; background:#c0392b; border-radius:2px; }
+.class-card-meta { font-size:11px; color:#aaa; margin-top:2px; }
+.class-card-actions { display:flex; align-items:center; gap:8px; margin-top:auto; padding-top:8px; }
+.btn-vimeo { height:34px; padding:0 14px; background:#1a1a1a; color:#fff; border-radius:6px; font-size:12px; font-weight:700; display:flex; align-items:center; gap:5px; }
+.btn-kakao-sm { height:34px; padding:0 14px; background:#FEE500; color:#3A1D1D; border-radius:6px; font-size:12px; font-weight:700; display:flex; align-items:center; gap:5px; }
+.btn-extend { height:34px; padding:0 14px; background:#1a3a5c; color:#fff; border-radius:6px; font-size:12px; font-weight:700; display:flex; align-items:center; gap:5px; }
+.btn-extend-disabled { height:34px; padding:0 14px; background:#f0f0f0; color:#aaa; border-radius:6px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:5px; cursor:default; }
+.class-expired { font-size:11px; color:#e74c3c; font-weight:600; margin-top:2px; }
+.class-expired-closed { font-size:11px; color:#aaa; font-weight:500; margin-top:2px; }
+
+/* ══ 찜목록 */
+.wish-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.wish-card { background:#fff; border-radius:10px; border:1px solid #eee; overflow:visible; position:relative; }
+.wish-thumb { height:120px; background:linear-gradient(135deg,#1a2534,#2d4060); display:flex; align-items:center; justify-content:center; font-size:24px; color:rgba(255,255,255,0.2); position:relative; border-radius:10px 10px 0 0; overflow:hidden; }
+.wish-remove { position:absolute; top:8px; right:8px; width:24px; height:24px; border-radius:50%; background:rgba(0,0,0,0.5); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; cursor:pointer; z-index:2; }
+.wish-info { padding:12px; }
+.wish-title { font-size:13px; font-weight:700; color:#111; margin-bottom:4px; line-height:1.4; }
+.wish-price { font-size:14px; font-weight:800; color:#c0392b; margin-bottom:8px; }
+.wish-price .origin { font-size:11px; color:#bbb; text-decoration:line-through; margin-left:4px; font-weight:400; }
+.wish-price.free-tag { color:#27ae60; }
+.wish-btns { display:flex; gap:6px; }
+.btn-cart { flex:1; height:32px; background:#f5f5f5; color:#333; border-radius:5px; font-size:11px; font-weight:600; }
+.btn-buy { flex:1; height:32px; background:#c0392b; color:#fff; border-radius:5px; font-size:11px; font-weight:600; }
+.wish-enrolled-badge { display:flex; align-items:center; justify-content:center; gap:5px; height:32px; background:#edf7f0; color:#27ae60; border-radius:5px; font-size:11px; font-weight:700; }
+.wish-purchased-badge { display:flex; align-items:center; justify-content:center; gap:5px; height:32px; background:#eef3f9; color:#1a3a5c; border-radius:5px; font-size:11px; font-weight:700; }
+
+/* ══ 결제내역 */
+.order-list { display:flex; flex-direction:column; gap:12px; }
+.order-item { background:#fff; border-radius:10px; border:1px solid #eee; padding:16px 20px; overflow:visible; }
+.order-item-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.order-date { font-size:11px; color:#aaa; }
+.order-status { font-size:11px; font-weight:700; padding:3px 8px; border-radius:3px; }
+.order-status.paid { background:#edf7f0; color:#27ae60; }
+.order-status.refunded { background:#f0f0f0; color:#888; }
+.order-status.refund-req { background:#fef0ee; color:#e74c3c; }
+.order-item-body { display:flex; align-items:center; gap:14px; }
+.order-thumb { width:72px; height:50px; background:linear-gradient(135deg,#1a2534,#2d4060); border-radius:5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:16px; color:rgba(255,255,255,0.2); }
+.order-info { flex:1; }
+.order-class-title { font-size:13px; font-weight:700; color:#111; margin-bottom:3px; }
+.order-class-type { font-size:11px; color:#aaa; }
+.order-amount { font-size:15px; font-weight:800; color:#111; text-align:right; flex-shrink:0; }
+.order-amount .free { color:#27ae60; font-size:13px; }
+.order-item-footer { margin-top:12px; padding-top:10px; border-top:1px solid #f0f0f0; display:flex; justify-content:flex-end; gap:8px; }
+.btn-order-detail { height:30px; padding:0 12px; background:#f5f5f5; color:#555; border-radius:4px; font-size:11px; font-weight:600; }
+.btn-refund { height:30px; padding:0 12px; background:#fff; color:#e74c3c; border:1px solid #e74c3c; border-radius:4px; font-size:11px; font-weight:600; }
+
+/* ══ 결제내역 상세 */
+.order-detail-header { background:#fff; border-radius:10px; border:1px solid #eee; padding:20px; margin-bottom:16px; display:flex; gap:16px; overflow:visible; }
+.od-thumb { width:100px; height:70px; background:linear-gradient(135deg,#1a2534,#2d4060); border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; color:rgba(255,255,255,0.2); }
+.od-info { flex:1; }
+.od-title { font-size:15px; font-weight:800; color:#111; margin-bottom:4px; }
+.od-type-badge { display:inline-block; padding:2px 8px; border-radius:3px; font-size:10px; font-weight:700; margin-bottom:8px; }
+.od-type-badge.premium { background:#fef0ee; color:#c0392b; }
+.od-type-badge.free { background:#edf7f0; color:#27ae60; }
+.od-meta { font-size:11px; color:#aaa; }
+.detail-section { background:#fff; border-radius:10px; border:1px solid #eee; padding:20px; margin-bottom:16px; overflow:visible; }
+.detail-section-title { font-size:13px; font-weight:700; color:#333; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #f0f0f0; }
+.detail-row { display:flex; padding:8px 0; border-bottom:1px solid #f9f9f9; }
+.detail-row:last-child { border-bottom:none; }
+.detail-label { width:120px; font-size:12px; color:#888; flex-shrink:0; }
+.detail-value { font-size:12px; color:#333; font-weight:500; }
+.detail-value.amount { color:#c0392b; font-weight:700; font-size:14px; }
+.refund-policy-box { background:#fef9f9; border:1px solid #f5c6c6; border-radius:6px; padding:14px 16px; margin-bottom:16px; font-size:12px; color:#c0392b; line-height:1.8; }
+.refund-policy-box strong { display:block; margin-bottom:4px; font-size:13px; }
+.btn-refund-apply { width:100%; height:46px; background:#e74c3c; color:#fff; border-radius:8px; font-size:14px; font-weight:700; margin-bottom:8px; }
+.btn-back-list { width:100%; height:40px; background:#f5f5f5; color:#555; border-radius:8px; font-size:13px; font-weight:600; }
+
+/* ══ 장바구니 */
+.cart-list { margin-bottom:20px; overflow:visible; }
+.cart-header { display:flex; align-items:center; gap:10px; padding:12px 16px; background:#fff; border-radius:8px 8px 0 0; border:1px solid #eee; border-bottom:none; }
+.cart-check-all { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:#333; cursor:pointer; }
+.cbox { width:18px; height:18px; border-radius:4px; border:2px solid #ddd; background:#fff; flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.cbox.checked { background:#c0392b; border-color:#c0392b; }
+.cbox.checked::after { content:'✓'; color:#fff; font-size:11px; font-weight:700; }
+.cart-del-sel { margin-left:auto; font-size:12px; color:#aaa; cursor:pointer; text-decoration:underline; }
+.cart-item { background:#fff; border:1px solid #eee; border-top:none; display:flex; align-items:center; gap:14px; padding:14px 16px; overflow:visible; }
+.cart-item:last-child { border-radius:0 0 8px 8px; }
+.cart-thumb { width:80px; height:56px; background:linear-gradient(135deg,#1a2534,#2d4060); border-radius:5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:16px; color:rgba(255,255,255,0.2); }
+.cart-info { flex:1; }
+.cart-title { font-size:13px; font-weight:700; color:#111; margin-bottom:3px; }
+.cart-type { font-size:11px; color:#aaa; }
+.cart-price { text-align:right; flex-shrink:0; }
+.cart-price .sale { font-size:15px; font-weight:800; color:#c0392b; }
+.cart-price .origin { font-size:11px; color:#bbb; text-decoration:line-through; }
+.cart-remove { font-size:16px; color:#ccc; cursor:pointer; padding:4px; }
+.cart-summary { background:#fff; border-radius:10px; border:1px solid #eee; padding:20px; overflow:visible; }
+.cart-summary-title { font-size:14px; font-weight:700; color:#111; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f0f0f0; }
+.cart-summary-row { display:flex; justify-content:space-between; font-size:13px; color:#555; margin-bottom:10px; }
+.cart-summary-row.total { font-size:16px; font-weight:800; color:#111; margin-top:14px; padding-top:14px; border-top:2px solid #111; }
+.btn-checkout { width:100%; height:50px; background:#c0392b; color:#fff; border-radius:8px; font-size:15px; font-weight:700; margin-top:16px; }
+.toss-note { text-align:center; font-size:11px; color:#aaa; margin-top:8px; }
+
+/* ══ 1:1 문의 */
+.qna-filter { display:flex; gap:8px; margin-bottom:16px; overflow:visible; }
+.qna-filter-btn { padding:5px 14px; border-radius:20px; border:1px solid #ddd; background:#fff; font-size:12px; font-weight:500; color:#888; cursor:pointer; font-family:inherit; }
+.qna-filter-btn.active { background:#1a3a5c; border-color:#1a3a5c; color:#fff; }
+.qna-write-btn { margin-left:auto; height:36px; padding:0 18px; background:#1a3a5c; color:#fff; border-radius:6px; font-size:12px; font-weight:700; }
+.qna-list { border-top:2px solid #222; margin-bottom:20px; }
+.qna-item { border-bottom:1px solid #eee; padding:14px 0; display:flex; align-items:flex-start; gap:12px; cursor:pointer; overflow:visible; }
+.qna-item:hover .qna-title { color:#c0392b; }
+.qna-status { flex-shrink:0; padding:3px 8px; border-radius:3px; font-size:10px; font-weight:700; margin-top:2px; }
+.qna-status.wait { background:#fef0ee; color:#e74c3c; }
+.qna-status.done { background:#edf7f0; color:#27ae60; }
+.qna-body { flex:1; }
+.qna-cat { font-size:10px; color:#aaa; margin-bottom:3px; }
+.qna-title { font-size:13px; font-weight:600; color:#111; transition:color .15s; }
+.qna-date { font-size:11px; color:#bbb; margin-top:3px; }
+.qna-action { flex-shrink:0; }
+.btn-qna-del { height:26px; padding:0 10px; background:#fff; color:#e74c3c; border:1px solid #e74c3c; border-radius:4px; font-size:10px; font-weight:600; }
+
+/* 문의 상세 */
+.qna-detail-box { background:#fff; border-radius:10px; border:1px solid #eee; overflow:visible; }
+.qna-detail-head { padding:18px 20px; border-bottom:1px solid #f0f0f0; overflow:visible; }
+.qna-detail-cat { font-size:11px; color:#aaa; margin-bottom:4px; }
+.qna-detail-title { font-size:15px; font-weight:800; color:#111; margin-bottom:8px; }
+.qna-detail-meta { font-size:11px; color:#bbb; display:flex; gap:12px; }
+.qna-detail-body { padding:18px 20px; font-size:13px; color:#444; line-height:1.9; border-bottom:1px solid #f0f0f0; }
+.qna-answer-area { padding:18px 20px; background:#f9f9f9; border-radius:0 0 10px 10px; overflow:visible; }
+.qna-answer-label { font-size:11px; font-weight:700; color:#1a3a5c; letter-spacing:0.5px; margin-bottom:10px; }
+.qna-answer-text { font-size:13px; color:#444; line-height:1.9; }
+.qna-no-answer { font-size:12px; color:#bbb; font-style:italic; }
+.qna-detail-footer { padding:14px 20px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f0f0f0; }
+
+/* 문의 작성/수정 폼 */
+.qna-form-wrap { background:#fff; border-radius:10px; border:1px solid #eee; padding:24px; overflow:visible; }
+.qna-form-title { font-size:14px; font-weight:700; color:#111; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid #f0f0f0; }
+.form-field { margin-bottom:14px; overflow:visible; }
+.form-label { font-size:12px; font-weight:600; color:#555; margin-bottom:6px; display:block; }
+.form-label .req { color:#c0392b; margin-left:2px; }
+.form-select { width:100%; height:42px; border:1px solid #e0e0e0; border-radius:8px; padding:0 12px; font-size:13px; font-family:inherit; color:#333; outline:none; }
+.form-select:focus { border-color:#1a3a5c; }
+.form-input { width:100%; height:42px; border:1px solid #e0e0e0; border-radius:8px; padding:0 14px; font-size:13px; font-family:inherit; color:#333; outline:none; }
+.form-input:focus { border-color:#1a3a5c; }
+.form-textarea { width:100%; height:140px; border:1px solid #e0e0e0; border-radius:8px; padding:12px 14px; font-size:13px; font-family:inherit; color:#333; outline:none; resize:vertical; }
+.form-textarea:focus { border-color:#1a3a5c; }
+.form-file { width:100%; height:42px; border:1px dashed #ddd; border-radius:8px; padding:0 14px; font-size:12px; font-family:inherit; color:#aaa; background:#fafafa; display:flex; align-items:center; cursor:pointer; }
+.btn-qna-submit { height:46px; padding:0 32px; background:#1a3a5c; color:#fff; border-radius:8px; font-size:14px; font-weight:700; }
+.btn-qna-cancel { height:46px; padding:0 24px; background:#f5f5f5; color:#555; border-radius:8px; font-size:14px; font-weight:600; }
+
+/* ══ 정보수정 */
+.profile-form { background:#fff; border-radius:10px; border:1px solid #eee; padding:24px; margin-bottom:16px; overflow:visible; }
+.profile-section-title { font-size:13px; font-weight:700; color:#333; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid #f0f0f0; display:flex; align-items:center; gap:6px; }
+.profile-section-title::before { content:''; width:3px; height:14px; background:#c0392b; border-radius:2px; flex-shrink:0; }
+.profile-field { margin-bottom:16px; overflow:visible; }
+.profile-label { font-size:12px; font-weight:600; color:#555; margin-bottom:6px; display:block; }
+.profile-label .req { color:#c0392b; margin-left:2px; }
+.profile-label .note { font-size:11px; color:#aaa; font-weight:400; margin-left:4px; }
+.profile-input { width:100%; height:44px; border:1px solid #e0e0e0; border-radius:8px; padding:0 14px; font-size:13px; font-family:inherit; color:#333; outline:none; transition:border-color .15s; }
+.profile-input:focus { border-color:#1a3a5c; }
+.profile-input:disabled { background:#f8f8f8; color:#bbb; }
+.profile-input-wrap { position:relative; overflow:visible; }
+.profile-input-wrap .eye-btn { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#bbb; font-size:15px; }
+.input-msg { font-size:11px; margin-top:4px; padding-left:2px; }
+.input-msg.success { color:#27ae60; }
+.input-msg.error { color:#e74c3c; }
+.input-row { display:flex; gap:8px; overflow:visible; }
+.input-row .profile-input { flex:1; }
+.btn-verify { height:44px; padding:0 14px; background:#555; color:#fff; border-radius:8px; font-size:12px; font-weight:700; white-space:nowrap; flex-shrink:0; }
+.agree-row { display:flex; align-items:center; gap:8px; padding:8px 0; cursor:pointer; }
+.agree-label { font-size:13px; color:#444; flex:1; }
+.agree-label .opt { font-size:11px; color:#aaa; margin-left:4px; }
+.btn-save-profile { width:100%; height:50px; background:#1a3a5c; color:#fff; border-radius:8px; font-size:15px; font-weight:700; margin-top:4px; }
+
+/* ══ 로그아웃 / 탈퇴 모달 */
+.logout-screen { background:radial-gradient(ellipse at center, #6b6b6b 0%, #4a4a4a 40%, #3a3a3a 100%); display:flex; align-items:center; justify-content:center; padding:80px 20px; }
+.logout-modal { background:#fff; border-radius:16px; width:360px; padding:36px 32px 28px; box-shadow:0 20px 60px rgba(0,0,0,0.35); text-align:center; overflow:visible; }
+.logout-icon { font-size:40px; margin-bottom:16px; }
+.logout-title { font-size:18px; font-weight:800; color:#1a1a1a; margin-bottom:8px; }
+.logout-desc { font-size:13px; color:#888; line-height:1.7; margin-bottom:28px; }
+.logout-btns { display:flex; gap:10px; }
+.btn-logout-confirm { flex:1; height:48px; background:#c0392b; color:#fff; border-radius:8px; font-size:14px; font-weight:700; }
+.btn-logout-cancel { flex:1; height:48px; background:#f5f5f5; color:#555; border-radius:8px; font-size:14px; font-weight:600; }
+
+/* 탈퇴 팝업 — 별도 배경 */
+.withdraw-screen { background:radial-gradient(ellipse at center, #6b6b6b 0%, #4a4a4a 40%, #3a3a3a 100%); display:flex; align-items:center; justify-content:center; padding:80px 20px; position:relative; }
+.withdraw-modal { background:#fff; border-radius:16px; width:400px; padding:36px 32px 28px; box-shadow:0 20px 60px rgba(0,0,0,0.35); text-align:center; overflow:visible; border-top:4px solid #e74c3c; }
+.withdraw-icon { font-size:36px; margin-bottom:12px; }
+.withdraw-title { font-size:18px; font-weight:800; color:#e74c3c; margin-bottom:8px; }
+.withdraw-desc { font-size:12px; color:#888; line-height:1.9; margin-bottom:20px; text-align:left; background:#fef9f9; border-radius:6px; padding:12px 14px; border:1px solid #f5c6c6; }
+.withdraw-desc li { padding-left:4px; margin-bottom:4px; }
+.withdraw-confirm-input { width:100%; height:44px; border:1px solid #e0e0e0; border-radius:8px; padding:0 14px; font-size:13px; font-family:inherit; outline:none; margin-bottom:20px; text-align:center; }
+.withdraw-confirm-input:focus { border-color:#e74c3c; }
+.btn-withdraw-confirm { flex:1; height:48px; background:#e74c3c; color:#fff; border-radius:8px; font-size:14px; font-weight:700; }
+.btn-withdraw-cancel { flex:1; height:48px; background:#f5f5f5; color:#555; border-radius:8px; font-size:14px; font-weight:600; }
+
+/* ══ 유틸 */
+.badge-free { display:inline-block; padding:2px 7px; background:#edf7f0; color:#27ae60; font-size:10px; font-weight:700; border-radius:3px; }
+.badge-premium { display:inline-block; padding:2px 7px; background:#fef0ee; color:#c0392b; font-size:10px; font-weight:700; border-radius:3px; }
+.flex-end { display:flex; justify-content:flex-end; gap:8px; }
+.mt-16 { margin-top:16px; }
+.mt-24 { margin-top:24px; }
+
+/* ══ 페이지네이션 공통 */
+.mp-pager { display:flex; align-items:center; justify-content:center; gap:4px; margin-top:28px; padding-bottom:8px; overflow:visible; }
+.mp-pg-btn { width:32px; height:32px; border-radius:6px; border:1px solid #e0e0e0; background:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:500; color:#888; cursor:pointer; font-family:inherit; transition:all .15s; }
+.mp-pg-btn:hover:not(.active):not(.disabled) { border-color:#c0392b; color:#c0392b; }
+.mp-pg-btn.active { background:#c0392b; border-color:#c0392b; color:#fff; font-weight:700; }
+.mp-pg-btn.disabled { color:#ddd; border-color:#f0f0f0; cursor:default; pointer-events:none; }
+.mp-pg-arrow { width:32px; height:32px; border-radius:6px; border:1px solid #e0e0e0; background:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; color:#aaa; cursor:pointer; font-family:inherit; transition:all .15s; }
+.mp-pg-arrow:hover { border-color:#555; color:#555; }
+.mp-pg-arrow.disabled { color:#ddd; border-color:#f0f0f0; cursor:default; }
+</style>
+</head>
+<body>
+
+<!-- ══ 기획서 헤더 ══ -->
+<div class="doc-header">
+  <div>
+    <div class="doc-proj">Project — 유니콘클래스 기획서 v3.0</div>
+    <div class="doc-title">마이페이지</div>
+  </div>
+</div>
+
+<!-- ══ 탭 네비 ══ -->
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <div class="tab-btn" onclick="location.href='./'">메인</div>
+    <div class="tab-btn" onclick="location.href='./02_unicorn_login.html'">로그인 / 회원가입</div>
+    <div class="tab-btn" onclick="location.href='./03_unicorn_class_list.html'">클래스 리스트</div>
+    <div class="tab-btn" onclick="location.href='./04_unicorn_class_detail.html'">클래스 상세</div>
+	<div class="tab-btn" onclick="location.href='./05_unicorn_class_vimeo_player.html'">영상 화면</div>
+	<div class="tab-btn" onclick="location.href='./06_unicorn_about.html'">회사소개</div>
+	<div class="tab-btn" onclick="location.href='./07_unicorn_instructor.html'">강사 리스트</div>
+	<div class="tab-btn" onclick="location.href='./08_unicorn_instructor_detail.html'">강사 상세</div>
+	<div class="tab-btn" onclick="location.href='./12_unicorn_instructor_apply.html'">강사 지원</div>
+	<div class="tab-btn" onclick="location.href='./09_unicorn_support.html'">고객센터</div>
+    <div class="tab-btn active" onclick="location.href='./10_unicorn_mypage.html'">마이페이지</div>
+	<div class="tab-btn" onclick="location.href='./11_unicorn_search.html'">검색결과</div>
+  </div>
+</nav>
+
+<!-- ══ 2뎁스 서브탭 ══ -->
+<div class="sub-tab-nav">
+  <div class="sub-tab-btn active"  onclick="showSection('my-class')">나의 강의</div>
+  <div class="sub-tab-btn"         onclick="showSection('wishlist')">찜목록</div>
+  <div class="sub-tab-btn"         onclick="showSection('orders')">결제내역</div>
+  <div class="sub-tab-btn"         onclick="showSection('order-detail')">결제내역 상세</div>
+  <!--div class="sub-tab-btn"         onclick="showSection('cart')">장바구니</div-->
+  <div class="sub-tab-btn"         onclick="showSection('qna-list')">1:1 문의 목록</div>
+  <div class="sub-tab-btn"         onclick="showSection('qna-detail')">1:1 문의 상세</div>
+  <div class="sub-tab-btn"         onclick="showSection('qna-write')">1:1 문의 작성</div>
+  <div class="sub-tab-btn"         onclick="showSection('review-list')">후기 목록</div>
+  <div class="sub-tab-btn"         onclick="showSection('review-write')">후기 작성&수정</div>
+  <div class="sub-tab-btn"         onclick="showSection('profile')">정보수정</div>
+  <div class="sub-tab-btn"         onclick="showSection('logout')">로그아웃</div>
+  <div class="sub-tab-btn"         onclick="showSection('withdraw')">회원탈퇴</div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 1 · 나의 강의
+════════════════════════════════════ -->
+<div id="panel-my-class" class="section-panel active">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">나의 강의</span><span class="s-url">/mypage/my-class</span><span class="s-desc">수강 목록 + 강의 입장</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div id="site-header" class="ann-host">
+        <div class="ann" style="left:0;top:0;"><div class="ann-bubble" data-ann="mc-1" onclick="activateAnn('mc-1')">1</div></div>
+        <div class="header-inner"><div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div><nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav><div class="header-right"><a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a><div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div><div class="my-btn"><div class="my-avatar">박</div>홍길동님<div class="my-dropdown"><a href="#" class="active">나의 강의</a><a href="#">찜목록</a><a href="#">결제내역</a><!--a href="#">장바구니</a--><a href="#">정보수정</a><a href="#">로그아웃</a></div></div></div></div>
+      </div>
+      <div class="mp-wrap">
+        <div class="ann-host mp-sidebar">
+          <div class="ann" style="left:0;top:0;"><div class="ann-bubble" data-ann="mc-2" onclick="activateAnn('mc-2')">2</div></div>
+          <div class="mp-user-area"><div class="mp-user-avatar">박</div><div class="mp-user-name">홍길동</div><div class="mp-user-id">hong_id</div></div>
+          <nav class="mp-nav">
+            <div class="mp-nav-item active"><span class="mp-nav-icon">📚</span>나의 강의</div>
+            <div class="mp-nav-item"><span class="mp-nav-icon">❤️</span>찜목록</div>
+            <div class="mp-nav-item"><span class="mp-nav-icon">💳</span>결제내역</div>
+            <!--div class="mp-nav-item"><span class="mp-nav-icon">🛒</span>장바구니<span class="mp-nav-badge">2</span></div-->
+            <div class="mp-nav-divider"></div>
+            <div class="mp-nav-item"><span class="mp-nav-icon">💬</span>1:1 문의</div>
+            <div class="mp-nav-item"><span class="mp-nav-icon">⚙️</span>정보수정</div>
+            <div class="mp-nav-divider"></div>
+            <div class="mp-nav-item mp-nav-logout"><span class="mp-nav-icon">🚪</span>로그아웃</div>
+          </nav>
+        </div>
+        <div class="mp-content">
+          <div class="mp-content-title">나의 강의 <span>총 4개</span></div>
+          <div class="ann-host my-class-tabs">
+            <div class="ann"><div class="ann-bubble" data-ann="mc-3" onclick="activateAnn('mc-3')">3</div></div>
+            <div class="my-class-tab active">전체 (4)</div>
+            <div class="my-class-tab">무료강의 (1)</div>
+            <div class="my-class-tab">프리미엄강의 (3)</div>
+          </div>
+          <div class="class-card-list">
+
+            <!-- 프리미엄 수강중 -->
+            <div class="ann-host class-card">
+              <div class="ann"><div class="ann-bubble" data-ann="mc-4" onclick="activateAnn('mc-4')">4</div></div>
+              <div class="class-card-thumb-wrap"><span class="thumb-badge">프리미엄</span>🎬</div>
+              <div class="class-card-body">
+                <div class="class-card-title">스마트스토어 월 1000만원 달성 비법 완전정복</div>
+                <div class="class-card-instructor">강사명 · 커머스</div>
+                <div class="class-card-progress"><div class="progress-label"><span>수강률 42%</span><span>12 / 28강</span></div><div class="progress-bar"><div class="progress-fill" style="width:42%"></div></div></div>
+                <div class="class-card-meta">수강 기간: 2026.02.15 ~ 2026.08.14</div>
+                <div class="class-card-actions">
+                  <button class="btn-vimeo">▶ 강의 보기</button>
+                  <button class="btn-kakao-sm">💬 카카오 오픈채팅 입장</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 프리미엄 만료 + 기간연장 가능 -->
+            <div class="ann-host class-card">
+              <div class="ann"><div class="ann-bubble" data-ann="mc-5" onclick="activateAnn('mc-5')">5</div></div>
+              <div class="class-card-thumb-wrap" style="opacity:.6"><span class="thumb-badge">프리미엄</span>🎬</div>
+              <div class="class-card-body">
+                <div class="class-card-title">AI 자동화로 만드는 월 300만원 부업 시스템</div>
+                <div class="class-card-instructor">강사명 · AI 활용</div>
+                <div class="class-card-progress"><div class="progress-label"><span>수강률 65%</span><span>16 / 24강</span></div><div class="progress-bar"><div class="progress-fill" style="width:65%"></div></div></div>
+                <div class="class-expired">⚠ 수강 기간 만료 (2026.01.01)</div>
+                <div class="class-card-actions">
+                  <button class="btn-vimeo" style="opacity:.4;cursor:default">▶ 강의 보기</button>
+                  <button class="btn-extend">+ 기간 연장</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 프리미엄 만료 + D-day 종료로 연장 불가 -->
+            <div class="ann-host class-card">
+              <div class="ann"><div class="ann-bubble" data-ann="mc-6" onclick="activateAnn('mc-6')">6</div></div>
+              <div class="class-card-thumb-wrap" style="opacity:.4"><span class="thumb-badge">프리미엄</span>🎬</div>
+              <div class="class-card-body">
+                <div class="class-card-title">유튜브 채널 0에서 구독자 10만 달성법</div>
+                <div class="class-card-instructor">강사명 · SNS 마케팅</div>
+                <div class="class-card-progress"><div class="progress-label"><span>수강률 100%</span><span>20 / 20강</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%;background:#27ae60"></div></div></div>
+                <div class="class-expired">⚠ 수강 기간 만료 (2025.12.01)</div>
+                <div class="class-expired-closed">🔒 강의 판매 종료 — 기간 연장 불가</div>
+                <div class="class-card-actions">
+                  <button class="btn-vimeo" style="opacity:.4;cursor:default">▶ 강의 보기</button>
+                  <button class="btn-extend-disabled">연장 불가</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 무료강의 -->
+            <div class="ann-host class-card">
+              <div class="ann"><div class="ann-bubble" data-ann="mc-7" onclick="activateAnn('mc-7')">7</div></div>
+              <div class="class-card-thumb-wrap"><span class="thumb-badge free">무료</span>🎬</div>
+              <div class="class-card-body">
+                <div class="class-card-title">인스타그램 팔로워 1만 만들기 무료 특강</div>
+                <div class="class-card-instructor">강사명 · SNS 마케팅</div>
+                <div class="class-card-meta">수강신청일: 2026.03.10 · 기간 제한 없음</div>
+                <div class="class-card-actions">
+                  <button class="btn-kakao-sm">💬 카카오 오픈채팅 입장</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 나의강의 페이징 -->
+          <div class="ann-host mp-pager">
+            <div class="ann" style="top:-25px;left:50%;transform:translateX(-50%);"><div class="ann-bubble" data-ann="mc-8" onclick="activateAnn('mc-8')">8</div></div>
+            <button class="mp-pg-arrow disabled">‹</button>
+            <button class="mp-pg-btn active">1</button>
+            <button class="mp-pg-btn">2</button>
+            <button class="mp-pg-btn">3</button>
+            <button class="mp-pg-arrow">›</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 나의 강의</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('mc-1')"><div class="desc-num" data-desc="mc-1">1</div><div class="desc-text"><strong>GNB — 로그인 후 상태</strong><br>로그인 버튼 → 아바타+이름 드롭다운 전환<br>드롭다운: 나의강의 / 찜목록 / 결제내역 / 정보수정 / 로그아웃</div></div>
+        <div class="desc-item" onclick="activateAnn('mc-2')"><div class="desc-num" data-desc="mc-2">2</div><div class="desc-text"><strong>마이페이지 사이드바 (공통)</strong><br>전 페이지 공통 컴포넌트<br>현재 페이지 active (빨간 좌측 라인)<!--br>장바구니 뱃지: 실시간 카운트--></div></div>
+        <div class="desc-item" onclick="activateAnn('mc-3')"><div class="desc-num" data-desc="mc-3">3</div><div class="desc-text"><strong>강의 탭 필터</strong><br>전체 / 무료강의 / 프리미엄강의<br>JS 필터링 (프론트 처리)</div></div>
+        <div class="desc-item" onclick="activateAnn('mc-4')"><div class="desc-num" data-desc="mc-4">4</div><div class="desc-text"><strong>프리미엄강의 — 수강중</strong><br>진도율 바 (<code>lc_progress</code>)<br>수강 기간 표시 (<code>lc_enroll.expire_at</code>)<br><strong>강의 보기</strong> → Vimeo 플레이어<br><strong>카카오 오픈채팅 입장</strong> → 오픈채팅 링크 새탭<br><br>📊 <strong>오픈채팅 클릭 추적</strong><br>버튼 클릭 시 <code>lc_openchat_log</code>에 기록<br>저장값: member_idx · class_idx · clicked_at<br>관리자 페이지에서 강의별 클릭 현황 확인 가능</div></div>
+        <div class="desc-item" onclick="activateAnn('mc-5')"><div class="desc-num" data-desc="mc-5">5</div><div class="desc-text"><strong>프리미엄강의 — 만료 / 연장 가능</strong><br>썸네일 opacity 60%, 버튼 비활성<br><strong>기간 연장 버튼</strong> → 해당 강의 클래스 상세 페이지로 이동<br>상세 페이지에서 재구매하면 <code>expire_at</code> 갱신<br><code>lc_class.sale_end_at</code> 기준 D-day 이내일 때만 표시</div></div>
+        <div class="desc-item" onclick="activateAnn('mc-6')"><div class="desc-num" data-desc="mc-6">6</div><div class="desc-text"><strong>프리미엄강의 — 만료 / 연장 불가</strong><br><code>lc_class.sale_end_at</code>이 현재 날짜 이후 → 판매 종료<br>"강의 판매 종료 — 기간 연장 불가" 안내 텍스트<br>연장 버튼 비활성 (회색)<br>버튼 클릭 시 toast: <strong>"해당 강의의 판매가 종료되어 더 이상 구매할 수 없습니다."</strong></div></div>
+        <div class="desc-item" onclick="activateAnn('mc-7')"><div class="desc-num" data-desc="mc-7">7</div><div class="desc-text"><strong>무료강의 — 수강중</strong><br>진도율/수강기간 없음<br><strong>카카오 오픈채팅 입장</strong> → <code>lc_enroll.kakao_url</code> 새탭<br>기간 제한 없음 표시<br><br>📊 <strong>오픈채팅 클릭 추적</strong><br>버튼 클릭 시 <code>lc_openchat_log</code>에 기록<br>저장값: member_idx · class_idx · clicked_at</div></div>
+        <div class="desc-item" onclick="activateAnn('mc-8')"><div class="desc-num" data-desc="mc-8">8</div><div class="desc-text"><strong>페이지네이션</strong><br>페이지당 <strong>10개</strong> 표시<br>총 건수 / 10 올림 = 총 페이지 수<br>API: <code>GET /api/mypage/classes?page=1&limit=10&type=all</code><br>탭 필터(전체/무료/프리미엄) 변경 시 page=1로 초기화</div></div>
+        <div class="desc-item"><div class="desc-num" style="background:#e67e22;cursor:default">i</div><div class="desc-text"><strong>DB</strong><br><code>lc_enroll</code>: enroll_idx, mb_id, class_idx, type, kakao_url, vimeo_url, enrolled_at, expire_at<br><code>lc_progress</code>: enroll_idx, current_ep, total_ep, rate<br><code>lc_class.sale_end_at</code>: 강의 판매 종료일 (D-day 기준)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 2 · 찜목록
+════════════════════════════════════ -->
+<div id="panel-wishlist" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">찜목록</span><span class="s-url">/mypage/wishlist</span><span class="s-desc">찜 강의 목록</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div id="site-header"><div class="header-inner"><div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div><nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav><div class="header-right"><a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a><div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div><div class="my-btn"><div class="my-avatar">박</div>홍길동님</div></div></div></div>
+      <div class="mp-wrap">
+        <div class="mp-sidebar"><div class="mp-user-area"><div class="mp-user-avatar">박</div><div class="mp-user-name">홍길동</div><div class="mp-user-id">hong_id</div></div><nav class="mp-nav"><div class="mp-nav-item"><span class="mp-nav-icon">📚</span>나의 강의</div><div class="mp-nav-item active"><span class="mp-nav-icon">❤️</span>찜목록</div><div class="mp-nav-item"><span class="mp-nav-icon">💳</span>결제내역</div><!--div class="mp-nav-item"><span class="mp-nav-icon">🛒</span>장바구니<span class="mp-nav-badge">2</span></div--><div class="mp-nav-divider"></div><div class="mp-nav-item"><span class="mp-nav-icon">💬</span>1:1 문의</div><div class="mp-nav-item"><span class="mp-nav-icon">⚙️</span>정보수정</div><div class="mp-nav-divider"></div><div class="mp-nav-item mp-nav-logout"><span class="mp-nav-icon">🚪</span>로그아웃</div></nav></div>
+        <div class="mp-content">
+          <div class="mp-content-title">찜목록 <span>총 5개</span></div>
+          <div class="ann-host wish-grid">
+            <div class="ann"><div class="ann-bubble" data-ann="wl-1" onclick="activateAnn('wl-1')">1</div></div>
+
+            <!-- 프리미엄 — 일반 -->
+            <div class="ann-host wish-card">
+              <div class="ann" style="left:5px;top:5px;"><div class="ann-bubble" data-ann="wl-2" onclick="activateAnn('wl-2')">2</div></div>
+              <div class="wish-thumb">🎬<div class="wish-remove">✕</div></div>
+              <div class="wish-info"><div class="wish-title">스마트스토어 월 1000만원 달성 비법</div><div class="wish-price">198,000원 <span class="origin">330,000원</span></div><div class="wish-btns"><!--button class="btn-cart">🛒 장바구니</button--><button class="btn-buy">바로 결제</button></div></div>
+            </div>
+
+            <!-- 무료 — 일반 -->
+            <div class="ann-host wish-card">
+              <div class="ann" style="left:5px;top:5px;"><div class="ann-bubble" data-ann="wl-3" onclick="activateAnn('wl-3')">3</div></div>
+              <div class="wish-thumb">🎬<div class="wish-remove">✕</div></div>
+              <div class="wish-info"><div class="wish-title">인스타그램 팔로워 1만 무료 특강</div><div class="wish-price free-tag">무료</div><div class="wish-btns"><button class="btn-buy" style="background:#27ae60;width:100%">수강 신청</button></div></div>
+            </div>
+
+            <!-- 프리미엄 — 이미 구매(수강중) -->
+            <div class="ann-host wish-card">
+              <div class="ann" style="left:5px;top:5px;"><div class="ann-bubble" data-ann="wl-4" onclick="activateAnn('wl-4')">4</div></div>
+              <div class="wish-thumb" style="opacity:.7">🎬<div class="wish-remove">✕</div></div>
+              <div class="wish-info"><div class="wish-title">AI 자동화 월 300만원 부업 시스템</div><div class="wish-price">148,000원 <span class="origin">250,000원</span></div><div class="wish-btns"><div class="wish-purchased-badge" style="width:100%">✅ 수강 중</div></div></div>
+            </div>
+
+            <!-- 무료 — 이미 신청완료 -->
+            <div class="ann-host wish-card">
+              <div class="ann" style="left:5px;top:5px;"><div class="ann-bubble" data-ann="wl-5" onclick="activateAnn('wl-5')">5</div></div>
+              <div class="wish-thumb" style="opacity:.7">🎬<div class="wish-remove">✕</div></div>
+              <div class="wish-info"><div class="wish-title">블로그 애드센스 수익화 무료 특강</div><div class="wish-price free-tag">무료</div><div class="wish-btns"><div class="wish-enrolled-badge" style="width:100%">✅ 수강신청 완료</div></div></div>
+            </div>
+
+            <!-- 프리미엄 — 판매종료 -->
+            <div class="ann-host wish-card">
+              <div class="ann" style="left:5px;top:5px;"><div class="ann-bubble" data-ann="wl-6" onclick="activateAnn('wl-6')">6</div></div>
+              <div class="wish-thumb" style="opacity:.4">🎬<div class="wish-remove">✕</div></div>
+              <div class="wish-info"><div class="wish-title">쿠팡 파트너스 월 500만원 달성법</div><div class="wish-price" style="color:#aaa">판매 종료</div><div class="wish-btns"><button style="height:32px;width:100%;background:#f0f0f0;color:#aaa;border-radius:5px;font-size:11px;font-weight:600;cursor:default">구매 불가</button></div></div>
+            </div>
+
+          </div>
+
+          <!-- 찜목록 페이징 -->
+          <div class="ann-host mp-pager">
+            <div class="ann" style="top:-25px;left:50%;transform:translateX(-50%);"><div class="ann-bubble" data-ann="wl-7" onclick="activateAnn('wl-7')">7</div></div>
+            <button class="mp-pg-arrow disabled">‹</button>
+            <button class="mp-pg-btn active">1</button>
+            <button class="mp-pg-btn">2</button>
+            <button class="mp-pg-arrow">›</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 찜목록</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('wl-1')"><div class="desc-num" data-desc="wl-1">1</div><div class="desc-text"><strong>찜목록 그리드</strong><br>3열 그리드<br>DB: <code>lc_wishlist</code> (wish_idx, mb_id, class_idx, created_at)<br>각 강의 상태를 join하여 버튼 분기 처리</div></div>
+        <div class="desc-item" onclick="activateAnn('wl-2')"><div class="desc-num" data-desc="wl-2">2</div><div class="desc-text"><strong>프리미엄강의 — 미구매</strong><br>✕ 버튼: 찜 즉시 해제<!--br><strong>장바구니</strong> → <code>lc_cart</code> 추가--><br><strong>바로 결제</strong> → Toss Payments 결제창</div></div>
+        <div class="desc-item" onclick="activateAnn('wl-3')"><div class="desc-num" data-desc="wl-3">3</div><div class="desc-text"><strong>무료강의 — 미신청</strong><br><strong>수강 신청</strong> → 즉시 <code>lc_enroll</code> 등록 + 카카오 링크 공개</div></div>
+        <div class="desc-item" onclick="activateAnn('wl-4')"><div class="desc-num" data-desc="wl-4">4</div><div class="desc-text"><strong>프리미엄강의 — 이미 구매(수강중)</strong><br><code>lc_enroll</code>에 해당 class_idx + mb_id 존재 여부로 판단<br>"✅ 수강 중" 배지 표시, 결제 버튼 숨김<br>✕ 버튼으로 찜 해제는 여전히 가능</div></div>
+        <div class="desc-item" onclick="activateAnn('wl-5')"><div class="desc-num" data-desc="wl-5">5</div><div class="desc-text"><strong>무료강의 — 이미 수강신청 완료</strong><br>"✅ 수강신청 완료" 배지 표시<br>신청 버튼 숨김<br>나의 강의 페이지에서 입장 가능 안내</div></div>
+        <div class="desc-item" onclick="activateAnn('wl-6')"><div class="desc-num" data-desc="wl-6">6</div><div class="desc-text"><strong>강의 판매 종료</strong><br><code>lc_class.sale_end_at</code>이 현재보다 이전인 경우<br>"판매 종료" 텍스트 + "구매 불가" 버튼 비활성<br>썸네일 opacity 40%</div></div>
+        <div class="desc-item" onclick="activateAnn('wl-7')"><div class="desc-num" data-desc="wl-7">7</div><div class="desc-text"><strong>페이지네이션</strong><br>페이지당 <strong>10개</strong> 표시 (3열 그리드 기준 3줄+1개)<br>API: <code>GET /api/mypage/wishlist?page=1&limit=10</code><br>찜 해제 후 해당 페이지 아이템 수가 0이 되면 이전 페이지로 자동 이동</div></div>
+        <div class="desc-item"><div class="desc-num" style="background:#e67e22;cursor:default">i</div><div class="desc-text"><strong>API</strong><br><code>GET /api/mypage/wishlist</code><br>응답에 class 상태(enrolled, purchased, sale_ended) 포함<br><code>DELETE /api/mypage/wishlist/:id</code></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 3 · 결제내역
+════════════════════════════════════ -->
+<div id="panel-orders" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">결제내역</span><span class="s-url">/mypage/orders</span><span class="s-desc">결제 목록 + 상태</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div id="site-header"><div class="header-inner"><div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div><nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav><div class="header-right"><a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a><div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div><div class="my-btn"><div class="my-avatar">박</div>홍길동님</div></div></div></div>
+      <div class="mp-wrap">
+        <div class="mp-sidebar"><div class="mp-user-area"><div class="mp-user-avatar">박</div><div class="mp-user-name">홍길동</div><div class="mp-user-id">hong_id</div></div><nav class="mp-nav"><div class="mp-nav-item"><span class="mp-nav-icon">📚</span>나의 강의</div><div class="mp-nav-item"><span class="mp-nav-icon">❤️</span>찜목록</div><div class="mp-nav-item active"><span class="mp-nav-icon">💳</span>결제내역</div><!--div class="mp-nav-item"><span class="mp-nav-icon">🛒</span>장바구니<span class="mp-nav-badge">2</span></div--><div class="mp-nav-divider"></div><div class="mp-nav-item"><span class="mp-nav-icon">💬</span>1:1 문의</div><div class="mp-nav-item"><span class="mp-nav-icon">⚙️</span>정보수정</div><div class="mp-nav-divider"></div><div class="mp-nav-item mp-nav-logout"><span class="mp-nav-icon">🚪</span>로그아웃</div></nav></div>
+        <div class="mp-content">
+          <div class="mp-content-title">결제내역</div>
+          <div class="ann-host order-list">
+            <div class="ann"><div class="ann-bubble" data-ann="od-1" onclick="activateAnn('od-1')">1</div></div>
+            <div class="ann-host order-item">
+              <div class="ann" style="left:5px;top:5px;"><div class="ann-bubble" data-ann="od-2" onclick="activateAnn('od-2')">2</div></div>
+              <div class="order-item-top"><span class="order-date">2026.03.15 14:32</span><span class="order-status paid">결제완료</span></div>
+              <div class="order-item-body"><div class="order-thumb">🎬</div><div class="order-info"><div class="order-class-title">스마트스토어 월 1000만원 달성 비법 완전정복</div><div class="order-class-type"><span class="badge-premium">프리미엄</span> · 강사명</div></div><div class="order-amount">198,000원</div></div>
+              <div class="order-item-footer"><button class="btn-order-detail">상세보기</button><button class="btn-refund">환불 신청</button></div>
+            </div>
+            <div class="ann-host order-item">
+              <div class="ann" style="left:5px;top:5px;"><div class="ann-bubble" data-ann="od-3" onclick="activateAnn('od-3')">3</div></div>
+              <div class="order-item-top"><span class="order-date">2026.02.01 09:10</span><span class="order-status refund-req">환불신청중</span></div>
+              <div class="order-item-body"><div class="order-thumb">🎬</div><div class="order-info"><div class="order-class-title">AI 자동화로 만드는 월 300만원 부업 시스템</div><div class="order-class-type"><span class="badge-premium">프리미엄</span> · 강사명</div></div><div class="order-amount">148,000원</div></div>
+              <div class="order-item-footer"><button class="btn-order-detail">상세보기</button></div>
+            </div>
+            <div class="ann-host order-item">
+              <div class="ann" style="left:5px;top:5px;"><div class="ann-bubble" data-ann="od-4" onclick="activateAnn('od-4')">4</div></div>
+              <div class="order-item-top"><span class="order-date">2026.03.10 11:20</span><span class="order-status paid">수강신청완료</span></div>
+              <div class="order-item-body"><div class="order-thumb">🎬</div><div class="order-info"><div class="order-class-title">인스타그램 팔로워 1만 만들기 무료 특강</div><div class="order-class-type"><span class="badge-free">무료</span> · 강사명</div></div><div class="order-amount"><span class="free">무료</span></div></div>
+              <div class="order-item-footer"><button class="btn-order-detail">상세보기</button></div>
+            </div>
+            <div class="order-item">
+              <div class="order-item-top"><span class="order-date">2026.01.05 16:44</span><span class="order-status refunded">환불완료</span></div>
+              <div class="order-item-body"><div class="order-thumb" style="opacity:.5">🎬</div><div class="order-info"><div class="order-class-title" style="color:#aaa">유튜브 채널 0에서 10만 달성법</div><div class="order-class-type"><span class="badge-premium">프리미엄</span> · 강사명</div></div><div class="order-amount" style="color:#bbb">128,000원</div></div>
+              <div class="order-item-footer"><button class="btn-order-detail">상세보기</button></div>
+            </div>
+          </div>
+
+          <!-- 결제내역 페이징 -->
+          <div class="ann-host mp-pager">
+            <div class="ann" style="top:-25px;left:50%;transform:translateX(-50%);"><div class="ann-bubble" data-ann="od-5" onclick="activateAnn('od-5')">5</div></div>
+            <button class="mp-pg-arrow disabled">‹</button>
+            <button class="mp-pg-btn active">1</button>
+            <button class="mp-pg-btn">2</button>
+            <button class="mp-pg-btn">3</button>
+            <button class="mp-pg-arrow">›</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 결제내역</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('od-1')"><div class="desc-num" data-desc="od-1">1</div><div class="desc-text"><strong>결제내역 목록</strong><br>최신순 (created_at DESC)<br>DB: <code>lc_order</code> (order_idx, mb_id, class_idx, amount, status, toss_payment_key, created_at)</div></div>
+        <div class="desc-item" onclick="activateAnn('od-2')"><div class="desc-num" data-desc="od-2">2</div><div class="desc-text"><strong>결제완료</strong><br>환불 신청 버튼 조건: <strong>결제 후 7일 이내 + 수강률 33% 미만</strong><br>조건 미충족 시 버튼 숨김</div></div>
+        <div class="desc-item" onclick="activateAnn('od-3')"><div class="desc-num" data-desc="od-3">3</div><div class="desc-text"><strong>환불신청중</strong><br>환불 버튼 없음 (처리 중)<br>관리자 승인 → "환불완료" 변경</div></div>
+        <div class="desc-item" onclick="activateAnn('od-4')"><div class="desc-num" data-desc="od-4">4</div><div class="desc-text"><strong>무료 수강신청</strong><br>금액 "무료" 초록 표시<br>환불 버튼 없음</div></div>
+        <div class="desc-item"><div class="desc-num" style="background:#e67e22;cursor:default">i</div><div class="desc-text"><strong>status 정의</strong><br>paid / refund_req / refunded / free<br>Toss 웹훅으로 자동 갱신</div></div>
+        <div class="desc-item" onclick="activateAnn('od-5')"><div class="desc-num" data-desc="od-5">5</div><div class="desc-text"><strong>페이지네이션</strong><br>페이지당 <strong>10개</strong> 표시, 최신순<br>API: <code>GET /api/mypage/orders?page=1&limit=10</code><br>응답: data[], total, page, limit<br>무료 수강신청 내역 포함 여부는 논의 필요</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 4 · 결제내역 상세
+════════════════════════════════════ -->
+<div id="panel-order-detail" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">결제내역 상세</span><span class="s-url">/mypage/orders/:id</span><span class="s-desc">결제 상세 + 환불 신청</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div id="site-header"><div class="header-inner"><div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div><nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav><div class="header-right"><a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a><div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div><div class="my-btn"><div class="my-avatar">박</div>홍길동님</div></div></div></div>
+      <div class="mp-wrap">
+        <div class="mp-sidebar"><div class="mp-user-area"><div class="mp-user-avatar">박</div><div class="mp-user-name">홍길동</div><div class="mp-user-id">hong_id</div></div><nav class="mp-nav"><div class="mp-nav-item"><span class="mp-nav-icon">📚</span>나의 강의</div><div class="mp-nav-item"><span class="mp-nav-icon">❤️</span>찜목록</div><div class="mp-nav-item active"><span class="mp-nav-icon">💳</span>결제내역</div><!--div class="mp-nav-item"><span class="mp-nav-icon">🛒</span>장바구니<span class="mp-nav-badge">2</span></div--><div class="mp-nav-divider"></div><div class="mp-nav-item"><span class="mp-nav-icon">💬</span>1:1 문의</div><div class="mp-nav-item"><span class="mp-nav-icon">⚙️</span>정보수정</div><div class="mp-nav-divider"></div><div class="mp-nav-item mp-nav-logout"><span class="mp-nav-icon">🚪</span>로그아웃</div></nav></div>
+        <div class="mp-content">
+          <div class="mp-content-title">결제내역 상세</div>
+          <div class="ann-host order-detail-header">
+            <div class="ann"><div class="ann-bubble" data-ann="os-1" onclick="activateAnn('os-1')">1</div></div>
+            <div class="od-thumb">🎬</div>
+            <div class="od-info"><div class="od-title">스마트스토어 월 1000만원 달성 비법 완전정복</div><span class="od-type-badge premium">프리미엄강의</span><div class="od-meta">강사명 &nbsp;|&nbsp; 수강기간: 2026.03.15 ~ 2026.09.14 (180일)</div></div>
+          </div>
+          <div class="ann-host detail-section">
+            <div class="ann"><div class="ann-bubble" data-ann="os-2" onclick="activateAnn('os-2')">2</div></div>
+            <div class="detail-section-title">결제 정보</div>
+            <div class="detail-row"><span class="detail-label">주문번호</span><span class="detail-value">ORDER-20260315-00042</span></div>
+            <div class="detail-row"><span class="detail-label">결제일시</span><span class="detail-value">2026.03.15 14:32:08</span></div>
+            <div class="detail-row"><span class="detail-label">결제수단</span><span class="detail-value">신용카드 (신한카드 1234)</span></div>
+            <div class="detail-row"><span class="detail-label">정가</span><span class="detail-value">330,000원</span></div>
+            <div class="detail-row"><span class="detail-label">할인금액</span><span class="detail-value" style="color:#27ae60">-132,000원 (40%)</span></div>
+            <div class="detail-row"><span class="detail-label">결제금액</span><span class="detail-value amount">198,000원</span></div>
+            <div class="detail-row"><span class="detail-label">PG사</span><span class="detail-value">토스페이먼츠</span></div>
+          </div>
+          <div class="ann-host refund-policy-box">
+            <div class="ann"><div class="ann-bubble" data-ann="os-3" onclick="activateAnn('os-3')">3</div></div>
+            <strong>환불 가능 조건 안내</strong>
+            · 결제일로부터 7일 이내 &amp; 수강률 33% 미만 → <span style="color:#27ae60;font-weight:700;">전액 환불</span><br>
+            · 이후 또는 수강률 33% 이상 → 잔여 수강기간 비례 환불<br>
+            · 현재 수강률: <strong>42%</strong> — <span style="color:#888">잔여 기간 비례 환불 적용</span>
+
+            <!-- 비례환불 계산 예시 -->
+            <div style="margin-top:14px;padding:14px 16px;background:#fff;border:1px solid #f0c0c0;border-radius:8px;">
+              <div style="font-size:12px;font-weight:700;color:#c0392b;margin-bottom:12px;">📊 비례환불 계산 예시</div>
+              <div style="font-size:11.5px;color:#555;line-height:1.6;margin-bottom:12px;">
+                <strong>조건</strong>: 결제금액 198,000원 · 수강기간 180일 · 수강 시작일 2026.03.15 · 환불 신청일 2026.04.15
+              </div>
+              <!-- 계산 표 -->
+              <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:11.5px;margin-bottom:12px;">
+                <span style="color:#888;">전체 수강기간</span><span style="color:#333;font-weight:600;">180일</span>
+                <span style="color:#888;">경과 수강일</span><span style="color:#333;font-weight:600;">31일 (3.15 ~ 4.15)</span>
+                <span style="color:#888;">잔여 수강일</span><span style="color:#333;font-weight:600;">149일</span>
+                <span style="color:#888;">1일당 금액</span><span style="color:#333;font-weight:600;">198,000 ÷ 180 = 1,100원</span>
+                <span style="color:#888;">환불 금액</span><span style="color:#c0392b;font-weight:700;">1,100 × 149 = <u>163,900원</u></span>
+              </div>
+              <div style="padding:8px 12px;background:#fff8e1;border-radius:5px;font-size:11px;color:#7a5800;line-height:1.7;">
+                ⚠ 실제 환불금액은 Toss Payments 정산 기준에 따라 수수료가 공제될 수 있으며,<br>
+                영업일 기준 3~5일 내 원결제 수단으로 환불됩니다.
+              </div>
+            </div>
+          </div>
+
+          <div class="ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="os-4" onclick="activateAnn('os-4')">4</div></div>
+            <button class="btn-refund-apply" onclick="document.getElementById('refund-modal').style.display='flex'">환불 신청하기</button>
+            <button class="btn-back-list">← 결제내역 목록</button>
+          </div>
+
+          <!-- 환불 신청 모달 열린 상태 (정적 화면) -->
+          <div style="margin-top:28px;">
+            <div style="display:inline-block;font-size:12px;font-weight:700;color:#c0392b;padding:5px 12px;background:#fdecea;border-radius:5px;margin-bottom:14px;">💬 환불 신청하기 버튼 클릭 시 — 신청 폼 모달</div>
+          </div>
+          <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px;">
+            <!-- 모달 UI 시각화 -->
+            <div>
+              <div style="background:rgba(0,0,0,0.45);border-radius:12px;padding:16px;width:340px;">
+                <div style="background:#fff;border-radius:12px;padding:22px;position:relative;">
+                  <div style="position:absolute;top:12px;right:14px;font-size:18px;color:#bbb;">✕</div>
+                  <div style="font-size:15px;font-weight:900;color:#1a1a1a;margin-bottom:4px;">환불 신청</div>
+                  <div style="font-size:11px;color:#888;margin-bottom:16px;">스마트스토어 월 1000만원 달성 비법</div>
+                  <!-- 환불 예정 금액 -->
+                  <div style="background:#fef9f9;border:1px solid #f5c6c6;border-radius:8px;padding:12px 14px;margin-bottom:14px;">
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:#888;">결제금액</span><span style="font-weight:600;">198,000원</span></div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:#888;">환불 유형</span><span style="color:#c0392b;font-weight:700;">잔여기간 비례 환불</span></div>
+                    <div style="border-top:1px dashed #f5c6c6;margin:8px 0;"></div>
+                    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:#c0392b;font-weight:700;">예상 환불금액</span><span style="color:#c0392b;font-weight:900;font-size:15px;">163,900원</span></div>
+                  </div>
+                  <!-- 환불 사유 -->
+                  <div style="margin-bottom:12px;">
+                    <div style="font-size:12px;color:#555;font-weight:600;margin-bottom:6px;">환불 사유 <span style="color:#c0392b;">*</span></div>
+                    <select style="width:100%;height:38px;border:1px solid #ddd;border-radius:6px;padding:0 10px;font-size:12px;font-family:inherit;color:#555;">
+                      <option>사유를 선택해 주세요</option>
+                      <option>강의 내용이 기대와 달라요</option>
+                      <option>강의 품질 문제 (영상/음질)</option>
+                      <option>실수로 결제했어요</option>
+                      <option>개인 사정으로 수강이 어려워요</option>
+                      <option>기타</option>
+                    </select>
+                  </div>
+                  <!-- 상세 사유 -->
+                  <div style="margin-bottom:14px;">
+                    <div style="font-size:12px;color:#555;font-weight:600;margin-bottom:6px;">상세 내용 <span style="font-size:11px;color:#bbb;">(선택)</span></div>
+                    <textarea style="width:100%;height:72px;border:1px solid #ddd;border-radius:6px;padding:8px 10px;font-size:12px;resize:none;box-sizing:border-box;font-family:inherit;color:#888;" placeholder="추가 내용을 입력해 주세요"></textarea>
+                  </div>
+                  <div style="font-size:10.5px;color:#aaa;margin-bottom:12px;line-height:1.6;">환불 신청 후 관리자 검토를 거쳐 영업일 기준 3~5일 내 처리됩니다.</div>
+                  <button style="width:100%;height:42px;background:#e74c3c;color:#fff;border-radius:8px;font-size:13px;font-weight:800;">환불 신청하기</button>
+                </div>
+              </div>
+              <div style="font-size:10.5px;color:#aaa;text-align:center;margin-top:6px;">모달 열린 상태 미리보기</div>
+            </div>
+            <!-- 설명 -->
+            <div style="flex:1;min-width:200px;padding-top:4px;">
+              <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:10px;">동작 방식</div>
+              <div style="font-size:12px;color:#555;line-height:2.2;">
+                · 환불 신청하기 버튼 클릭 → 모달 표시<br>
+                · 환불 유형(전액/비례) 자동 판단 후 표시<br>
+                · 비례 환불 시 예상 환불금액 자동 계산<br>
+                · 환불 사유 선택 필수 / 상세 내용 선택<br>
+                · 신청 완료 → <code>lc_order.status = refund_req</code><br>
+                · 관리자 승인 → Toss Payments 환불 API 호출<br>
+                · 처리 완료 → <code>status = refunded</code>
+              </div>
+              <div style="margin-top:10px;padding:10px 12px;background:#fdecea;border-left:3px solid #c0392b;border-radius:4px;font-size:11.5px;color:#7a1a1a;line-height:1.7;">
+                전액 환불 케이스에서는<br>예상 환불금액이 결제금액과 동일하게 표시
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 결제내역 상세</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('os-1')"><div class="desc-num" data-desc="os-1">1</div><div class="desc-text"><strong>강의 정보 헤더</strong><br>썸네일 + 강의명 + 유형배지 + 강사 + 수강기간<br>API: <code>GET /api/mypage/orders/:id</code></div></div>
+        <div class="desc-item" onclick="activateAnn('os-2')"><div class="desc-num" data-desc="os-2">2</div><div class="desc-text"><strong>결제 정보</strong><br>주문번호 / 결제일시 / 결제수단 / 정가 / 할인 / 결제금액 / PG사<br>PG: <strong>Toss Payments</strong></div></div>
+        <div class="desc-item" onclick="activateAnn('os-3')"><div class="desc-num" data-desc="os-3">3</div><div class="desc-text">
+          <strong>환불 정책 박스</strong><br>
+          현재 수강률 실시간 표시<br>
+          33% 미만 + 7일 이내 → "전액 환불" 초록 강조<br>
+          조건 미충족 → 잔여 기간 비례 환불 안내<br><br>
+          <strong>비례환불 계산 공식</strong><br>
+          환불금액 = (결제금액 ÷ 전체수강일) × 잔여수강일<br>
+          잔여수강일 = 전체수강일 - 경과수강일<br><br>
+          <strong>예시</strong> (결제금액 198,000원 / 수강 180일)<br>
+          · 31일 경과 → 잔여 149일<br>
+          · 1일당 1,100원 × 149일 = <strong>163,900원 환불</strong><br>
+          · PG 수수료 공제 후 실환불액 상이할 수 있음
+        </div></div>
+        <div class="desc-item" onclick="activateAnn('os-4')"><div class="desc-num" data-desc="os-4">4</div><div class="desc-text">
+          <strong>환불 신청 버튼 → 신청 폼 모달</strong><br>
+          클릭 시 모달 팝업으로 신청 폼 표시<br>
+          모달 내 구성:<br>
+          · 환불 유형 자동 판단 (전액/비례)<br>
+          · 예상 환불금액 자동 계산 표시<br>
+          · 환불 사유 선택 (필수)<br>
+          · 상세 내용 입력 (선택)<br>
+          신청 완료 → <code>POST /api/mypage/orders/:id/refund</code><br>
+          관리자 승인 → Toss Payments 환불 API 연동<br>
+          완료 후 status: refund_req → refunded
+        </div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 환불 신청 모달 (전역 공통) -->
+<div id="refund-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#fff;border-radius:14px;max-width:400px;width:92%;padding:28px;position:relative;">
+    <button onclick="document.getElementById('refund-modal').style.display='none'" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;color:#aaa;cursor:pointer;">✕</button>
+    <div style="font-size:16px;font-weight:900;color:#1a1a1a;margin-bottom:4px;">환불 신청</div>
+    <div style="font-size:12px;color:#888;margin-bottom:20px;">스마트스토어 월 1000만원 달성 비법 완전정복</div>
+    <div style="background:#fef9f9;border:1px solid #f5c6c6;border-radius:8px;padding:14px 16px;margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:#888;">결제금액</span><span style="font-weight:600;">198,000원</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:#888;">환불 유형</span><span style="color:#c0392b;font-weight:700;">잔여기간 비례 환불</span></div>
+      <div style="border-top:1px dashed #f5c6c6;margin:10px 0;"></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:#c0392b;font-weight:700;">예상 환불금액</span><span style="color:#c0392b;font-weight:900;font-size:16px;">163,900원</span></div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="font-size:12px;color:#555;font-weight:600;margin-bottom:6px;">환불 사유 <span style="color:#c0392b;">*</span></div>
+      <select style="width:100%;height:42px;border:1px solid #ddd;border-radius:8px;padding:0 12px;font-size:13px;font-family:inherit;color:#555;">
+        <option>사유를 선택해 주세요</option>
+        <option>강의 내용이 기대와 달라요</option>
+        <option>강의 품질 문제 (영상/음질)</option>
+        <option>실수로 결제했어요</option>
+        <option>개인 사정으로 수강이 어려워요</option>
+        <option>기타</option>
+      </select>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:12px;color:#555;font-weight:600;margin-bottom:6px;">상세 내용 <span style="font-size:11px;color:#bbb;">(선택)</span></div>
+      <textarea style="width:100%;height:80px;border:1px solid #ddd;border-radius:8px;padding:10px 12px;font-size:13px;resize:none;box-sizing:border-box;font-family:inherit;" placeholder="추가 내용을 입력해 주세요"></textarea>
+    </div>
+    <div style="font-size:11px;color:#aaa;margin-bottom:14px;line-height:1.7;">환불 신청 후 관리자 검토를 거쳐 영업일 기준 3~5일 내 처리됩니다.</div>
+    <button style="width:100%;height:46px;background:#e74c3c;color:#fff;border-radius:10px;font-size:14px;font-weight:900;">환불 신청하기</button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 5 · 장바구니
+════════════════════════════════════ -->
+<div id="panel-cart" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">장바구니</span><span class="s-url">/mypage/cart</span><span class="s-desc">선택 결제 + Toss Payments</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div id="site-header"><div class="header-inner"><div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div><nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav><div class="header-right"><a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a><div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div><div class="my-btn"><div class="my-avatar">박</div>홍길동님</div></div></div></div>
+      <div class="mp-wrap">
+        <div class="mp-sidebar"><div class="mp-user-area"><div class="mp-user-avatar">박</div><div class="mp-user-name">홍길동</div><div class="mp-user-id">hong_id</div></div><nav class="mp-nav"><div class="mp-nav-item"><span class="mp-nav-icon">📚</span>나의 강의</div><div class="mp-nav-item"><span class="mp-nav-icon">❤️</span>찜목록</div><div class="mp-nav-item"><span class="mp-nav-icon">💳</span>결제내역</div><div class="mp-nav-item active"><span class="mp-nav-icon">🛒</span>장바구니<span class="mp-nav-badge">2</span></div><div class="mp-nav-divider"></div><div class="mp-nav-item"><span class="mp-nav-icon">💬</span>1:1 문의</div><div class="mp-nav-item"><span class="mp-nav-icon">⚙️</span>정보수정</div><div class="mp-nav-divider"></div><div class="mp-nav-item mp-nav-logout"><span class="mp-nav-icon">🚪</span>로그아웃</div></nav></div>
+        <div class="mp-content">
+          <div class="mp-content-title">장바구니 <span>2개 담김</span></div>
+          <div style="display:flex;gap:20px;align-items:flex-start;">
+            <div style="flex:1;overflow:visible;">
+              <div class="ann-host cart-list">
+                <div class="ann"><div class="ann-bubble" data-ann="ct-1" onclick="activateAnn('ct-1')">1</div></div>
+                <div class="cart-header"><label class="cart-check-all"><div class="cbox checked"></div>전체선택 (2/2)</label><span class="cart-del-sel">선택삭제</span></div>
+                <div class="ann-host cart-item">
+                  <div class="ann"><div class="ann-bubble" data-ann="ct-2" onclick="activateAnn('ct-2')">2</div></div>
+                  <div class="cbox checked"></div><div class="cart-thumb">🎬</div>
+                  <div class="cart-info"><div class="cart-title">스마트스토어 월 1000만원 달성 비법 완전정복</div><div class="cart-type"><span class="badge-premium">프리미엄</span> · 강사명</div></div>
+                  <div class="cart-price"><div class="sale">198,000원</div><div class="origin">330,000원</div></div>
+                  <div class="cart-remove">×</div>
+                </div>
+                <div class="cart-item">
+                  <div class="cbox checked"></div><div class="cart-thumb">🎬</div>
+                  <div class="cart-info"><div class="cart-title">AI 자동화로 만드는 월 300만원 부업 시스템</div><div class="cart-type"><span class="badge-premium">프리미엄</span> · 강사명</div></div>
+                  <div class="cart-price"><div class="sale">148,000원</div><div class="origin">250,000원</div></div>
+                  <div class="cart-remove">×</div>
+                </div>
+              </div>
+            </div>
+            <div class="ann-host" style="width:240px;flex-shrink:0;">
+              <div class="ann"><div class="ann-bubble" data-ann="ct-3" onclick="activateAnn('ct-3')">3</div></div>
+              <div class="cart-summary">
+                <div class="cart-summary-title">결제 금액</div>
+                <div class="cart-summary-row"><span>정가 합계</span><span>580,000원</span></div>
+                <div class="cart-summary-row"><span style="color:#27ae60">할인 합계</span><span style="color:#27ae60">-234,000원</span></div>
+                <div class="cart-summary-row total"><span>최종 결제금액</span><span>346,000원</span></div>
+                <button class="btn-checkout">결제하기</button>
+                <div class="toss-note">토스페이먼츠로 안전하게 결제</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 장바구니</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('ct-1')"><div class="desc-num" data-desc="ct-1">1</div><div class="desc-text"><strong>장바구니 목록</strong><br>전체선택 / 선택삭제<br>DB: <code>lc_cart</code> (cart_idx, mb_id, class_idx, added_at)<br>이미 수강중인 강의 담기 방지 (서버 검증)</div></div>
+        <div class="desc-item" onclick="activateAnn('ct-2')"><div class="desc-num" data-desc="ct-2">2</div><div class="desc-text"><strong>장바구니 아이템</strong><br>× 즉시 삭제 (toast 알림)<br>체크 해제 시 결제금액에서 제외<br>무료강의 담기 불가 (직접 수강신청)</div></div>
+        <div class="desc-item" onclick="activateAnn('ct-3')"><div class="desc-num" data-desc="ct-3">3</div><div class="desc-text"><strong>결제 요약 + 결제하기</strong><br>선택 항목만 실시간 금액 계산<br><strong>결제하기</strong> → Toss Payments 결제창<br>성공 → lc_order, lc_enroll 생성 + 장바구니 삭제<br>실패/취소 → 장바구니 유지</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 6 · 1:1 문의 목록
+════════════════════════════════════ -->
+<div id="panel-qna-list" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">1:1 문의 목록</span><span class="s-url">/mypage/qna</span><span class="s-desc">문의 내역 리스트</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div id="site-header"><div class="header-inner"><div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div><nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav><div class="header-right"><a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a><div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div><div class="my-btn"><div class="my-avatar">박</div>홍길동님</div></div></div></div>
+      <div class="mp-wrap">
+        <div class="mp-sidebar"><div class="mp-user-area"><div class="mp-user-avatar">박</div><div class="mp-user-name">홍길동</div><div class="mp-user-id">hong_id</div></div><nav class="mp-nav"><div class="mp-nav-item"><span class="mp-nav-icon">📚</span>나의 강의</div><div class="mp-nav-item"><span class="mp-nav-icon">❤️</span>찜목록</div><div class="mp-nav-item"><span class="mp-nav-icon">💳</span>결제내역</div><!--div class="mp-nav-item"><span class="mp-nav-icon">🛒</span>장바구니<span class="mp-nav-badge">2</span></div--><div class="mp-nav-divider"></div><div class="mp-nav-item active"><span class="mp-nav-icon">💬</span>1:1 문의</div><div class="mp-nav-item"><span class="mp-nav-icon">⚙️</span>정보수정</div><div class="mp-nav-divider"></div><div class="mp-nav-item mp-nav-logout"><span class="mp-nav-icon">🚪</span>로그아웃</div></nav></div>
+        <div class="mp-content">
+          <div class="mp-content-title">1:1 문의</div>
+          <div class="ann-host" style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <div class="ann"><div class="ann-bubble" data-ann="ql-1" onclick="activateAnn('ql-1')">1</div></div>
+            <div class="qna-filter" style="margin-bottom:0;flex:1;">
+              <button class="qna-filter-btn active">전체</button>
+              <button class="qna-filter-btn">답변대기</button>
+              <button class="qna-filter-btn">답변완료</button>
+            </div>
+            <button class="qna-write-btn">+ 문의 작성</button>
+          </div>
+          <div class="ann-host qna-list">
+            <div class="ann"><div class="ann-bubble" data-ann="ql-2" onclick="activateAnn('ql-2')">2</div></div>
+            <!-- 답변완료 — 삭제 불가 -->
+            <div class="ann-host qna-item">
+              <div class="ann" style="top:13px;left:-16px;"><div class="ann-bubble" data-ann="ql-3" onclick="activateAnn('ql-3')">3</div></div>
+              <span class="qna-status done">답변완료</span>
+              <div class="qna-body"><div class="qna-cat">강의 수강</div><div class="qna-title">스마트스토어 강의 Vimeo 영상이 재생이 안 돼요</div><div class="qna-date">2026.03.18</div></div>
+              <div class="qna-action"></div>
+            </div>
+            <!-- 답변대기 — 삭제 가능 -->
+            <div class="ann-host qna-item">
+              <div class="ann" style="top:13px;left:-16px;"><div class="ann-bubble" data-ann="ql-4" onclick="activateAnn('ql-4')">4</div></div>
+              <span class="qna-status wait">답변대기</span>
+              <div class="qna-body"><div class="qna-cat">결제/환불</div><div class="qna-title">환불 처리가 얼마나 걸리나요?</div><div class="qna-date">2026.03.20</div></div>
+              <div class="qna-action"><button class="btn-qna-del">삭제</button></div>
+            </div>
+          </div>
+
+          <!-- 1:1 문의 페이징 -->
+          <div class="ann-host mp-pager">
+            <div class="ann" style="top:-25px;left:50%;transform:translateX(-50%);"><div class="ann-bubble" data-ann="ql-5" onclick="activateAnn('ql-5')">5</div></div>
+            <button class="mp-pg-arrow disabled">‹</button>
+            <button class="mp-pg-btn active">1</button>
+            <button class="mp-pg-btn">2</button>
+            <button class="mp-pg-arrow">›</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 1:1 문의 목록</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('ql-1')"><div class="desc-num" data-desc="ql-1">1</div><div class="desc-text"><strong>상태 필터 + 문의 작성 버튼</strong><br>전체 / 답변대기 / 답변완료<br><strong>문의 작성</strong> → <code>/mypage/qna/write</code></div></div>
+        <div class="desc-item" onclick="activateAnn('ql-2')"><div class="desc-num" data-desc="ql-2">2</div><div class="desc-text"><strong>문의 목록</strong><br>최신순. 행 클릭 → 문의 상세 페이지<br>DB: <code>lc_qna</code> (qna_idx, mb_id, category, title, content, file_path, status, answer, answered_at, created_at)</div></div>
+        <div class="desc-item" onclick="activateAnn('ql-3')"><div class="desc-num" data-desc="ql-3">3</div><div class="desc-text"><strong>답변완료 항목</strong><br>삭제 버튼 없음 (답변 달린 후 삭제 불가)<br>수정도 불가 — 읽기 전용</div></div>
+        <div class="desc-item" onclick="activateAnn('ql-4')"><div class="desc-num" data-desc="ql-4">4</div><div class="desc-text"><strong>답변대기 항목</strong><br>삭제 버튼 노출<br>삭제 클릭 → 확인 toast 후 즉시 삭제<br>수정은 상세 페이지에서 가능<br><code>DELETE /api/mypage/qna/:id</code></div></div>
+        <div class="desc-item" onclick="activateAnn('ql-5')"><div class="desc-num" data-desc="ql-5">5</div><div class="desc-text"><strong>페이지네이션</strong><br>페이지당 <strong>10개</strong> 표시, 최신순<br>API: <code>GET /api/mypage/qna?page=1&limit=10&status=all</code><br>상태 필터(전체/답변대기/답변완료) 변경 시 page=1로 초기화<br>문의 삭제 후 해당 페이지 아이템 수가 0이 되면 이전 페이지로 이동</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 7 · 1:1 문의 상세
+════════════════════════════════════ -->
+<div id="panel-qna-detail" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">1:1 문의 상세</span><span class="s-url">/mypage/qna/:id</span><span class="s-desc">문의 내용 + 관리자 답변</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div id="site-header"><div class="header-inner"><div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div><nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav><div class="header-right"><a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a><div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div><div class="my-btn"><div class="my-avatar">박</div>홍길동님</div></div></div></div>
+      <div class="mp-wrap">
+        <div class="mp-sidebar"><div class="mp-user-area"><div class="mp-user-avatar">박</div><div class="mp-user-name">홍길동</div><div class="mp-user-id">hong_id</div></div><nav class="mp-nav"><div class="mp-nav-item"><span class="mp-nav-icon">📚</span>나의 강의</div><div class="mp-nav-item"><span class="mp-nav-icon">❤️</span>찜목록</div><div class="mp-nav-item"><span class="mp-nav-icon">💳</span>결제내역</div><!--div class="mp-nav-item"><span class="mp-nav-icon">🛒</span>장바구니<span class="mp-nav-badge">2</span></div--><div class="mp-nav-divider"></div><div class="mp-nav-item active"><span class="mp-nav-icon">💬</span>1:1 문의</div><div class="mp-nav-item"><span class="mp-nav-icon">⚙️</span>정보수정</div><div class="mp-nav-divider"></div><div class="mp-nav-item mp-nav-logout"><span class="mp-nav-icon">🚪</span>로그아웃</div></nav></div>
+        <div class="mp-content">
+          <div class="mp-content-title">문의 상세</div>
+
+          <!-- 케이스 A: 답변완료 -->
+          <div style="margin-bottom:8px;font-size:11px;color:#aaa;font-weight:600;letter-spacing:.5px;">▸ 케이스 A — 답변완료 (수정/삭제 불가)</div>
+          <div class="ann-host qna-detail-box" style="margin-bottom:24px;">
+            <div class="ann"><div class="ann-bubble" data-ann="qd-1" onclick="activateAnn('qd-1')">1</div></div>
+            <div class="qna-detail-head">
+              <div class="qna-detail-cat">강의 수강</div>
+              <div class="qna-detail-title">스마트스토어 강의 Vimeo 영상이 재생이 안 돼요</div>
+              <div class="qna-detail-meta"><span>2026.03.18 10:24</span><span class="qna-status done" style="font-size:10px;padding:2px 6px">답변완료</span></div>
+            </div>
+            <div class="qna-detail-body">Vimeo 강의를 클릭하면 화면이 까맣게만 나오고 재생이 되지 않습니다. 크롬 최신 버전을 사용하고 있고 다른 브라우저도 동일합니다.</div>
+            <div class="ann-host qna-answer-area">
+              <div class="ann"><div class="ann-bubble" data-ann="qd-2" onclick="activateAnn('qd-2')">2</div></div>
+              <div class="qna-answer-label">관리자 답변 · 2026.03.19 14:30</div>
+              <div class="qna-answer-text">안녕하세요, 유니콘클래스 고객센터입니다. 해당 증상은 그래픽 드라이버 업데이트로 해결되는 경우가 많습니다. 드라이버 업데이트 후 재시도해 주시기 바랍니다.</div>
+            </div>
+            <div class="qna-detail-footer">
+              <button class="btn-back-list" style="width:auto;height:34px;padding:0 16px;font-size:12px;">목록으로</button>
+              <div style="font-size:11px;color:#bbb;">답변 완료된 문의는 수정·삭제가 불가합니다.</div>
+            </div>
+          </div>
+
+          <!-- 케이스 B: 답변대기 -->
+          <div style="margin-bottom:8px;font-size:11px;color:#aaa;font-weight:600;letter-spacing:.5px;">▸ 케이스 B — 답변대기 (수정/삭제 가능)</div>
+          <div class="ann-host qna-detail-box">
+            <div class="ann"><div class="ann-bubble" data-ann="qd-3" onclick="activateAnn('qd-3')">3</div></div>
+            <div class="qna-detail-head">
+              <div class="qna-detail-cat">결제/환불</div>
+              <div class="qna-detail-title">환불 처리가 얼마나 걸리나요?</div>
+              <div class="qna-detail-meta"><span>2026.03.20 09:15</span><span class="qna-status wait" style="font-size:10px;padding:2px 6px">답변대기</span></div>
+            </div>
+            <div class="qna-detail-body">환불 신청을 했는데 처리 기간이 궁금합니다. 영업일 기준 며칠 정도 소요되나요?</div>
+            <div class="ann-host qna-answer-area">
+              <div class="ann"><div class="ann-bubble" data-ann="qd-4" onclick="activateAnn('qd-4')">4</div></div>
+              <div class="qna-answer-label">관리자 답변</div>
+              <div class="qna-no-answer">아직 답변이 등록되지 않았습니다.</div>
+            </div>
+            <div class="qna-detail-footer">
+              <button class="btn-back-list" style="width:auto;height:34px;padding:0 16px;font-size:12px;">목록으로</button>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-order-detail" style="height:34px;font-size:12px;">수정하기</button>
+                <button class="btn-refund" style="height:34px;font-size:12px;">삭제하기</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 1:1 문의 상세</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('qd-1')"><div class="desc-num" data-desc="qd-1">1</div><div class="desc-text"><strong>문의 상세 헤더</strong><br>카테고리 / 제목 / 작성일 / 상태 배지<br>API: <code>GET /api/mypage/qna/:id</code></div></div>
+        <div class="desc-item" onclick="activateAnn('qd-2')"><div class="desc-num" data-desc="qd-2">2</div><div class="desc-text"><strong>관리자 답변 영역 — 답변완료</strong><br>답변자 + 답변일시 + 답변 내용<br>이 상태에서는 <strong>수정/삭제 모두 불가</strong><br>하단에 "답변 완료된 문의는 수정·삭제가 불가합니다." 안내</div></div>
+        <div class="desc-item" onclick="activateAnn('qd-3')"><div class="desc-num" data-desc="qd-3">3</div><div class="desc-text"><strong>문의 상세 — 답변대기</strong><br>동일 구조이나 답변 영역에 "아직 답변이 없습니다." 표시</div></div>
+        <div class="desc-item" onclick="activateAnn('qd-4')"><div class="desc-num" data-desc="qd-4">4</div><div class="desc-text"><strong>답변대기 — 수정/삭제 버튼</strong><br><strong>수정하기</strong> → 문의 작성 페이지로 이동 (기존 내용 불러오기)<br><strong>삭제하기</strong> → 확인 모달 후 삭제<br><code>DELETE /api/mypage/qna/:id</code></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 8 · 1:1 문의 작성
+════════════════════════════════════ -->
+<div id="panel-qna-write" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">1:1 문의 작성</span><span class="s-url">/mypage/qna/write</span><span class="s-desc">신규 작성 / 수정 공용</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div id="site-header"><div class="header-inner"><div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div><nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav><div class="header-right"><a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a><div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div><div class="my-btn"><div class="my-avatar">박</div>홍길동님</div></div></div></div>
+      <div class="mp-wrap">
+        <div class="mp-sidebar"><div class="mp-user-area"><div class="mp-user-avatar">박</div><div class="mp-user-name">홍길동</div><div class="mp-user-id">hong_id</div></div><nav class="mp-nav"><div class="mp-nav-item"><span class="mp-nav-icon">📚</span>나의 강의</div><div class="mp-nav-item"><span class="mp-nav-icon">❤️</span>찜목록</div><div class="mp-nav-item"><span class="mp-nav-icon">💳</span>결제내역</div><!--div class="mp-nav-item"><span class="mp-nav-icon">🛒</span>장바구니<span class="mp-nav-badge">2</span></div--><div class="mp-nav-divider"></div><div class="mp-nav-item active"><span class="mp-nav-icon">💬</span>1:1 문의</div><div class="mp-nav-item"><span class="mp-nav-icon">⚙️</span>정보수정</div><div class="mp-nav-divider"></div><div class="mp-nav-item mp-nav-logout"><span class="mp-nav-icon">🚪</span>로그아웃</div></nav></div>
+        <div class="mp-content">
+          <div class="mp-content-title">문의 작성</div>
+          <div class="ann-host qna-form-wrap">
+            <div class="ann"><div class="ann-bubble" data-ann="qw-1" onclick="activateAnn('qw-1')">1</div></div>
+            <div class="form-field">
+              <label class="form-label">문의 유형 <span class="req">*</span></label>
+              <select class="form-select"><option>선택해 주세요</option><option>강의 수강</option><option>결제/환불</option><option>계정/회원</option><option>기술 문제</option><option>기타</option></select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">제목 <span class="req">*</span></label>
+              <input type="text" class="form-input" placeholder="문의 제목을 입력해 주세요">
+            </div>
+            <div class="form-field">
+              <label class="form-label">내용 <span class="req">*</span></label>
+              <textarea class="form-textarea" placeholder="문의 내용을 자세히 입력해 주세요 (최대 2000자)"></textarea>
+            </div>
+            <div class="ann-host form-field">
+              <div class="ann" style="left:-22px;"><div class="ann-bubble" data-ann="qw-2" onclick="activateAnn('qw-2')">2</div></div>
+              <label class="form-label">첨부파일</label>
+              <div class="form-file">📎 파일을 선택하거나 여기에 드래그하세요 (이미지/PDF, 최대 5MB)</div>
+            </div>
+            <div class="flex-end mt-16">
+              <button class="btn-qna-cancel">취소</button>
+              <button class="btn-qna-submit">등록하기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 1:1 문의 작성</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('qw-1')"><div class="desc-num" data-desc="qw-1">1</div><div class="desc-text"><strong>문의 작성 폼</strong><br>신규 작성 · 수정 공용 페이지<br>수정 시: URL <code>/mypage/qna/:id/edit</code>, 기존 내용 pre-fill<br>유형(필수) / 제목(100자) / 내용(2000자)<br><code>POST /api/mypage/qna</code> 신규<br><code>PUT /api/mypage/qna/:id</code> 수정</div></div>
+        <div class="desc-item" onclick="activateAnn('qw-2')"><div class="desc-num" data-desc="qw-2">2</div><div class="desc-text"><strong>파일 첨부</strong><br>이미지(jpg/png/gif) / PDF<br>최대 5MB<br>업로드 경로: <code>lc_qna.file_path</code><br>수정 시 기존 파일 유지 or 교체 가능</div></div>
+        <div class="desc-item"><div class="desc-num" style="background:#e67e22;cursor:default">i</div><div class="desc-text"><strong>답변 후 수정 접근 차단</strong><br>status = "done" 상태의 qna_idx로 edit URL 직접 접근 시<br>서버에서 403 리턴 → 목록으로 redirect<br>프론트 버튼 비노출로도 1차 방지</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 9-1 · 후기 목록
+════════════════════════════════════ -->
+<div id="panel-review-list" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">후기 목록</span><span class="s-url">/mypage/review</span><span class="s-desc">내가 작성한 후기 목록</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div id="site-header"><div class="header-inner"><div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div><nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav><div class="header-right"><a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a><div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div><div class="my-btn"><div class="my-avatar">박</div>홍길동님</div></div></div></div>
+      <div class="mp-wrap">
+        <div class="mp-sidebar"><div class="mp-user-area"><div class="mp-user-avatar">박</div><div class="mp-user-name">홍길동</div><div class="mp-user-id">hong_id</div></div><nav class="mp-nav"><div class="mp-nav-item"><span class="mp-nav-icon">📚</span>나의 강의</div><div class="mp-nav-item"><span class="mp-nav-icon">❤️</span>찜목록</div><div class="mp-nav-item"><span class="mp-nav-icon">💳</span>결제내역</div><!--div class="mp-nav-item"><span class="mp-nav-icon">🛒</span>장바구니<span class="mp-nav-badge">2</span></div--><div class="mp-nav-divider"></div><div class="mp-nav-item"><span class="mp-nav-icon">💬</span>1:1 문의</div><div class="mp-nav-item active"><span class="mp-nav-icon">⭐</span>후기 관리</div><div class="mp-nav-item"><span class="mp-nav-icon">⚙️</span>정보수정</div><div class="mp-nav-divider"></div><div class="mp-nav-item mp-nav-logout"><span class="mp-nav-icon">🚪</span>로그아웃</div></nav></div>
+        <div class="mp-content">
+          <div class="mp-content-title">후기 목록 <span>내가 작성한 후기</span></div>
+
+          <!-- 후기 작성 가능 강의 목록 -->
+          <div class="ann-host" style="margin-bottom:20px;">
+            <div class="ann"><div class="ann-bubble" data-ann="rl-1" onclick="activateAnn('rl-1')">1</div></div>
+            <div style="font-size:13px;font-weight:700;color:#333;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #f0f0f0;">후기 작성 가능한 강의</div>
+            <!-- 미작성 -->
+            <div style="background:#fff;border:1px solid #eee;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:8px;">
+              <div style="width:60px;height:42px;border-radius:6px;background:linear-gradient(135deg,#1a2534,#2d4060);flex-shrink:0;"></div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;color:#111;">[뾴공략] 월 5000만원 폰 창업 마스터클래스</div>
+                <div style="font-size:11px;color:#aaa;margin-top:2px;">결제일 2026.03.24 · 미작성</div>
+              </div>
+              <button style="height:34px;padding:0 14px;background:#c0392b;color:#fff;border-radius:6px;font-size:12px;font-weight:700;white-space:nowrap;">후기 작성</button>
+            </div>
+            <!-- 작성완료 -->
+            <div style="background:#f8f9fa;border:1px solid #e8e8e8;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:8px;">
+              <div style="width:60px;height:42px;border-radius:6px;background:linear-gradient(135deg,#0f2027,#203a43);flex-shrink:0;"></div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:700;color:#333;">[소업] SNS로 월 300 버는 실전 수익화 전략</div>
+                <div style="font-size:11px;color:#aaa;margin-top:2px;">결제일 2026.02.10 · 작성완료</div>
+              </div>
+              <button style="height:34px;padding:0 14px;background:#e0e0e0;color:#999;border-radius:6px;font-size:12px;font-weight:700;white-space:nowrap;">수정하기</button>
+            </div>
+          </div>
+
+          <!-- 작성한 후기 목록 -->
+          <div class="ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="rl-2" onclick="activateAnn('rl-2')">2</div></div>
+            <div style="font-size:13px;font-weight:700;color:#333;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #f0f0f0;">작성한 후기</div>
+            <!-- 후기 아이템 -->
+            <div style="background:#fff;border:1px solid #eee;border-radius:10px;padding:16px 18px;margin-bottom:8px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div style="font-size:12px;font-weight:700;color:#c0392b;">[소업] SNS로 월 300 버는 실전 수익화 전략</div>
+                <div style="font-size:11px;color:#bbb;">2026.02.20</div>
+              </div>
+              <div style="color:#f39c12;font-size:13px;margin-bottom:6px;">★★★★★</div>
+              <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:4px;">정말 실전에 바로 적용할 수 있었어요!</div>
+              <div style="font-size:12px;color:#666;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">강의 퀄리티가 정말 뛰어납니다. 실질적인 내용 위주로 구성되어 있어서 바로 적용할 수 있었어요.</div>
+              <div style="margin-top:10px;display:flex;gap:6px;">
+                <div style="width:48px;height:48px;border-radius:6px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:16px;">🖼️</div>
+              </div>
+              <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:6px;">
+                <button style="height:30px;padding:0 12px;background:#fff;border:1px solid #ddd;border-radius:5px;font-size:11px;color:#555;">수정</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 후기 목록</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('rl-1')">
+          <div class="desc-num" data-desc="rl-1">1</div>
+          <div class="desc-text">
+            <strong>후기 작성 가능한 강의 목록</strong><br>
+            유료 결제 완료 강의만 표시<br>
+            무료강의는 목록에 미포함<br>
+            미작성 → <code>후기 작성</code> 버튼 (빨강)<br>
+            작성완료 → <code>수정하기</code> 버튼 (회색)<br>
+            수정 클릭 시 → 후기 작성&수정 페이지로 이동
+          </div>
+        </div>
+        <div class="desc-item" onclick="activateAnn('rl-2')">
+          <div class="desc-num" data-desc="rl-2">2</div>
+          <div class="desc-text">
+            <strong>작성한 후기 목록</strong><br>
+            강의명 · 작성일 · 별점 · 제목 · 내용 미리보기<br>
+            첨부 이미지 썸네일 표시<br>
+            수정 버튼 클릭 → 후기 작성&수정 페이지<br>
+            삭제 기능 없음 (정책상 삭제 불가)
+          </div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" style="background:#e67e22;">i</div>
+          <div class="desc-text">
+            <strong>정책</strong><br>
+            강의당 후기 1회만 작성 가능<br>
+            작성 후 수정은 가능, 삭제는 불가<br>
+            관리자 페이지에서 후기 직접 작성/관리 가능<br>
+            메인 페이지 후기 슬라이더에 노출
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 9-2 · 후기 작성&수정
+════════════════════════════════════ -->
+<div id="panel-review-write" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">후기 작성 &amp; 수정</span><span class="s-url">/mypage/review/write</span><span class="s-desc">후기 작성 또는 기존 후기 수정</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div id="site-header"><div class="header-inner"><div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div><nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav><div class="header-right"><a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a><div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div><div class="my-btn"><div class="my-avatar">박</div>홍길동님</div></div></div></div>
+      <div class="mp-wrap">
+        <div class="mp-sidebar"><div class="mp-user-area"><div class="mp-user-avatar">박</div><div class="mp-user-name">홍길동</div><div class="mp-user-id">hong_id</div></div><nav class="mp-nav"><div class="mp-nav-item"><span class="mp-nav-icon">📚</span>나의 강의</div><div class="mp-nav-item"><span class="mp-nav-icon">❤️</span>찜목록</div><div class="mp-nav-item"><span class="mp-nav-icon">💳</span>결제내역</div><!--div class="mp-nav-item"><span class="mp-nav-icon">🛒</span>장바구니<span class="mp-nav-badge">2</span></div--><div class="mp-nav-divider"></div><div class="mp-nav-item"><span class="mp-nav-icon">💬</span>1:1 문의</div><div class="mp-nav-item active"><span class="mp-nav-icon">⭐</span>후기 관리</div><div class="mp-nav-item"><span class="mp-nav-icon">⚙️</span>정보수정</div><div class="mp-nav-divider"></div><div class="mp-nav-item mp-nav-logout"><span class="mp-nav-icon">🚪</span>로그아웃</div></nav></div>
+        <div class="mp-content">
+          <div class="mp-content-title">후기 작성 <span>유료 결제 강의에 한해 작성 가능</span></div>
+
+          <!-- 후기 작성 폼 -->
+          <div class="ann-host" style="background:#fff;border:1px solid #eee;border-radius:10px;padding:20px;">
+            <div class="ann"><div class="ann-bubble" data-ann="rw-1" onclick="activateAnn('rw-1')">1</div></div>
+            <div style="font-size:13px;font-weight:700;color:#333;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #f0f0f0;">후기 작성 — [뾴공략] 월 5000만원 폰 창업</div>
+
+            <!-- 별점 -->
+            <div style="margin-bottom:16px;">
+              <div style="font-size:12px;color:#888;margin-bottom:6px;">별점 <span style="color:#c0392b;">*</span></div>
+              <div class="ann-host" style="display:inline-block;">
+                <div class="ann"><div class="ann-bubble" data-ann="rw-2" onclick="activateAnn('rw-2')">2</div></div>
+                <div style="display:flex;gap:4px;">
+                  <span style="font-size:28px;cursor:pointer;color:#f39c12;">★</span>
+                  <span style="font-size:28px;cursor:pointer;color:#f39c12;">★</span>
+                  <span style="font-size:28px;cursor:pointer;color:#f39c12;">★</span>
+                  <span style="font-size:28px;cursor:pointer;color:#f39c12;">★</span>
+                  <span style="font-size:28px;cursor:pointer;color:#ddd;">★</span>
+                </div>
+              </div>
+              <span style="font-size:12px;color:#888;margin-left:8px;">4점 / 5점</span>
+            </div>
+
+            <!-- 제목 -->
+            <div style="margin-bottom:12px;">
+              <div style="font-size:12px;color:#888;margin-bottom:6px;">제목 <span style="color:#c0392b;">*</span></div>
+              <input type="text" placeholder="후기 제목을 입력해 주세요 (최대 100자)" style="width:100%;height:42px;border:1px solid #ddd;border-radius:6px;padding:0 12px;font-size:13px;box-sizing:border-box;">
+            </div>
+
+            <!-- 내용 -->
+            <div style="margin-bottom:12px;">
+              <div style="font-size:12px;color:#888;margin-bottom:6px;">내용 <span style="color:#c0392b;">*</span></div>
+              <textarea placeholder="강의에 대한 솔직한 후기를 작성해 주세요 (최소 20자 이상)" style="width:100%;height:120px;border:1px solid #ddd;border-radius:6px;padding:10px 12px;font-size:13px;resize:vertical;box-sizing:border-box;font-family:inherit;"></textarea>
+            </div>
+
+            <!-- 이미지 첨부 -->
+            <div class="ann-host" style="margin-bottom:16px;">
+              <div class="ann"><div class="ann-bubble" data-ann="rw-3" onclick="activateAnn('rw-3')">3</div></div>
+              <div style="font-size:12px;color:#888;margin-bottom:6px;">이미지 첨부 <span style="font-size:11px;color:#bbb;">(최대 10장, jpg/png/gif)</span></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <div style="width:70px;height:70px;border:2px dashed #ddd;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#bbb;font-size:22px;">+<span style="font-size:9px;margin-top:2px;">사진 추가</span></div>
+                <div style="width:70px;height:70px;border-radius:8px;background:#f0f0f0;position:relative;display:flex;align-items:center;justify-content:center;font-size:20px;">🖼️<div style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:#c0392b;border-radius:50%;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</div></div>
+              </div>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="ann-host" style="display:flex;gap:8px;">
+              <div class="ann"><div class="ann-bubble" data-ann="rw-4" onclick="activateAnn('rw-4')">4</div></div>
+              <button style="flex:1;height:44px;background:#e0e0e0;color:#888;border-radius:8px;font-size:13px;font-weight:700;">목록으로</button>
+              <button style="flex:2;height:44px;background:#c0392b;color:#fff;border-radius:8px;font-size:14px;font-weight:800;">후기 등록하기</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 후기 작성&수정</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('rw-1')">
+          <div class="desc-num" data-desc="rw-1">1</div>
+          <div class="desc-text">
+            <strong>후기 작성 폼</strong><br>
+            별점 + 제목 + 내용 필수 입력<br>
+            수정 시 기존 내용 자동 채워짐<br>
+            URL 파라미터로 강의 구분: <code>?class_idx=1</code><br>
+            수정 시: <code>?review_idx=5</code>
+          </div>
+        </div>
+        <div class="desc-item" onclick="activateAnn('rw-2')">
+          <div class="desc-num" data-desc="rw-2">2</div>
+          <div class="desc-text">
+            <strong>별점 선택</strong><br>
+            ★ 1~5점 클릭 선택<br>
+            hover 시 미리보기 효과<br>
+            1점 미만 제출 불가
+          </div>
+        </div>
+        <div class="desc-item" onclick="activateAnn('rw-3')">
+          <div class="desc-num" data-desc="rw-3">3</div>
+          <div class="desc-text">
+            <strong>이미지 첨부</strong><br>
+            jpg / png / gif 허용<br>
+            최대 10장, 장당 최대 5MB<br>
+            첨부 후 썸네일 미리보기<br>
+            X 버튼으로 개별 삭제<br>
+            수정 시 기존 이미지 유지 + 추가/삭제 가능
+          </div>
+        </div>
+        <div class="desc-item" onclick="activateAnn('rw-4')">
+          <div class="desc-num" data-desc="rw-4">4</div>
+          <div class="desc-text">
+            <strong>버튼</strong><br>
+            목록으로 → /mypage/review 이동<br>
+            후기 등록하기 → POST 제출<br>
+            내용 20자 미만 시 제출 불가 + 안내 문구<br>
+            제출 성공 시 → 후기 목록 페이지로 이동
+          </div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" style="background:#e67e22;">i</div>
+          <div class="desc-text">
+            <strong>정책</strong><br>
+            강의당 1회만 작성 가능<br>
+            수정은 가능, 삭제는 불가<br>
+            비정상 접근(미결제 강의) 시 → 403 처리
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 9 · 정보수정
+════════════════════════════════════ -->
+<div id="panel-profile" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">정보수정</span><span class="s-url">/mypage/profile</span><span class="s-desc">회원정보 수정</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div id="site-header"><div class="header-inner"><div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div><nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav><div class="header-right"><a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a><div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div><div class="my-btn"><div class="my-avatar">박</div>홍길동님</div></div></div></div>
+      <div class="mp-wrap">
+        <div class="mp-sidebar"><div class="mp-user-area"><div class="mp-user-avatar">박</div><div class="mp-user-name">홍길동</div><div class="mp-user-id">hong_id</div></div><nav class="mp-nav"><div class="mp-nav-item"><span class="mp-nav-icon">📚</span>나의 강의</div><div class="mp-nav-item"><span class="mp-nav-icon">❤️</span>찜목록</div><div class="mp-nav-item"><span class="mp-nav-icon">💳</span>결제내역</div><!--div class="mp-nav-item"><span class="mp-nav-icon">🛒</span>장바구니<span class="mp-nav-badge">2</span></div--><div class="mp-nav-divider"></div><div class="mp-nav-item"><span class="mp-nav-icon">💬</span>1:1 문의</div><div class="mp-nav-item active"><span class="mp-nav-icon">⚙️</span>정보수정</div><div class="mp-nav-divider"></div><div class="mp-nav-item mp-nav-logout"><span class="mp-nav-icon">🚪</span>로그아웃</div></nav></div>
+        <div class="mp-content">
+          <div class="mp-content-title">정보수정</div>
+          <div class="ann-host profile-form">
+            <div class="ann"><div class="ann-bubble" data-ann="pf-1" onclick="activateAnn('pf-1')">1</div></div>
+            <div class="profile-section-title">기본 정보</div>
+            <div class="profile-field"><label class="profile-label">아이디 <span class="note">(수정 불가)</span></label><input type="text" class="profile-input" value="hong_id" disabled></div>
+            <div class="ann-host profile-field"><div class="ann" style="left:-22px;"><div class="ann-bubble" data-ann="pf-2" onclick="activateAnn('pf-2')">2</div></div><label class="profile-label">이름 <span class="req">*</span></label><input type="text" class="profile-input" value="홍길동"></div>
+            <div class="ann-host profile-field"><div class="ann" style="left:-22px;"><div class="ann-bubble" data-ann="pf-3" onclick="activateAnn('pf-3')">3</div></div><label class="profile-label">휴대전화번호 <span class="req">*</span></label><div class="input-row"><input type="text" class="profile-input" value="010-1234-5678" disabled><button class="btn-verify">변경</button></div><div class="input-msg success">✓ 인증된 번호입니다</div></div>
+            <div class="profile-field"><label class="profile-label">이메일</label><input type="text" class="profile-input" value="hong@example.com"></div>
+          </div>
+          <div class="ann-host profile-form">
+            <div class="ann"><div class="ann-bubble" data-ann="pf-4" onclick="activateAnn('pf-4')">4</div></div>
+            <div class="profile-section-title">비밀번호 변경</div>
+            <div class="profile-field"><label class="profile-label">현재 비밀번호</label><div class="profile-input-wrap"><input type="password" class="profile-input" placeholder="현재 비밀번호 입력"><button class="eye-btn">👁</button></div></div>
+            <div class="profile-field"><label class="profile-label">새 비밀번호</label><div class="profile-input-wrap"><input type="password" class="profile-input" placeholder="영문+숫자+특수문자 8자 이상"><button class="eye-btn">👁</button></div></div>
+            <div class="profile-field"><label class="profile-label">새 비밀번호 확인</label><div class="profile-input-wrap"><input type="password" class="profile-input" placeholder="새 비밀번호를 다시 입력"><button class="eye-btn">👁</button></div></div>
+            <div style="font-size:11px;color:#aaa;margin-top:-8px;">비밀번호를 변경하지 않을 경우 빈칸으로 두세요.</div>
+          </div>
+          <div class="ann-host profile-form">
+            <div class="ann"><div class="ann-bubble" data-ann="pf-5" onclick="activateAnn('pf-5')">5</div></div>
+            <div class="profile-section-title">마케팅 수신 동의</div>
+            <label class="agree-row"><div class="cbox checked"></div><span class="agree-label">이메일 수신 동의 <span class="opt">(선택)</span></span></label>
+            <label class="agree-row"><div class="cbox"></div><span class="agree-label">SMS 수신 동의 <span class="opt">(선택)</span></span></label>
+          </div>
+          <button class="btn-save-profile">저장하기</button>
+
+          <!-- 회원탈퇴 — 버튼만 (팝업은 별도 섹션) -->
+          <div class="ann-host mt-24" style="background:#fff;border-radius:10px;border:1px solid #f5c6c6;padding:20px;">
+            <div class="ann"><div class="ann-bubble" data-ann="pf-6" onclick="activateAnn('pf-6')">6</div></div>
+            <div style="font-size:13px;font-weight:700;color:#e74c3c;margin-bottom:8px;display:flex;align-items:center;gap:6px;">⚠ 회원탈퇴</div>
+            <div style="font-size:12px;color:#888;line-height:1.8;margin-bottom:16px;">탈퇴 시 모든 수강 내역, 찜목록이 삭제되며 복구되지 않습니다.<br>수강 중이거나 환불 처리 중인 경우 탈퇴가 제한됩니다.</div>
+            <button style="height:42px;padding:0 24px;background:#fff;color:#e74c3c;border:1.5px solid #e74c3c;border-radius:8px;font-size:13px;font-weight:700;">회원탈퇴</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 정보수정</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('pf-1')"><div class="desc-num" data-desc="pf-1">1</div><div class="desc-text"><strong>기본 정보</strong><br>아이디: disabled (수정 불가)<br>이름, 이메일: 직접 수정 가능<br>API: <code>PUT /api/mypage/profile</code></div></div>
+        <div class="desc-item" onclick="activateAnn('pf-2')"><div class="desc-num" data-desc="pf-2">2</div><div class="desc-text"><strong>이름</strong><br>최소 2자, 한글/영문만 허용<br>숫자·특수문자 입력 시 에러</div></div>
+        <div class="desc-item" onclick="activateAnn('pf-3')"><div class="desc-num" data-desc="pf-3">3</div><div class="desc-text"><strong>휴대전화번호 변경</strong><br>현재 번호 disabled<br><strong>변경 버튼</strong> → SMS 인증 플로우 (회원가입과 동일)<br>인증 완료 후 새 번호로 저장</div></div>
+        <div class="desc-item" onclick="activateAnn('pf-4')"><div class="desc-num" data-desc="pf-4">4</div><div class="desc-text"><strong>비밀번호 변경</strong><br>소셜 회원(카카오/네이버)은 이 블록 숨김<br>영문+숫자+특수문자 8자 이상<br>비워두면 변경 안 함</div></div>
+        <div class="desc-item" onclick="activateAnn('pf-5')"><div class="desc-num" data-desc="pf-5">5</div><div class="desc-text"><strong>마케팅 수신 동의</strong><br>DB: <code>g5_member.mb_mailling</code></div></div>
+        <div class="desc-item" onclick="activateAnn('pf-6')"><div class="desc-num" data-desc="pf-6">6</div><div class="desc-text"><strong>회원탈퇴 버튼</strong><br>클릭 → 회원탈퇴 확인 팝업 표시<br>(로그아웃과 동일한 모달 방식)<br>탈퇴 불가 조건: 수강중 / 환불 처리중</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 10 · 로그아웃
+════════════════════════════════════ -->
+<div id="panel-logout" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">로그아웃</span><span class="s-url">/logout</span><span class="s-desc">로그아웃 확인 모달</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div class="ann-host logout-screen">
+        <div class="ann" style="left:0;top:0;"><div class="ann-bubble" data-ann="lo-1" onclick="activateAnn('lo-1')">1</div></div>
+        <div class="ann-host logout-modal">
+          <div class="ann"><div class="ann-bubble" data-ann="lo-2" onclick="activateAnn('lo-2')">2</div></div>
+          <div class="logout-icon">🚪</div>
+          <div class="logout-title">로그아웃</div>
+          <div class="logout-desc">로그아웃 하시겠습니까?<br>언제든지 다시 로그인하실 수 있습니다.</div>
+          <div class="logout-btns">
+            <button class="btn-logout-cancel">취소</button>
+            <button class="ann-host btn-logout-confirm">
+              <div class="ann"><div class="ann-bubble" data-ann="lo-3" onclick="activateAnn('lo-3')">3</div></div>
+              로그아웃
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 로그아웃</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('lo-1')"><div class="desc-num" data-desc="lo-1">1</div><div class="desc-text"><strong>로그아웃 모달 배경</strong><br>별도 페이지가 아닌 모달 처리<br>GNB 드롭다운 / 사이드바 클릭 시 표시<br>배경 딤처리 (로그인 페이지 동일 스타일)</div></div>
+        <div class="desc-item" onclick="activateAnn('lo-2')"><div class="desc-num" data-desc="lo-2">2</div><div class="desc-text"><strong>확인 모달</strong><br>취소 → 모달 닫힘, 현재 페이지 유지<br>배경 클릭 → 모달 닫힘</div></div>
+        <div class="desc-item" onclick="activateAnn('lo-3')"><div class="desc-num" data-desc="lo-3">3</div><div class="desc-text"><strong>로그아웃 확인 버튼</strong><br><code>POST /logout</code> (Gnuboard 세션 파기)<br>완료 후 메인(/) 이동<br>소셜 회원: 서비스 세션만 파기 (카카오/네이버 별도 해제 불필요)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 11 · 회원탈퇴 팝업
+════════════════════════════════════ -->
+<div id="panel-withdraw" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider"><span class="s-title">회원탈퇴</span><span class="s-url">팝업 (정보수정 페이지에서 호출)</span><span class="s-desc">탈퇴 확인 모달</span></div>
+  <div class="section-body">
+    <div class="screen-col">
+      <div class="ann-host withdraw-screen">
+        <div class="ann" style="left:0;top:0;"><div class="ann-bubble" data-ann="wd-1" onclick="activateAnn('wd-1')">1</div></div>
+        <div class="ann-host withdraw-modal">
+          <div class="ann"><div class="ann-bubble" data-ann="wd-2" onclick="activateAnn('wd-2')">2</div></div>
+          <div class="withdraw-icon">⚠️</div>
+          <div class="withdraw-title">회원 탈퇴</div>
+          <ul class="withdraw-desc">
+            <li>탈퇴 시 모든 수강 내역, 찜목록, 결제 기록이 삭제됩니다.</li>
+            <li>삭제된 데이터는 복구되지 않습니다.</li>
+            <li>수강 중인 강의가 있으면 탈퇴가 제한됩니다.</li>
+            <li>환불 처리 중인 경우 처리 완료 후 탈퇴 가능합니다.</li>
+          </ul>
+          <div class="ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="wd-3" onclick="activateAnn('wd-3')">3</div></div>
+            <input type="text" class="withdraw-confirm-input" placeholder='확인을 위해 "탈퇴합니다"를 입력하세요'>
+          </div>
+          <div class="logout-btns">
+            <button class="btn-withdraw-cancel">취소</button>
+            <button class="ann-host btn-withdraw-confirm" style="opacity:.4;cursor:default">
+              <div class="ann"><div class="ann-bubble" data-ann="wd-4" onclick="activateAnn('wd-4')">4</div></div>
+              탈퇴하기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 회원탈퇴 팝업</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('wd-1')"><div class="desc-num" data-desc="wd-1">1</div><div class="desc-text"><strong>탈퇴 모달 배경</strong><br>정보수정 페이지의 "회원탈퇴" 버튼 클릭 시 표시<br>로그아웃 모달과 동일한 딤 배경<br>border-top: 4px solid #e74c3c로 심각성 강조</div></div>
+        <div class="desc-item" onclick="activateAnn('wd-2')"><div class="desc-num" data-desc="wd-2">2</div><div class="desc-text"><strong>탈퇴 안내 목록</strong><br>삭제 항목 명시 (수강내역, 찜목록, 결제기록)<br>탈퇴 제한 조건 명시 (수강중, 환불중)</div></div>
+        <div class="desc-item" onclick="activateAnn('wd-3')"><div class="desc-num" data-desc="wd-3">3</div><div class="desc-text"><strong>이중 확인 입력</strong><br>"탈퇴합니다" 텍스트 정확히 입력해야 탈퇴 버튼 활성화<br>그 외 입력값이면 버튼 비활성 (opacity 40%)<br>오탈자 방지 + 실수 탈퇴 방지</div></div>
+        <div class="desc-item" onclick="activateAnn('wd-4')"><div class="desc-num" data-desc="wd-4">4</div><div class="desc-text"><strong>탈퇴하기 버튼</strong><br>입력값 일치 시 활성화<br>클릭 → <code>DELETE /api/mypage/member</code><br>서버에서 수강중/환불중 재검증 → 조건 미충족 시 에러 toast<br>성공 → 세션 삭제 후 메인(/) 이동</div></div>
+        <div class="desc-item"><div class="desc-num" style="background:#e67e22;cursor:default">i</div><div class="desc-text"><strong>탈퇴 처리 플로우</strong><br>1. 서버: 수강중 + 환불중 검증<br>2. g5_member.mb_leave_date 설정<br>3. 개인정보 즉시 익명화 (이름, 연락처)<br>4. 관련 데이터 정리 (lc_enroll, lc_cart 등)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ── 서브탭 전환 ──
+function showSection(key) {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-' + key);
+  if (panel) panel.classList.add('active');
+
+  document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.sub-tab-btn[onclick="showSection('${key}')"]`);
+  if (btn) btn.classList.add('active');
+
+  const divider = panel && panel.querySelector('.section-divider');
+  if (divider) {
+    const top = divider.getBoundingClientRect().top + window.scrollY - 136;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll('.ann-bubble.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-num.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+}
+
+// ── section-divider sticky 전환 ──
+(function() {
+  const STICKY_TOP = 93;
+  document.querySelectorAll('.sd-sentinel').forEach(sentinel => {
+    const divider = sentinel.nextElementSibling;
+    if (!divider || !divider.classList.contains('section-divider')) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { divider.classList.toggle('is-stuck', !entry.isIntersecting); },
+      { rootMargin: `-${STICKY_TOP}px 0px 0px 0px`, threshold: 0 }
+    );
+    observer.observe(sentinel);
+  });
+})();
+
+// ── ann-bubble ↔ desc-item 양방향 연동 ──
+function activateAnn(id) {
+  const bubble = document.querySelector(`.ann-bubble[data-ann="${id}"]`);
+  const isActive = bubble && bubble.classList.contains('active');
+
+  const parts = id.split('-');
+  const prefix = parts.slice(0, parts.length - 1).join('-');
+
+  document.querySelectorAll(`.ann-bubble[data-ann^="${prefix}-"]`).forEach(el => el.classList.remove('active'));
+  document.querySelectorAll(`.desc-num[data-desc^="${prefix}-"]`).forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+
+  if (isActive) return;
+
+  if (bubble) {
+    bubble.classList.add('active');
+    const target = bubble.closest('.ann-host');
+    if (target) {
+      const HEADER_H = 160;
+      const rect = target.getBoundingClientRect();
+      window.scrollTo({ top: window.scrollY + rect.top - HEADER_H - 24, behavior: 'smooth' });
+      target.style.outline = '2.5px solid #c0392b';
+      target.style.outlineOffset = '4px';
+      target.style.borderRadius = '6px';
+      setTimeout(() => { target.style.outline = ''; target.style.outlineOffset = ''; }, 1800);
+    }
+  }
+
+  const descNum = document.querySelector(`.desc-num[data-desc="${id}"]`);
+  if (descNum) {
+    descNum.classList.add('active');
+    const item = descNum.closest('.desc-item');
+    if (item) {
+      item.classList.add('active');
+      const col = item.closest('.desc-col');
+      if (col) {
+        const headH = col.querySelector('.desc-col-head')?.offsetHeight || 0;
+        col.scrollTo({ top: item.offsetTop - headH - 12, behavior: 'smooth' });
+      }
+    }
+  }
+}
+</script>
+</body>
+</html>

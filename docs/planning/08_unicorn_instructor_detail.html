@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유니콘클래스 — 강사 상세</title>
+<link rel="stylesheet" href="./noto-sans.css" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+.tab-nav {border-bottom:2px solid var(--red);}
+/* ══════════════════════════════
+   강사 상세 — 프로필 영역
+══════════════════════════════ */
+.profile-section {
+  padding:48px 60px 40px;
+  display:flex; gap:64px; align-items:flex-start;
+}
+
+/* 좌: 사진 */
+.profile-photo-wrap {
+  width:280px; flex-shrink:0; position:relative;
+}
+/* V자 빨간 장식 */
+.profile-photo-deco {
+  position:absolute; bottom:0; left:-8px;
+  width:220px; height:200px; z-index:0;
+  overflow:hidden; pointer-events:none;
+}
+.profile-photo-deco::before,
+.profile-photo-deco::after {
+  content:'';
+  position:absolute;
+  width:0; height:0;
+}
+/* 큰 V */
+.profile-photo-deco::before {
+  bottom:0; left:0;
+  border-left:110px solid transparent;
+  border-right:110px solid transparent;
+  border-bottom:110px solid rgba(192,57,43,0.18);
+}
+/* 작은 V (위에 겹침) */
+.profile-photo-deco::after {
+  bottom:20px; left:20px;
+  border-left:90px solid transparent;
+  border-right:90px solid transparent;
+  border-bottom:90px solid rgba(192,57,43,0.13);
+}
+.profile-photo-img {
+  position:relative; z-index:1;
+  width:100%; height:340px;
+  background:linear-gradient(160deg, #e8eef4 0%, #c4d8ec 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size:11px; color:#9ab0c4; gap:8px;
+  border-radius:2px;
+}
+.profile-photo-img .person-icon { font-size:80px; color:#b0c8dc; }
+
+/* 우: 정보 */
+.profile-info-wrap { flex:1; min-width:0; }
+
+.profile-name {
+  font-size:28px; font-weight:900; color:#111;
+  letter-spacing:-0.5px; margin-bottom:6px;
+}
+.profile-category {
+  font-size:13px; color:#888; margin-bottom:14px;
+}
+
+/* 소셜 아이콘 */
+.profile-social {
+  display:flex; gap:8px; margin-bottom:28px;
+}
+.social-icon {
+  width:30px; height:30px; border-radius:6px;
+  border:1px solid #ddd;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; color:#555; cursor:pointer;
+  transition:border-color .15s, color .15s;
+}
+.social-icon:hover { border-color:#c0392b; color:#c0392b; }
+
+/* 강사소개 / 강사 경력 행 */
+.profile-row {
+  display:flex; gap:0; border-top:1px solid #eee; padding:20px 0;
+}
+.profile-row:last-of-type { border-bottom:1px solid #eee; }
+.profile-row-label {
+  width:80px; flex-shrink:0;
+  font-size:13px; font-weight:700; color:#333;
+  padding-top:1px;
+}
+.profile-row-content { flex:1; }
+
+/* 강사소개 불릿 리스트 */
+.intro-list { list-style:none; }
+.intro-list li {
+  font-size:13px; color:#444; line-height:1.8;
+  padding-left:14px; position:relative;
+}
+.intro-list li::before {
+  content:'•'; position:absolute; left:0; color:#c0392b; font-weight:700;
+}
+
+/* 강사 경력 리스트 */
+.career-list { list-style:none; }
+.career-list li {
+  font-size:13px; color:#444; line-height:1.8;
+  padding-left:14px; position:relative;
+}
+.career-list li::before {
+  content:'•'; position:absolute; left:0; color:#c0392b; font-weight:700;
+}
+
+/* ══════════════════════════════
+   강의 목록 영역
+══════════════════════════════ */
+.lecture-section {
+  padding:40px 60px 60px;
+  border-top:8px solid #f5f5f5;
+}
+.lecture-section-title {
+  font-size:18px; font-weight:900; color:#111;
+  margin-bottom:24px; letter-spacing:-0.3px;
+}
+
+/* 강의 카드 그리드 — 클래스 리스트와 동일 */
+.lecture-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+
+.class-card {
+  border-radius:8px; overflow:hidden; cursor:pointer;
+  border:1px solid #eee; background:#fff;
+  transition:box-shadow .15s, transform .15s;
+}
+.class-card:hover { box-shadow:0 6px 20px rgba(0,0,0,0.1); transform:translateY(-2px); }
+.card-thumb { position:relative; aspect-ratio:16/9; overflow:hidden; }
+.card-thumb-inner { width:100%; height:100%; }
+.card-info { padding:10px 12px 14px; }
+.card-tags { display:flex; gap:3px; margin-bottom:6px; flex-wrap:wrap; }
+.ctag { font-size:10px; font-weight:700; padding:2px 6px; border-radius:2px; }
+.ct-hot { background:#fdecea; color:#c0392b; }
+.ct-new { background:#e8f5e9; color:#27ae60; }
+.ct-best { background:#fef0ee; color:#c0392b; border:1px solid #c0392b; }
+.ct-free { background:#e8f5e9; color:#27ae60; }
+.card-title-text {
+  font-size:13px; font-weight:700; color:#1a1a1a; line-height:1.4;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  margin-bottom:4px;
+}
+.card-meta { font-size:11.5px; color:#999; }
+</style>
+</head>
+<body>
+
+<!-- ── 기획서 헤더 ── -->
+<div class="doc-header">
+  <div>
+    <div class="doc-proj">Project — 유니콘클래스 기획서 v3.0</div>
+    <div class="doc-title">강사 상세</div>
+  </div>
+</div>
+
+<!-- ══ 탭 네비게이션 ══ -->
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <div class="tab-btn" onclick="location.href='./'">메인</div>
+    <div class="tab-btn" onclick="location.href='./02_unicorn_login.html'">로그인 / 회원가입</div>
+    <div class="tab-btn" onclick="location.href='./03_unicorn_class_list.html'">클래스 리스트</div>
+    <div class="tab-btn" onclick="location.href='./04_unicorn_class_detail.html'">클래스 상세</div>
+	<div class="tab-btn" onclick="location.href='./05_unicorn_class_vimeo_player.html'">영상 화면</div>
+	<div class="tab-btn" onclick="location.href='./06_unicorn_about.html'">회사소개</div>
+	<div class="tab-btn" onclick="location.href='./07_unicorn_instructor.html'">강사 리스트</div>
+	<div class="tab-btn active" onclick="location.href='./08_unicorn_instructor_detail.html'">강사 상세</div>
+	<div class="tab-btn" onclick="location.href='./12_unicorn_instructor_apply.html'">강사 지원</div>
+	<div class="tab-btn" onclick="location.href='./09_unicorn_support.html'">고객센터</div>
+    <div class="tab-btn" onclick="location.href='./10_unicorn_mypage.html'">마이페이지</div>
+	<div class="tab-btn" onclick="location.href='./11_unicorn_search.html'">검색결과</div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+<div class="screen-wrap">
+
+  <!-- ① GNB -->
+  <div id="site-header" class="ann-host">
+    <div class="ann" onclick="activateAnn(1)" style="left:0;top:0;"><div class="ann-bubble" id="ann-1">1</div></div>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-box"><span>UNICORN<br>CLASS</span></div>
+      </div>
+      <nav class="gnb">
+        <div class="gnb-item">클래스
+          <div class="gnb-dropdown"><a href="#">무료강의</a><a href="#">프리미엄강의</a></div>
+        </div>
+        <div class="gnb-item">회사소개</div>
+        <div class="gnb-item active">강사진</div>
+        <div class="gnb-item">고객센터
+          <div class="gnb-dropdown"><a href="#">공지사항</a><a href="#">FAQ</a></div>
+        </div>
+      </nav>
+      <div class="header-right">
+	  	<a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a>
+        <div class="search-box">
+          <input type="text" placeholder="강사 / 과정명을 입력해 주세요.">
+          <button>🔍</button>
+        </div>
+        <span class="login-btn">로그인</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② 강사 프로필 영역 -->
+  <div class="profile-section">
+
+    <!-- 좌: 사진 -->
+    <div class="profile-photo-wrap ann-host">
+      <div class="ann" onclick="activateAnn(2)"><div class="ann-bubble" id="ann-2">2</div></div>
+      <div class="profile-photo-deco"></div>
+      <div class="profile-photo-img">
+        <div class="person-icon">👤</div>
+        <small>강사 사진<br>권장: 280×340px</small>
+      </div>
+    </div>
+
+    <!-- 우: 정보 -->
+    <div class="profile-info-wrap">
+
+      <!-- 이름 + 카테고리 -->
+      <div class="ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(3)"><div class="ann-bubble" id="ann-3">3</div></div>
+        <div class="profile-name">강사명</div>
+        <div class="profile-category">카테고리</div>
+      </div>
+
+      <!-- 소셜 아이콘 -->
+      <div class="profile-social ann-host" style="position:relative;">
+        <div class="ann" onclick="activateAnn(4)"><div class="ann-bubble" id="ann-4">4</div></div>
+        <div class="social-icon" title="유튜브">▶</div>
+        <div class="social-icon" title="인스타그램">📷</div>
+        <div class="social-icon" title="틱톡">♪</div>
+        <div class="social-icon" title="이메일">@</div>
+      </div>
+
+      <!-- 강사소개 -->
+      <div class="profile-row ann-host">
+        <div class="ann" onclick="activateAnn(5)"><div class="ann-bubble" id="ann-5">5</div></div>
+        <div class="profile-row-label">강사소개</div>
+        <div class="profile-row-content">
+          <ul class="intro-list">
+            <li>SBS 8시 뉴스 출연</li>
+            <li>SBS 모닝와이드 출연</li>
+            <li>SBS 호구들의 비밀과외 출연</li>
+            <li>MBC 오늘아침 출연</li>
+            <li>조선일보 메인1위</li>
+            <li>중앙일보 메인1위</li>
+            <li>한국경제 메인 1위 등...</li>
+            <li>수십개의 언론, 방송사에서 노출</li>
+            <li>32만 구독자 유튜버</li>
+            <li>집구할때 체크리스트 영상 하나로 500만 이상 조회수</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 강사 경력 -->
+      <div class="profile-row ann-host">
+        <div class="ann" onclick="activateAnn(6)"><div class="ann-bubble" id="ann-6">6</div></div>
+        <div class="profile-row-label">강사 경력</div>
+        <div class="profile-row-content">
+          <ul class="career-list">
+            <li>前 대형 이커머스 플랫폼 마케팅 팀장 (7년)</li>
+            <li>現 SNS 마케팅 컨설팅 법인 대표</li>
+            <li>연 매출 30억 이상 스마트스토어 운영</li>
+            <li>쿠팡 공식 파트너 마케팅 강사</li>
+            <li>중소벤처기업진흥공단 멘토링 강사</li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /profile-info-wrap -->
+  </div><!-- /profile-section -->
+
+  <!-- ③ 강의 목록 -->
+  <div class="lecture-section ann-host">
+    <div class="ann" onclick="activateAnn(7)" style="left:0;top:0;"><div class="ann-bubble" id="ann-7">7</div></div>
+    <div class="lecture-section-title">강의 목록</div>
+    <div class="lecture-grid ann-host" style="position:relative;">
+      <div class="ann" onclick="activateAnn(8)"><div class="ann-bubble" id="ann-8">8</div></div>
+
+      <!-- 카드 1 -->
+      <div class="class-card">
+        <div class="card-thumb">
+          <div class="card-thumb-inner" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364)"></div>
+        </div>
+        <div class="card-info">
+          <div class="card-tags"><span class="ctag ct-best">BEST</span></div>
+          <div class="card-title-text">[강사명] 월 5000만원, 하루 한대로 월급 만드는 폰 창업</div>
+          <div class="card-meta">강사명 · 커머스</div>
+        </div>
+      </div>
+
+      <!-- 카드 2 -->
+      <div class="class-card">
+        <div class="card-thumb">
+          <div class="card-thumb-inner" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)"></div>
+        </div>
+        <div class="card-info">
+          <div class="card-tags"><span class="ctag ct-new">NEW</span></div>
+          <div class="card-title-text">SNS 마케팅으로 월 100만원 추가 수익 만들기</div>
+          <div class="card-meta">강사명 · SNS</div>
+        </div>
+      </div>
+
+      <!-- 카드 3 -->
+      <div class="class-card">
+        <div class="card-thumb">
+          <div class="card-thumb-inner" style="background:linear-gradient(135deg,#0d0d0d,#1a0a0a,#2d1515)"></div>
+        </div>
+        <div class="card-info">
+          <div class="card-tags"><span class="ctag ct-free">무료</span></div>
+          <div class="card-title-text">AI 자동화로 하루 1시간만 일하는 스마트스토어 운영법</div>
+          <div class="card-meta">강사명 · AI</div>
+        </div>
+      </div>
+
+      <!-- 카드 4 -->
+      <div class="class-card">
+        <div class="card-thumb">
+          <div class="card-thumb-inner" style="background:linear-gradient(135deg,#1a0a2a,#2d1545,#150a20)"></div>
+        </div>
+        <div class="card-info">
+          <div class="card-tags"><span class="ctag ct-hot">HOT</span></div>
+          <div class="card-title-text">쿠팡 로켓배송 셀러 입점부터 월 1000만원 달성까지 완벽 가이드</div>
+          <div class="card-meta">강사명 · 커머스</div>
+        </div>
+      </div>
+
+      <!-- 카드 5 -->
+      <div class="class-card">
+        <div class="card-thumb">
+          <div class="card-thumb-inner" style="background:linear-gradient(135deg,#0a2a1a,#0d3520,#051a0d)"></div>
+        </div>
+        <div class="card-info">
+          <div class="card-tags"><span class="ctag ct-new">NEW</span></div>
+          <div class="card-title-text">인스타그램 릴스로 팔로워 1만 명 모으고 수익화하는 방법</div>
+          <div class="card-meta">강사명 · SNS</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <div id="footer">
+    <div class="footer-logo">UNICORN CLASS</div>
+    <div class="footer-info">
+      <strong>상호</strong>유니콘클래스&nbsp;&nbsp;
+      <strong>대표</strong>홍길동&nbsp;&nbsp;
+      <strong>사업자등록번호</strong>000-00-00000<br>
+      <strong>주소</strong>서울특별시 OO구 OO로 000&nbsp;&nbsp;
+      <strong>이메일</strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b3dbd6dfc3f3c6dddad0dcc1ddd0dfd2c0c09dd0dc9dd8c1">[email&#160;protected]</a>
+    </div>
+    <div class="footer-links">
+      <a href="#">이용약관</a>
+      <a href="#">개인정보처리방침</a>
+      <a href="#">회사소개</a>
+      <a href="#">고객센터</a>
+    </div>
+    <div class="footer-copy">© 2026 유니콘클래스. All rights reserved.</div>
+  </div>
+
+</div><!-- /screen-wrap -->
+
+<!-- Description 패널 -->
+<div class="desc-panel">
+  <div class="desc-panel-head">📋 화면 설명</div>
+
+  <div class="desc-item" id="desc-1" onclick="activateAnn(1)">
+    <div class="desc-num">1</div>
+    <div>
+      <div class="desc-label">GNB</div>
+      <div class="desc-text">클래스 리스트와 동일. 강사진 메뉴 active.</div>
+      <span class="desc-tag t-gray">공통 컴포넌트</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-2" onclick="activateAnn(2)">
+    <div class="desc-num">2</div>
+    <div>
+      <div class="desc-label">강사 사진</div>
+      <div class="desc-text">좌측 고정 영역. 사진 뒤에 V자 빨간 삼각형 장식 (타이탄클래스 동일 구조). 배경 제거된 인물 컷 권장. DB: lc_instructor.photo</div>
+      <span class="desc-tag t-red">사진 제공 필요</span>
+      <span class="desc-tag t-blue">lc_instructor</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-3" onclick="activateAnn(3)">
+    <div class="desc-num">3</div>
+    <div>
+      <div class="desc-label">강사명 + 카테고리</div>
+      <div class="desc-text">강사명(28px bold) + 카테고리 텍스트(회색). DB: lc_instructor.name, category</div>
+      <span class="desc-tag t-blue">lc_instructor</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-4" onclick="activateAnn(4)">
+    <div class="desc-num">4</div>
+    <div>
+      <div class="desc-label">소셜 아이콘</div>
+      <div class="desc-text">유튜브 / 인스타그램 / 틱톡 / 이메일 등. 해당 URL이 등록된 아이콘만 노출. 클릭 시 새 탭 열기. DB: lc_instructor.social_youtube, social_insta, social_tiktok, social_email</div>
+      <span class="desc-tag t-blue">등록된 항목만 노출</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-5" onclick="activateAnn(5)">
+    <div class="desc-num">5</div>
+    <div>
+      <div class="desc-label">강사소개</div>
+      <div class="desc-text">좌: "강사소개" 고정 레이블 / 우: 불릿(•) 리스트. DB: lc_instructor_intro 테이블 (instructor_idx FK, intro_text, sort_order). 개수 제한 없음.</div>
+      <span class="desc-tag t-blue">lc_instructor_intro</span>
+      <span class="desc-tag t-red">내용 제공 필요</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-6" onclick="activateAnn(6)">
+    <div class="desc-num">6</div>
+    <div>
+      <div class="desc-label">강사 경력</div>
+      <div class="desc-text">좌: "강사 경력" 고정 레이블 / 우: 불릿(•) 리스트. 강사소개와 동일한 레이아웃. 경력 미등록 시 "등록된 경력이 없습니다." 표시. DB: lc_instructor_career 테이블 (instructor_idx FK, career_text, sort_order)</div>
+      <span class="desc-tag t-blue">lc_instructor_career</span>
+      <span class="desc-tag t-gray">미등록 시 안내 문구</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-7" onclick="activateAnn(7)">
+    <div class="desc-num">7</div>
+    <div>
+      <div class="desc-label">강의 목록 섹션</div>
+      <div class="desc-text">회색 구분선(border-top:8px solid #f5f5f5)으로 프로필 영역과 구분. "강의 목록" 타이틀. 해당 강사의 강의만 필터링.</div>
+      <span class="desc-tag t-blue">lc_class WHERE instructor_idx</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-8" onclick="activateAnn(8)">
+    <div class="desc-num">8</div>
+    <div>
+      <div class="desc-label">강의 카드</div>
+      <div class="desc-text">클래스 리스트와 동일한 카드 구조 (썸네일 16:9 + 뱃지 + 제목 2줄 + 강사명). 3열 그리드. 카드 클릭 시 강의 상세(03) 이동.</div>
+      <span class="desc-tag t-blue">→ 강의 상세(03)</span>
+      <span class="desc-tag t-gray">클래스 리스트 카드와 동일</span>
+    </div>
+  </div>
+
+  <div style="padding:10px 14px; background:#fef0ee; border-bottom:1px solid #e8eef4;">
+    <div style="font-size:10px; font-weight:700; color:#e74c3c; letter-spacing:1px;">📌 DB 연동 테이블</div>
+    <div style="font-size:10px; color:#666; margin-top:6px; line-height:1.8;">
+      lc_instructor (기본 정보)<br>
+      lc_instructor_intro (소개 항목)<br>
+      lc_instructor_career (경력 항목)<br>
+      lc_class (강의 목록, FK: instructor_idx)
+    </div>
+  </div>
+
+</div><!-- /desc-panel -->
+</div><!-- /page-wrap -->
+
+<script>
+function activateAnn(num) {
+  const bubble = document.getElementById('ann-' + num);
+  const isActive = bubble && bubble.classList.contains('active');
+
+  // 전체 초기화
+  document.querySelectorAll('.ann-bubble.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.ann-host.active-host').forEach(el => el.classList.remove('active-host'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+
+  if (isActive) return; // 토글 off
+
+  // bubble + host 활성화
+  if (bubble) {
+    bubble.classList.add('active');
+    const host = bubble.closest('.ann-host');
+    if (host) {
+      host.classList.add('active-host');
+
+      // ① 화면 요소로 스크롤 (sticky 헤더 92px 고려)
+      const HEADER_H = 92;
+      const rect = host.getBoundingClientRect();
+      const scrollY = window.scrollY + rect.top - HEADER_H - 24;
+      window.scrollTo({ top: scrollY, behavior: 'smooth' });
+    }
+  }
+
+  // desc-item 활성화 + ② desc-panel 내부 스크롤
+  const descItem = document.getElementById('desc-' + num);
+  if (descItem) {
+    descItem.classList.add('active');
+    const panel = descItem.closest('.desc-panel');
+    if (panel) {
+      const headH = panel.querySelector('.desc-panel-head')?.offsetHeight || 0;
+      panel.scrollTo({ top: descItem.offsetTop - headH - 8, behavior: 'smooth' });
+    }
+  }
+}
+</script>
+</body>
+</html>

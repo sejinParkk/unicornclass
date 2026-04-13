@@ -1,0 +1,36 @@
+[09-Apr-2026 01:55:12 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[22007]: Invalid datetime format: 1366 Incorrect string value: '\xC5\xD7\xBD\xBA\xC5\xCD' for column `unicornclass`.`lc_member`.`mb_name` at row 1 in /var/www/html/app/Core/DB.php:104
+Stack trace:
+#0 /var/www/html/app/Core/DB.php(104): PDOStatement->execute(Array)
+#1 /var/www/html/app/Repositories/MemberRepository.php(52): App\Core\DB::insert('INSERT INTO lc_...', Array)
+#2 /var/www/html/app/Http/Controllers/AuthController.php(125): App\Repositories\MemberRepository->create(Array)
+#3 [internal function]: App\Http\Controllers\AuthController->register()
+#4 /var/www/html/app/Core/Router.php(131): call_user_func_array(Array, Array)
+#5 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#6 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#7 {main}
+  thrown in /var/www/html/app/Core/DB.php on line 104
+[09-Apr-2026 02:35:08 UTC] PHP Fatal error:  Uncaught Error: Unknown named parameter $class_idx in /var/www/html/app/Core/Router.php:131
+Stack trace:
+#0 /var/www/html/app/Core/Router.php(131): call_user_func_array(Array, Array)
+#1 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#2 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#3 {main}
+  thrown in /var/www/html/app/Core/Router.php on line 131
+[09-Apr-2026 02:35:42 UTC] PHP Warning:  Trying to access array offset on value of type null in /var/www/html/resources/views/pages/admin/classes/form.php on line 285
+[09-Apr-2026 02:36:07 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[22007]: Invalid datetime format: 1366 Incorrect string value: '\xB0\xAD \xBC\xD2\xB0...' for column `unicornclass`.`lc_class_chapter`.`title` at row 1 in /var/www/html/app/Core/DB.php:104
+Stack trace:
+#0 /var/www/html/app/Core/DB.php(104): PDOStatement->execute(Array)
+#1 /var/www/html/app/Repositories/ChapterRepository.php(51): App\Core\DB::insert('INSERT INTO lc_...', Array)
+#2 /var/www/html/app/Http/Controllers/Admin/ChapterController.php(45): App\Repositories\ChapterRepository->create(5, Array)
+#3 [internal function]: App\Http\Controllers\Admin\ChapterController->store()
+#4 /var/www/html/app/Core/Router.php(133): call_user_func_array(Array, Array)
+#5 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#6 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#7 {main}
+  thrown in /var/www/html/app/Core/DB.php on line 104
+[09-Apr-2026 02:36:36 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Admin\InstructorController" not found in /var/www/html/app/Core/Router.php:132
+Stack trace:
+#0 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#1 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#2 {main}
+  thrown in /var/www/html/app/Core/Router.php on line 132

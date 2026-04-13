@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"<?php echo ''Unicorn Class OK'';\")",
+      "Bash(docker exec:*)",
+      "Bash(D:/project/Unicornclass/resources/views/pages/auth/find-id.php:*)",
+      "Bash(__NEW_LINE_c045524339311f5f__ cat:*)",
+      "Bash(D:/project/Unicornclass/resources/views/pages/auth/find-password.php:*)",
+      "Bash(__NEW_LINE_c045524339311f5f__ echo:*)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(curl:*)",
+      "Bash(CSRF=\"217e2be38034e4d341a49c8730cfc5be769eccf4afde366a875b52f90491337e\" curl -v -b /tmp/admin_cookies.txt -c /tmp/admin_cookies.txt -X POST http://localhost:8080/admin/login --data-urlencode \"login_id=admin\" --data-urlencode \"password=Admin1234!\" --data-urlencode \"csrf_token=$CSRF\")",
+      "Bash(CSRF=\"217e2be38034e4d341a49c8730cfc5be769eccf4afde366a875b52f90491337e\" curl -s -b /tmp/admin_cookies.txt -c /tmp/admin_cookies.txt -X POST http://localhost:8080/admin/login --data-urlencode \"login_id=admin\" --data-urlencode \"password=Admin1234!\" --data-urlencode \"csrf_token=$CSRF\")",
+      "Bash(CSRF=\"770e161a8884d202d2ce3417a6cf02d9b9c66f0c7b19c382c6cc941ca2d93e4f\" curl -v -b /tmp/admin_cookies.txt -c /tmp/admin_cookies.txt -X POST http://localhost:8080/admin/login --data-urlencode \"login_id=admin\" --data-urlencode \"password=Admin1234!\" --data-urlencode \"csrf_token=$CSRF\")",
+      "Bash(CSRF=\"770e161a8884d202d2ce3417a6cf02d9b9c66f0c7b19c382c6cc941ca2d93e4f\" curl -s -b /tmp/admin_cookies.txt -c /tmp/admin_cookies.txt -X POST http://localhost:8080/admin/login --data-urlencode \"login_id=admin\" --data-urlencode \"password=Admin1234!\" --data-urlencode \"csrf_token=$CSRF\")",
+      "Bash(1 echo:*)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(winpty docker:*)",
+      "Bash(/dev/null ls:*)",
+      "Bash(docker ps:*)",
+      "Bash(ls D:/project/Unicornclass/.env*)",
+      "Bash(docker cp:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(grep:*)",
+      "Bash(/dev/null:*)",
+      "Bash(for f:*)",
+      "Bash(do)",
+      "Bash(echo \"=== $f ===\")",
+      "Read(//d/project/Unicornclass/**)",
+      "Bash(echo \"\\(no <style> tag\\)\")",
+      "Bash(find D:projectUnicornclass -type f -name *instructor*.php)",
+      "Bash(find D:projectUnicornclass/views -type f -name *.php)",
+      "Bash(find D:/project/Unicornclass -type f -name *route* -o -name *Route*)",
+      "Bash(docker compose:*)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(find . -type f -name *.php -path */Controllers/* ! -path */Admin/* ! -path */Api/*)",
+      "Bash(xargs ls:*)",
+      "Bash(python3:*)",
+      "Bash(node -e ':*)"
+    ]
+  }
+}

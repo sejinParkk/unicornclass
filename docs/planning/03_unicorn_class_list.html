@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유니콘클래스 — 클래스 리스트</title>
+<link rel="stylesheet" href="./noto-sans.css" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+.tab-nav {border-bottom:2px solid var(--red);}
+/* ══════════════════════════════
+   서브 배너
+══════════════════════════════ */
+#sub-banner {
+  position:relative;
+  background:linear-gradient(105deg, #0d0d0d 0%, #1a1a2e 60%, #0f2027 100%);
+  padding:36px 32px 32px;
+  overflow:hidden;
+}
+.sub-banner-bg {
+  position:absolute; inset:0;
+  background:linear-gradient(105deg, rgba(192,57,43,0.15) 0%, transparent 60%);
+  pointer-events:none;
+}
+.sub-banner-label {
+  font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:2px;
+  text-transform:uppercase; margin-bottom:8px;
+}
+.sub-banner-title {
+  font-size:32px; font-weight:900; color:#fff; letter-spacing:-1px; line-height:1.2;
+}
+
+/* ══════════════════════════════
+   클래스 탭
+══════════════════════════════ */
+#class-tabs {
+  background:#fff; border-bottom:2px solid #eee;
+  padding:0 32px; display:flex; gap:0; position:relative;
+}
+.class-tab {
+  padding:0 4px; height:50px; margin-right:24px;
+  display:flex; align-items:center;
+  font-size:14px; font-weight:600; color:#999; cursor:pointer;
+  border-bottom:3px solid transparent; margin-bottom:-2px;
+  transition:all .15s;
+}
+.class-tab:hover { color:#333; }
+.class-tab.active { color:#c0392b; border-bottom-color:#c0392b; }
+
+/* ══════════════════════════════
+   카테고리 필터
+══════════════════════════════ */
+#category-bar {
+  padding:16px 32px 14px;
+  border-bottom:1px solid #f0f0f0;
+  display:flex; gap:6px; flex-wrap:wrap;
+  position:relative;
+}
+.cat-btn {
+  height:30px; padding:0 14px;
+  border-radius:15px; border:1px solid #e0e0e0;
+  font-size:12.5px; font-weight:600; color:#555;
+  background:#fff; cursor:pointer;
+  transition:all .15s;
+}
+.cat-btn:hover { border-color:#c0392b; color:#c0392b; }
+.cat-btn.active {
+  background:#c0392b; border-color:#c0392b; color:#fff;
+}
+
+/* ══════════════════════════════
+   클래스 그리드 영역
+══════════════════════════════ */
+#class-grid-wrap {
+  padding:28px 32px 0; position:relative;
+}
+.class-grid {
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:20px;
+}
+.class-card {
+  border-radius:8px; overflow:hidden; cursor:pointer;
+  border:1px solid #eee; background:#fff;
+  transition:box-shadow .15s, transform .15s;
+}
+.class-card:hover { box-shadow:0 6px 20px rgba(0,0,0,0.1); transform:translateY(-2px); }
+.card-thumb { position:relative; aspect-ratio:16/9; overflow:hidden; }
+.card-thumb-inner { width:100%; height:100%; }
+.card-info { padding:10px 12px 14px; }
+.card-tags { display:flex; gap:3px; margin-bottom:6px; flex-wrap:wrap; }
+.ctag { font-size:10px; font-weight:700; padding:2px 6px; border-radius:2px; }
+.ct-hot { background:#fdecea; color:#c0392b; }
+.ct-new { background:#e8f5e9; color:#27ae60; }
+.ct-premium { background:#f3e8ff; color:#8e44ad; }
+.card-title-text {
+  font-size:13px; font-weight:700; color:#1a1a1a; line-height:1.4;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  margin-bottom:4px;
+}
+.card-meta { font-size:11.5px; color:#999; }
+</style>
+</head>
+<body>
+
+<!-- ── 기획서 헤더 ── -->
+<div class="doc-header">
+  <div>
+    <div class="doc-proj">Project — 유니콘클래스 기획서 v3.0</div>
+    <div class="doc-title">클래스 리스트</div>
+  </div>
+</div>
+
+<!-- ══ 탭 네비게이션 ══ -->
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <div class="tab-btn" onclick="location.href='./'">메인</div>
+    <div class="tab-btn" onclick="location.href='./02_unicorn_login.html'">로그인 / 회원가입</div>
+    <div class="tab-btn active" onclick="location.href='./03_unicorn_class_list.html'">클래스 리스트</div>
+    <div class="tab-btn" onclick="location.href='./04_unicorn_class_detail.html'">클래스 상세</div>
+	<div class="tab-btn" onclick="location.href='./05_unicorn_class_vimeo_player.html'">영상 화면</div>
+	<div class="tab-btn" onclick="location.href='./06_unicorn_about.html'">회사소개</div>
+	<div class="tab-btn" onclick="location.href='./07_unicorn_instructor.html'">강사 리스트</div>
+	<div class="tab-btn" onclick="location.href='./08_unicorn_instructor_detail.html'">강사 상세</div>
+	<div class="tab-btn" onclick="location.href='./12_unicorn_instructor_apply.html'">강사 지원</div>
+	<div class="tab-btn" onclick="location.href='./09_unicorn_support.html'">고객센터</div>
+    <div class="tab-btn" onclick="location.href='./10_unicorn_mypage.html'">마이페이지</div>
+	<div class="tab-btn" onclick="location.href='./11_unicorn_search.html'">검색결과</div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- ══ 좌: 화면 ══ -->
+  <div class="screen-wrap">
+
+    <!-- HEADER -->
+    <div id="site-header">
+      <div class="header-inner">
+        <div class="logo">
+          <div class="logo-box"><span>UNICORN<br>CLASS</span></div>
+        </div>
+        <nav class="gnb">
+          <div class="gnb-item active">클래스
+            <div class="gnb-dropdown">
+              <a href="#">무료강의</a>
+              <a href="#">프리미엄강의</a>
+              
+            </div>
+          </div>
+          <div class="gnb-item">회사소개</div>
+          <div class="gnb-item">강사진</div>
+          <div class="gnb-item">고객센터
+            <div class="gnb-dropdown">
+              <a href="#">공지사항</a>
+              <a href="#">FAQ</a>
+            </div>
+          </div>
+        </nav>
+        <div class="header-right">
+			<a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a>
+          <div class="search-box">
+            <input type="text" placeholder="강사 / 과정명을 입력해 주세요.">
+            <button>🔍</button>
+          </div>
+          <span class="login-btn">로그인</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ① 서브 배너 -->
+    <div id="sub-banner" class="ann-host">
+      <div class="ann" style="top:5px;left:10px"><div class="ann-bubble" data-ann="cl-1" onclick="activateAnn('cl-1')">1</div></div>
+      <div class="sub-banner-bg"></div>
+      <div class="sub-banner-label">지금 진행중인</div>
+      <div class="sub-banner-title">클래스</div>
+    </div>
+
+    <!-- ② 클래스 탭 -->
+    <div id="class-tabs" class="ann-host">
+      <div class="ann" style="left:10px"><div class="ann-bubble" data-ann="cl-2" onclick="activateAnn('cl-2')">2</div></div>
+      <div class="class-tab active" onclick="switchTab(this, 'free')">무료강의</div>
+      <div class="class-tab" onclick="switchTab(this, 'premium')">프리미엄강의</div>
+    </div>
+
+    <!-- ③ 카테고리 필터 -->
+    <div id="category-bar" class="ann-host">
+      <div class="ann" style="left:10px;top:0"><div class="ann-bubble" data-ann="cl-3" onclick="activateAnn('cl-3')">3</div></div>
+      <button class="cat-btn active" onclick="switchCat(this)">전체</button>
+      <button class="cat-btn" onclick="switchCat(this)">AI</button>
+      <button class="cat-btn" onclick="switchCat(this)">SNS</button>
+      <button class="cat-btn" onclick="switchCat(this)">디자인/영상</button>
+      <button class="cat-btn" onclick="switchCat(this)">마케팅</button>
+      <button class="cat-btn" onclick="switchCat(this)">유튜브</button>
+      <button class="cat-btn" onclick="switchCat(this)">커머스</button>
+    </div>
+
+    <!-- ④ 클래스 그리드 -->
+    <div id="class-grid-wrap">
+      <div class="ann" style="left:15px;top:5px">
+        <div class="ann-bubble" data-ann="cl-4" data-scroll="class-grid-wrap" onclick="activateAnn('cl-4')">4</div>
+      </div>
+      <div class="class-grid">
+
+        <!-- 카드 1 -->
+        <div class="class-card">
+          <div class="card-thumb">
+            <div class="card-thumb-inner" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364)"></div>
+          </div>
+          <div class="card-info">
+            <div class="card-tags"><span class="ctag ct-hot">HOT</span></div>
+            <div class="card-title-text">[김구링] 생계형으로 완성한 트렌드 커머스 AI자동화로 수익내기</div>
+            <div class="card-meta">김구링 · 커머스</div>
+          </div>
+        </div>
+
+        <!-- 카드 2 -->
+        <div class="class-card">
+          <div class="card-thumb">
+            <div class="card-thumb-inner" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)"></div>
+          </div>
+          <div class="card-info">
+            <div class="card-tags"><span class="ctag ct-hot">HOT</span><span class="ctag ct-new">NEW</span></div>
+            <div class="card-title-text">[현우] 50대도 월 백 버는 원현우의 AI 제휴마케팅 무료특강</div>
+            <div class="card-meta">원현우 · 마케팅</div>
+          </div>
+        </div>
+
+        <!-- 카드 3 -->
+        <div class="class-card">
+          <div class="card-thumb">
+            <div class="card-thumb-inner" style="background:linear-gradient(135deg,#0d0d0d,#1a0a0a,#2d1515)"></div>
+          </div>
+          <div class="card-info">
+            <div class="card-tags"><span class="ctag ct-new">NEW</span></div>
+            <div class="card-title-text">[광희상] 나만의 커스텀 마스터 클래스 완성하기</div>
+            <div class="card-meta">광희상 · 커머스</div>
+          </div>
+        </div>
+
+        <!-- 카드 4 -->
+        <div class="class-card">
+          <div class="card-thumb">
+            <div class="card-thumb-inner" style="background:linear-gradient(135deg,#1a2a1a,#0d1f0d,#153015)"></div>
+          </div>
+          <div class="card-info">
+            <div class="card-tags"><span class="ctag ct-new">NEW</span></div>
+            <div class="card-title-text">[소업] SNS로 월 300 버는 실전 수익화 전략 무료특강</div>
+            <div class="card-meta">소업 · 마케팅</div>
+          </div>
+        </div>
+
+        <!-- 카드 5 -->
+        <div class="class-card">
+          <div class="card-thumb">
+            <div class="card-thumb-inner" style="background:linear-gradient(135deg,#2a1a0a,#3d2a0d,#1a1205)"></div>
+          </div>
+          <div class="card-info">
+            <div class="card-tags"><span class="ctag ct-hot">HOT</span></div>
+            <div class="card-title-text">[단비] 유튜브 수익화 3개월 완성 마스터클래스</div>
+            <div class="card-meta">단비 · 유튜브</div>
+          </div>
+        </div>
+
+        <!-- 카드 6 -->
+        <div class="class-card">
+          <div class="card-thumb">
+            <div class="card-thumb-inner" style="background:linear-gradient(135deg,#0a1a2a,#0d1f35,#071520)"></div>
+          </div>
+          <div class="card-info">
+            <div class="card-tags"><span class="ctag ct-new">NEW</span></div>
+            <div class="card-title-text">[뾴공략] 월 5000만원, 누구나 하루에 한대로 월급 만드는 본창업</div>
+            <div class="card-meta">뾴공략 · AI</div>
+          </div>
+        </div>
+
+        <!-- 카드 7 -->
+        <div class="class-card">
+          <div class="card-thumb">
+            <div class="card-thumb-inner" style="background:linear-gradient(135deg,#1a0a2a,#2d1545,#150a20)"></div>
+          </div>
+          <div class="card-info">
+            <div class="card-tags"><span class="ctag ct-hot">HOT</span><span class="ctag ct-new">NEW</span></div>
+            <div class="card-title-text">[메리] 집에서 재고없이 코스트코 상품으로 월급벌기 무료특강</div>
+            <div class="card-meta">메리 · 커머스</div>
+          </div>
+        </div>
+
+        <!-- 카드 8 -->
+        <div class="class-card">
+          <div class="card-thumb">
+            <div class="card-thumb-inner" style="background:linear-gradient(135deg,#0a2a1a,#0d3520,#051a0d)"></div>
+          </div>
+          <div class="card-info">
+            <div class="card-tags"><span class="ctag ct-new">NEW</span></div>
+            <div class="card-title-text">[주건] 직장인도 월 300! 헬스 숍폼으로 수익화 특강</div>
+            <div class="card-meta">주건 · 유튜브</div>
+          </div>
+        </div>
+
+        <!-- 카드 9 -->
+        <div class="class-card">
+          <div class="card-thumb">
+            <div class="card-thumb-inner" style="background:linear-gradient(135deg,#2a2a0a,#35350d,#1a1a05)"></div>
+          </div>
+          <div class="card-info">
+            <div class="card-tags"><span class="ctag ct-hot">HOT</span></div>
+            <div class="card-title-text">[단비] 기술 X 노하우로 숍꾸! 쇼핑숏폼 올인원 무료 클래스</div>
+            <div class="card-meta">단비 · 유튜브</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ⑤ 페이징 -->
+    <div id="pagination" class="ann-host">
+      <div class="ann" style="left:50%;top:10px;margin-left:-12px"><div class="ann-bubble" data-ann="cl-5" onclick="activateAnn('cl-5')">5</div></div>
+      <button class="page-arrow">‹</button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-arrow">›</button>
+    </div>
+
+    <!-- FOOTER -->
+    <div id="footer">
+      <div class="footer-logo">UNICORN CLASS</div>
+      <div class="footer-info">
+        <strong>상호</strong>유니콘클래스&nbsp;&nbsp;<strong>대표</strong>홍길동&nbsp;&nbsp;<strong>사업자등록번호</strong>000-00-00000<br>
+        <strong>주소</strong>서울특별시 OO구 OO로 000, OOO호&nbsp;&nbsp;<strong>대표전화</strong>000-0000-0000&nbsp;&nbsp;<strong>이메일</strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7c14191010133c0912151f130e121f101d0f0f521f1352170e">[email&#160;protected]</a>
+      </div>
+      <div class="footer-links">
+        <a href="#">이용약관</a>
+        <a href="#" class="em">개인정보처리방침</a>
+        <a href="#">회사소개</a>
+        <a href="#">고객센터</a>
+      </div>
+      <div class="footer-copy">© 2026 유니콘클래스. All rights reserved.</div>
+    </div>
+
+  </div><!-- /.screen-wrap -->
+
+  <!-- ══ 우: Description 패널 ══ -->
+  <div class="desc-panel">
+    <div class="desc-panel-head">Description</div>
+    <div class="desc-list">
+
+      <div class="desc-item" onclick="activateAnn('cl-1')">
+        <div class="desc-num" data-desc="cl-1">1</div>
+        <div class="desc-text"><strong>서브 배너</strong>: 현재 페이지명 + 서브 디스크립션<br>배경: 어두운 그라디언트 (메인 히어로 축소형)<br>향후 이미지/영상 교체 가능</div>
+      </div>
+
+      <div class="desc-item" onclick="activateAnn('cl-2')">
+        <div class="desc-num" data-desc="cl-2">2</div>
+        <div class="desc-text"><strong>클래스 탭</strong>: 무료강의 / 프리미엄강의<br>탭 전환 시 카드 목록 + 카테고리 필터 갱신<br>URL 변경: <code>/class?type=free</code> 등</div>
+      </div>
+
+      <div class="desc-item" onclick="activateAnn('cl-3')">
+        <div class="desc-num" data-desc="cl-3">3</div>
+        <div class="desc-text"><strong>카테고리 필터</strong>: 전체 / AI / SNS / 디자인·영상 / 마케팅 / 유튜브 / 커머스<br>전체 선택 시 전체 노출<br>다중 선택 불가 (단일 선택)</div>
+      </div>
+
+      <div class="desc-item" onclick="activateAnn('cl-4')">
+        <div class="desc-num" data-desc="cl-4">4</div>
+        <div class="desc-text"><strong>클래스 카드 그리드</strong>: 3열 고정<br>페이지당 최대 9개 노출<br>썸네일(16:9 빈 배경) + NEW·HOT 배지 + 강의명(1줄 ...) + 강사명·카테고리<br>hover: 카드 위로 2px 이동 + 그림자</div>
+      </div>
+
+      <div class="desc-item" onclick="activateAnn('cl-5')">
+        <div class="desc-num" data-desc="cl-5">5</div>
+        <div class="desc-text"><strong>페이징</strong>: 이전/다음 화살표 + 페이지 번호<br>현재 페이지 빨강 강조<br>서버사이드 페이징 (PHP)</div>
+      </div>
+
+    </div>
+  </div><!-- /.desc-panel -->
+
+</div><!-- /.page-wrap -->
+
+<script>
+// ── 탭 전환 ──
+function switchTab(el, type) {
+  document.querySelectorAll('.class-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── 카테고리 전환 ──
+function switchCat(el) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── ann 양방향 연동 ──
+function activateAnn(id) {
+  const bubble = document.querySelector(`.ann-bubble[data-ann="${id}"]`);
+  const isActive = bubble && bubble.classList.contains('active');
+
+  document.querySelectorAll('.ann-bubble[data-ann]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-num[data-desc]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+
+  if (isActive) return;
+
+  if (bubble) {
+    bubble.classList.add('active');
+
+    const annHost = bubble.closest('.ann-host');
+    if (annHost) {
+      const HEADER_H = 80;
+      const rect = annHost.getBoundingClientRect();
+      window.scrollTo({ top: window.scrollY + rect.top - HEADER_H - 54, behavior: 'smooth' });
+      annHost.style.outline = '2.5px solid #c0392b';
+      annHost.style.outlineOffset = '4px';
+      annHost.style.borderRadius = '4px';
+      setTimeout(() => { annHost.style.outline = ''; annHost.style.outlineOffset = ''; }, 1800);
+    } else {
+      const scrollTarget = bubble.dataset.scroll;
+      if (scrollTarget) {
+        const el = document.getElementById(scrollTarget);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          window.scrollTo({ top: window.scrollY + rect.top - 70, behavior: 'smooth' });
+        }
+      }
+    }
+  }
+
+  const descNum = document.querySelector(`.desc-num[data-desc="${id}"]`);
+  if (descNum) {
+    descNum.classList.add('active');
+    const item = descNum.closest('.desc-item');
+    if (item) {
+      item.classList.add('active');
+      const panel = item.closest('.desc-panel');
+      if (panel) {
+        const headH = panel.querySelector('.desc-panel-head')?.offsetHeight || 0;
+        panel.scrollTo({ top: item.offsetTop - headH - 12, behavior: 'smooth' });
+      }
+    }
+  }
+}
+</script>
+</body>
+</html>

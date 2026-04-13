@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS `lc_member` (
+    `mb_idx`          INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+    `mb_id`           VARCHAR(50)   NOT NULL,
+    `mb_name`         VARCHAR(50)   NOT NULL,
+    `mb_email`        VARCHAR(100)  NOT NULL,
+    `mb_phone`        VARCHAR(20)   NULL,
+    `mb_password`     VARCHAR(255)  NULL COMMENT 'NULL = 소셜 전용',
+    `mb_role`         ENUM('user','admin') NOT NULL DEFAULT 'user',
+    `mb_status`       ENUM('active','dormant','withdrawn') NOT NULL DEFAULT 'active',
+    `signup_type`     ENUM('email','kakao','naver') NOT NULL DEFAULT 'email',
+    `social_provider` VARCHAR(20)   NULL,
+    `social_id`       VARCHAR(100)  NULL,
+    `profile_img`     VARCHAR(255)  NULL,
+    `last_login_at`   DATETIME      NULL,
+    `created_at`      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`mb_idx`),
+    UNIQUE KEY `uq_mb_id`    (`mb_id`),
+    UNIQUE KEY `uq_mb_email` (`mb_email`),
+    KEY `idx_mb_status`      (`mb_status`),
+    KEY `idx_signup_type`    (`signup_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

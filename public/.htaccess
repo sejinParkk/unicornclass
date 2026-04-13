@@ -1,0 +1,9 @@
+Options -Indexes
+RewriteEngine On
+
+# 실제 파일/디렉토리는 그대로 서빙
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# 모든 요청을 index.php로 라우팅
+RewriteRule ^ index.php [QSA,L]

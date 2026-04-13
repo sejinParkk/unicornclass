@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유니콘클래스 — 영상 화면</title>
+<link rel="stylesheet" href="./noto-sans.css" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+.tab-nav {border-bottom:2px solid var(--red);}
+.cart-icon {
+  position:relative; cursor:pointer; padding:4px 6px;
+  display:flex; align-items:center; font-size:22px; color:#333;
+  transition:color .15s;
+}
+.cart-icon:hover { color:#c0392b; }
+.cart-badge {
+  position:absolute; top:0; right:0;
+  width:16px; height:16px; border-radius:50%;
+  background:#c0392b; color:#fff;
+  font-size:9px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+  border:2px solid #fff;
+}
+.mypage-wrap { position:relative; z-index:110; }
+.mypage-btn {
+  display:flex; align-items:center; gap:6px; cursor:pointer;
+  padding:4px 10px; border-radius:20px;
+  border:1px solid #e0e0e0; background:#fff;
+  font-size:13px; font-weight:600; color:#1a1a1a;
+  transition:all .15s;
+}
+.mypage-btn:hover { border-color:#c0392b; color:#c0392b; }
+.mypage-avatar {
+  width:24px; height:24px; border-radius:50%;
+  background:#c0392b; color:#fff;
+  font-size:10px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.mypage-dropdown {
+  position:absolute; top:100%; right:0;
+  padding-top:8px;
+  background:transparent;
+  display:none; z-index:120; min-width:160px;
+}
+.mypage-dropdown-inner {
+  background:#fff; border:1px solid #e0e0e0;
+  border-top:2px solid #c0392b;
+  border-radius:0 0 6px 6px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.1); padding:4px 0;
+}
+.mypage-wrap:hover .mypage-dropdown { display:block; }
+.mypage-dropdown a { display:block; padding:9px 16px; font-size:12.5px; color:#333; font-weight:400; border-bottom:1px solid #f5f5f5; }
+.mypage-dropdown a:last-child { border-bottom:none; }
+.mypage-dropdown a:hover { background:#fff5f5; color:#c0392b; }
+.mypage-dropdown .md-logout { color:#999; border-top:1px solid #eee; margin-top:2px; }
+#breadcrumb {
+  padding:10px 32px; font-size:12px; color:#aaa;
+  border-bottom:1px solid #f5f5f5;
+  position:relative;
+}
+#breadcrumb span { color:#888; }
+#breadcrumb span + span::before { content:' > '; color:#ccc; margin:0 4px; }
+#breadcrumb span.cur { color:#555; font-weight:600; }
+#player-wrap {
+  background:#0d0d0d;
+  padding:0;
+  position:relative;
+}
+.player-ratio {
+  position:relative; width:100%; aspect-ratio:16/9;
+  background:#000; display:flex; align-items:center; justify-content:center;
+}
+.player-placeholder {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px; color:rgba(255,255,255,0.35);
+}
+.player-placeholder .pl-icon { font-size:52px; opacity:.4; }
+.player-placeholder .pl-text { font-size:13px; letter-spacing:1px; }
+.player-placeholder .pl-note {
+  font-size:11px; color:rgba(255,255,255,0.2);
+  border:1px dashed rgba(255,255,255,0.15); padding:4px 14px; border-radius:3px;
+}
+.player-embed-note {
+  position:absolute; top:10px; right:14px;
+  background:rgba(26,58,92,0.85); color:#fff;
+  font-size:10px; padding:4px 10px; border-radius:3px; letter-spacing:0.5px;
+}
+#info-bar {
+  padding:16px 32px; background:#fff;
+  border-bottom:1px solid #eee;
+  display:flex; align-items:center; gap:16px;
+  position:relative;
+}
+.info-bar-title { font-size:16px; font-weight:800; color:#1a1a1a; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.info-bar-meta { font-size:12.5px; color:#888; white-space:nowrap; }
+.info-bar-badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:3px; background:#f3e8ff; color:#8e44ad; white-space:nowrap; }
+#content-wrap {
+  display:flex; gap:0; align-items:flex-start;
+  padding:28px 32px; position:relative;
+}
+.content-left { flex:1; min-width:0; padding-right:28px; border-right:1px solid #f0f0f0; }
+.content-right { width:260px; flex-shrink:0; padding-left:28px; position:sticky; top:44px; align-self:flex-start; }
+.section-label { font-size:13px; font-weight:800; color:#1a1a1a; margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid #f0f0f0; }
+.lecture-desc { font-size:13px; color:#555; line-height:1.9; margin-bottom:24px; }
+.chapter-list { margin-bottom:24px; }
+.chapter-item {
+  display:flex; align-items:center; gap:12px;
+  padding:10px 14px; border:1px solid #eee; border-radius:6px;
+  margin-bottom:6px; cursor:pointer; transition:all .15s; background:#fff;
+}
+.chapter-item:hover { border-color:#c0392b; background:#fff5f5; }
+.chapter-item.active { border-color:#c0392b; background:#fff5f5; }
+.ch-num {
+  width:26px; height:26px; border-radius:50%; background:#e8eaed;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; color:#666; flex-shrink:0;
+}
+.chapter-item.active .ch-num { background:#c0392b; color:#fff; }
+.ch-title { flex:1; font-size:13px; font-weight:600; color:#333; }
+.chapter-item.active .ch-title { color:#c0392b; }
+.ch-duration { font-size:11.5px; color:#aaa; white-space:nowrap; }
+.ch-lock { font-size:13px; color:#ccc; }
+.side-inst-card {
+  border:1px solid #eee; border-radius:8px; overflow:hidden;
+  margin-bottom:16px;
+}
+.side-inst-head {
+  background:#f9f9f9; padding:10px 14px;
+  font-size:11.5px; font-weight:700; color:#555;
+  border-bottom:1px solid #eee;
+}
+.side-inst-body { padding:14px; display:flex; gap:12px; align-items:center; }
+.side-inst-avatar {
+  width:44px; height:44px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,#888,#bbb);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:11px; font-weight:700;
+}
+.side-inst-name { font-size:14px; font-weight:800; color:#1a1a1a; }
+.side-inst-sub { font-size:11.5px; color:#888; margin-top:2px; }
+.side-chat-card {
+  border:1px solid #ffe082; border-radius:8px; overflow:hidden;
+  margin-bottom:16px; background:#fffdf0;
+}
+.side-chat-head {
+  background:#fff8d6; padding:10px 14px;
+  font-size:11.5px; font-weight:700; color:#7a5800;
+  border-bottom:1px solid #ffe082;
+}
+.side-chat-body { padding:14px; }
+.side-chat-desc { font-size:12px; color:#888; margin-bottom:10px; line-height:1.6; }
+.btn-kakao {
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  width:100%; height:40px; border-radius:6px;
+  background:#fee500; color:#3c1e1e; font-size:13px; font-weight:800;
+  text-decoration:none; transition:opacity .15s;
+}
+.btn-kakao:hover { opacity:.85; }
+.side-order-card {
+  border:1px solid #eee; border-radius:8px; overflow:hidden;
+}
+.side-order-head {
+  background:#f9f9f9; padding:10px 14px;
+  font-size:11.5px; font-weight:700; color:#555;
+  border-bottom:1px solid #eee;
+}
+.side-order-row {
+  display:flex; justify-content:space-between;
+  padding:8px 14px; font-size:12px; border-bottom:1px solid #f5f5f5;
+}
+.side-order-row:last-child { border-bottom:none; }
+.side-order-row .ol { color:#888; }
+.side-order-row .ov { font-weight:600; color:#1a1a1a; }
+.section-sep {
+  margin:0 32px;
+  padding:12px 16px;
+  background:#1a3a5c; color:#fff;
+  border-radius:6px 6px 0 0;
+  font-size:13px; font-weight:700; letter-spacing:0.5px;
+  display:flex; align-items:center; gap:8px;
+}
+.section-sep .sep-badge {
+  background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:10px;
+  font-size:10px; letter-spacing:1px;
+}
+#access-cases {
+  margin:0 32px 40px; padding:24px;
+  border:1px solid #d0dae8; border-top:none; border-radius:0 0 6px 6px;
+  background:#fafcff; position:relative;
+}
+.val-case-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.val-case { border:1px solid #e0e0e0; border-radius:6px; overflow:hidden; background:#fff; }
+.val-case-head { padding:8px 14px; font-size:11px; font-weight:700; letter-spacing:0.5px; border-bottom:1px solid #eee; }
+.val-case.type-info .val-case-head   { background:#e8f0ff; color:#1a3a8a; }
+.val-case.type-warn .val-case-head   { background:#fff8e1; color:#7a5800; }
+.val-case.type-error .val-case-head  { background:#fdecea; color:#922b21; }
+.val-case.type-success .val-case-head{ background:#e8f5e9; color:#1a6b2e; }
+.val-case-body { padding:12px 14px; }
+.val-case-state {
+  padding:9px 12px; border-radius:5px; font-size:12px; line-height:1.6; margin-bottom:8px;
+}
+.val-case-state.info   { background:#e8f0ff; color:#1a3a8a; }
+.val-case-state.warn   { background:#fff8e1; color:#7a5800; }
+.val-case-state.error  { background:#fdecea; color:#922b21; }
+.val-case-state.success{ background:#e8f5e9; color:#1a6b2e; }
+.val-case-msg { font-size:11.5px; color:#888; line-height:1.6; }
+.player-overlay {
+  position:absolute; inset:0;
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  background:rgba(0,0,0,0.55);
+  display:flex; align-items:center; justify-content:center;
+  z-index:10;
+}
+.overlay-box {
+  background:rgba(255,255,255,0.96); border-radius:10px;
+  padding:28px 32px; text-align:center; max-width:320px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+.overlay-icon { font-size:36px; margin-bottom:10px; }
+.overlay-title { font-size:15px; font-weight:800; color:#1a1a1a; margin-bottom:6px; }
+.overlay-desc { font-size:12.5px; color:#666; line-height:1.7; margin-bottom:16px; }
+.overlay-btn {
+  display:block; width:100%; height:42px; border-radius:6px;
+  font-size:14px; font-weight:800; cursor:pointer; border:none;
+  margin-bottom:8px; transition:opacity .15s;
+}
+.overlay-btn.red { background:#c0392b; color:#fff; }
+.overlay-btn.red:hover { opacity:.88; }
+.overlay-btn.gray { background:#f0f0f0; color:#555; }
+.overlay-btn.gray:hover { background:#e0e0e0; }
+.case-switcher {
+  display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px;
+}
+.csw-btn {
+  padding:5px 12px; border-radius:14px; border:1px solid #ddd;
+  font-size:12px; font-weight:600; color:#666; cursor:pointer; transition:all .15s;
+  background:#fff;
+}
+.csw-btn:hover { border-color:#1a3a5c; color:#1a3a5c; }
+.csw-btn.active { background:#1a3a5c; color:#fff; border-color:#1a3a5c; }
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div>
+    <div class="doc-proj">Project — 유니콘클래스 기획서 v3.0</div>
+    <div class="doc-title">영상 수강 (Vimeo Player)</div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <div class="tab-btn" onclick="location.href='./'">메인</div>
+    <div class="tab-btn" onclick="location.href='./02_unicorn_login.html'">로그인 / 회원가입</div>
+    <div class="tab-btn" onclick="location.href='./03_unicorn_class_list.html'">클래스 리스트</div>
+    <div class="tab-btn" onclick="location.href='./04_unicorn_class_detail.html'">클래스 상세</div>
+	<div class="tab-btn active" onclick="location.href='./05_unicorn_class_vimeo_player.html'">영상 화면</div>
+	<div class="tab-btn" onclick="location.href='./06_unicorn_about.html'">회사소개</div>
+	<div class="tab-btn" onclick="location.href='./07_unicorn_instructor.html'">강사 리스트</div>
+	<div class="tab-btn" onclick="location.href='./08_unicorn_instructor_detail.html'">강사 상세</div>
+	<div class="tab-btn" onclick="location.href='./12_unicorn_instructor_apply.html'">강사 지원</div>
+	<div class="tab-btn" onclick="location.href='./09_unicorn_support.html'">고객센터</div>
+    <div class="tab-btn" onclick="location.href='./10_unicorn_mypage.html'">마이페이지</div>
+	<div class="tab-btn" onclick="location.href='./11_unicorn_search.html'">검색결과</div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+<div class="screen-wrap">
+
+  <div id="site-header">
+    <div class="header-inner">
+      <div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div>
+      <nav class="gnb">
+        <div class="gnb-item active">클래스
+          <div class="gnb-dropdown"><a href="#">무료강의</a><a href="#">프리미엄강의</a></div>
+        </div>
+        <div class="gnb-item">회사소개</div>
+        <div class="gnb-item">강사진</div>
+        <div class="gnb-item">고객센터
+          <div class="gnb-dropdown"><a href="#">공지사항</a><a href="#">FAQ</a></div>
+        </div>
+      </nav>
+      <div class="header-right">
+	  	<a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a>
+        <div class="search-box">
+          <input type="text" placeholder="강사 / 과정명을 입력해 주세요.">
+          <button>🔍</button>
+        </div>
+          <div class="cart-icon">🛒<div class="cart-badge">2</div></div>
+          <div class="mypage-wrap">
+            <div class="mypage-btn">
+              <div class="mypage-avatar">홍</div>
+              홍길동 님 ▾
+            </div>
+            <div class="mypage-dropdown">
+              <div class="mypage-dropdown-inner">
+                <a href="#">마이페이지</a>
+                <a href="#">내 강의</a>
+                <a href="#">장바구니</a>
+                <a href="#">결제 내역</a>
+                <a href="#">1:1 문의</a>
+                <a href="#" class="md-logout">로그아웃</a>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <div id="breadcrumb" class="ann-host">
+    <div class="ann" style="left:10px;top:0"><div class="ann-bubble" data-ann="vp-1" onclick="activateAnn('vp-1')">1</div></div>
+    <span>홈</span><span>내 강의</span><span>[뾴공략] 폰 창업 마스터클래스</span><span class="cur">영상 수강</span>
+  </div>
+
+  <div id="player-wrap" class="ann-host">
+    <div class="ann" style="left:10px;top:5px"><div class="ann-bubble" data-ann="vp-2" onclick="activateAnn('vp-2')">2</div></div>
+    <div class="player-ratio" id="player-ratio">
+      <div class="player-placeholder">
+        <div class="pl-icon">▶</div>
+        <div class="pl-text">VIMEO PLAYER 영역</div>
+        <div class="pl-note">&lt;iframe src="https://player.vimeo.com/video/{VIDEO_ID}"&gt;</div>
+      </div>
+      <div class="player-embed-note">Vimeo Embed · 16:9</div>
+      <div class="player-overlay" id="player-overlay" style="display:none;">
+        <div class="overlay-box" id="overlay-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="info-bar" class="ann-host">
+    <div class="ann" style="left:10px;top:5px"><div class="ann-bubble" data-ann="vp-3" onclick="activateAnn('vp-3')">3</div></div>
+    <div class="info-bar-title">[뾴공략] 월 5000만원, 누구나 하루 한대로 월급 만드는 폰 창업 마스터클래스</div>
+    <span class="info-bar-badge">프리미엄강의</span>
+    <div class="info-bar-meta">뾴공략 · AI</div>
+  </div>
+
+  <div id="content-wrap">
+    <div class="ann" style="left:0;top:0;">
+      <div class="ann-bubble" data-ann="vp-4" data-scroll="content-wrap" onclick="activateAnn('vp-4')">4</div>
+    </div>
+
+    <div class="content-left">
+
+      <div class="ann-host" style="margin-bottom:24px;">
+        <div class="ann" style="left:-11px;top:-5px"><div class="ann-bubble" data-ann="vp-5" onclick="activateAnn('vp-5')">5</div></div>
+        <div class="section-label">강의 목록</div>
+        <div class="chapter-list">
+          <div class="chapter-item active">
+            <div class="ch-num">1</div>
+            <div class="ch-title">OT — 이 강의로 무엇을 얻을 수 있나</div>
+            <div class="ch-duration">08:24</div>
+          </div>
+          <div class="chapter-item">
+            <div class="ch-num">2</div>
+            <div class="ch-title">폰 창업의 본질 — 왜 지금인가</div>
+            <div class="ch-duration">22:10</div>
+          </div>
+          <div class="chapter-item">
+            <div class="ch-num">3</div>
+            <div class="ch-title">월 5000 구조 설계하기</div>
+            <div class="ch-duration">31:45</div>
+          </div>
+          <div class="chapter-item">
+            <div class="ch-num">4</div>
+            <div class="ch-title">실전 세팅 — 계정·도구·자동화</div>
+            <div class="ch-duration">28:03</div>
+          </div>
+          <div class="chapter-item">
+            <div class="ch-num">5</div>
+            <div class="ch-title">Q&A 및 마무리</div>
+            <div class="ch-duration">15:30</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">강의 소개</div>
+        <div class="lecture-desc">
+          본 강의는 스마트폰 하나로 월 수익을 만드는 구조를 처음부터 끝까지 설명하는 실전 마스터클래스입니다.<br>
+          OT부터 Q&A까지 총 5개 챕터로 구성되어 있으며, 비메오(Vimeo)를 통해 고화질로 제공됩니다.
+        </div>
+      </div>
+
+      <!-- ★ 강의 자료: 파일 + 외부 링크 둘 다 지원 (클라이언트 피드백 반영) -->
+      <div class="ann-host" style="margin-bottom:24px;">
+        <div class="ann" style="left:-11px;top:-5px"><div class="ann-bubble" data-ann="vp-5b" onclick="activateAnn('vp-5b')">5-1</div></div>
+        <div class="section-label">📎 강의 자료</div>
+
+        <!-- 타입 범례 -->
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;">
+            <span style="width:10px;height:10px;background:#1a3a5c;border-radius:2px;display:inline-block;"></span> 첨부 파일
+          </span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;">
+            <span style="width:10px;height:10px;background:#2980b9;border-radius:2px;display:inline-block;"></span> 외부 링크
+          </span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
+
+          <!-- 파일 타입 1 -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;padding:10px 14px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:28px;height:28px;background:#1a3a5c;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0;">📄</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#333;">수익화 전략 요약 자료.pdf</div>
+                <div style="font-size:11px;color:#aaa;margin-top:2px;">첨부 파일 · 2.3MB</div>
+              </div>
+            </div>
+            <button style="height:32px;padding:0 14px;background:#1a3a5c;color:#fff;border-radius:5px;font-size:12px;font-weight:700;white-space:nowrap;border:none;cursor:pointer;">다운로드</button>
+          </div>
+
+          <!-- 파일 타입 2 -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:8px;padding:10px 14px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:28px;height:28px;background:#1a3a5c;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0;">📊</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#333;">실전 세팅 체크리스트.xlsx</div>
+                <div style="font-size:11px;color:#aaa;margin-top:2px;">첨부 파일 · 0.8MB</div>
+              </div>
+            </div>
+            <button style="height:32px;padding:0 14px;background:#1a3a5c;color:#fff;border-radius:5px;font-size:12px;font-weight:700;white-space:nowrap;border:none;cursor:pointer;">다운로드</button>
+          </div>
+
+          <!-- 외부 링크 타입 1 -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#f0f7ff;border:1px solid #c3dcf5;border-radius:8px;padding:10px 14px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:28px;height:28px;background:#2980b9;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0;">🔗</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#333;">노션 강의 보충 자료</div>
+                <div style="font-size:11px;color:#2980b9;margin-top:2px;">외부 링크 · notion.so/···</div>
+              </div>
+            </div>
+            <a href="#" target="_blank" style="height:32px;padding:0 14px;background:#2980b9;color:#fff;border-radius:5px;font-size:12px;font-weight:700;white-space:nowrap;display:flex;align-items:center;text-decoration:none;">새 탭 열기</a>
+          </div>
+
+          <!-- 외부 링크 타입 2 -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#f0f7ff;border:1px solid #c3dcf5;border-radius:8px;padding:10px 14px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:28px;height:28px;background:#2980b9;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0;">🔗</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#333;">구글 스프레드시트 실습 템플릿</div>
+                <div style="font-size:11px;color:#2980b9;margin-top:2px;">외부 링크 · docs.google.com/···</div>
+              </div>
+            </div>
+            <a href="#" target="_blank" style="height:32px;padding:0 14px;background:#2980b9;color:#fff;border-radius:5px;font-size:12px;font-weight:700;white-space:nowrap;display:flex;align-items:center;text-decoration:none;">새 탭 열기</a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="content-right">
+
+      <div class="ann-host">
+        <div class="ann" style="left:-11px;top:-5px"><div class="ann-bubble" data-ann="vp-6" onclick="activateAnn('vp-6')">6</div></div>
+        <div class="side-inst-card">
+          <div class="side-inst-head">강사</div>
+          <div class="side-inst-body">
+            <div class="side-inst-avatar">강사</div>
+            <div>
+              <div class="side-inst-name">뾴공략</div>
+              <div class="side-inst-sub">AI · 폰 창업 전문가</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ann-host">
+        <div class="ann" style="left:-11px;top:-5px"><div class="ann-bubble" data-ann="vp-7" onclick="activateAnn('vp-7')">7</div></div>
+        <div class="side-chat-card">
+          <div class="side-chat-head">💬 카카오 오픈채팅</div>
+          <div class="side-chat-body">
+            <div class="side-chat-desc">수강생 전용 오픈채팅방입니다.<br>질문·피드백은 채팅방을 이용해 주세요.</div>
+            <a href="#" class="btn-kakao">💬 오픈채팅 입장하기</a>
+            <div style="margin-top:8px;padding:6px 8px;background:rgba(255,200,0,0.15);border-radius:4px;border-left:3px solid #f39c12;">
+              <div style="font-size:10px;color:#7a5800;font-weight:600;">📊 클릭 추적</div>
+              <div style="font-size:10px;color:#7a5800;margin-top:2px;">버튼 클릭 시 member_idx + class_idx + 클릭 시각을 서버에 기록<br>관리자 페이지에서 클릭 현황 확인 가능</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ann-host">
+        <div class="ann" style="left:-11px;top:-5px"><div class="ann-bubble" data-ann="vp-8" onclick="activateAnn('vp-8')">8</div></div>
+        <div class="side-order-card">
+          <div class="side-order-head">결제 정보</div>
+          <div class="side-order-row"><span class="ol">주문번호</span><span class="ov">UC-20260324-00123</span></div>
+          <div class="side-order-row"><span class="ol">결제금액</span><span class="ov" style="color:#c0392b;">138,600원</span></div>
+          <div class="side-order-row"><span class="ol">결제일</span><span class="ov">2026.03.24</span></div>
+          <div class="side-order-row"><span class="ol">수강기간</span><span class="ov">무제한</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-sep" style="margin-top:8px;">
+    <span>🔒</span> 접근 유효성 케이스
+    <span class="sep-badge">ACCESS CONTROL</span>
+  </div>
+
+  <div id="access-cases" class="ann-host">
+    <div class="ann" style="top:5px;">
+      <div class="ann-bubble" data-ann="vp-9" data-scroll="access-cases" onclick="activateAnn('vp-9')">9</div>
+    </div>
+    <div style="margin-bottom:16px;font-size:12px;color:#888;">
+      아래 케이스를 클릭하면 위 플레이어에 해당 유효성 오버레이가 미리보기로 표시됩니다.
+    </div>
+    <div class="case-switcher">
+      <button class="csw-btn active" onclick="showOverlay('ok')">✅ 정상 수강</button>
+      <button class="csw-btn" onclick="showOverlay('nonmember')">① 비회원</button>
+      <button class="csw-btn" onclick="showOverlay('unpaid')">② 미구매 회원</button>
+      <button class="csw-btn" onclick="showOverlay('expired')">③ 수강기간 만료</button>
+      <button class="csw-btn" onclick="showOverlay('suspended')">④ 계정 정지</button>
+    </div>
+
+    <div class="val-case-grid">
+      <div class="val-case type-success">
+        <div class="val-case-head">CASE 1 — 결제 완료 회원 (정상)</div>
+        <div class="val-case-body">
+          <div class="val-case-state success">✅ 수강 가능<br>플레이어가 정상 노출되며 영상이 재생됩니다.</div>
+          <div class="val-case-msg">서버에서 결제 내역 확인 후 Vimeo video_id 반환<br>iframe embed 방식으로 삽입</div>
+        </div>
+      </div>
+      <div class="val-case type-warn">
+        <div class="val-case-head">CASE 2 — 비회원 접근</div>
+        <div class="val-case-body">
+          <div class="val-case-state warn">⚠ 로그인이 필요합니다.<br>플레이어 영역에 블러 오버레이 표시</div>
+          <div class="val-case-msg">URL 직접 접근 시에도 동일 처리<br>로그인 후 원래 페이지로 redirect</div>
+        </div>
+      </div>
+      <div class="val-case type-error">
+        <div class="val-case-head">CASE 3 — 미구매 회원</div>
+        <div class="val-case-body">
+          <div class="val-case-state error">✖ 구매 후 수강 가능합니다.<br>플레이어 영역에 블러 오버레이 + 결제하기 버튼</div>
+          <div class="val-case-msg">강의 상세 페이지로 이동 유도<br>video_id 비노출 (서버에서 미반환)</div>
+        </div>
+      </div>
+      <div class="val-case type-warn">
+        <div class="val-case-head">CASE 4 — 수강기간 만료</div>
+        <div class="val-case-body">
+          <div class="val-case-state warn">⚠ 수강기간이 만료되었습니다.<br>현재는 무제한 정책으로 해당 없음 (추후 기간제 도입 시 대비)</div>
+          <div class="val-case-msg">만료일 D-7부터 배너로 안내<br>재구매 또는 연장 기능 추후 결정</div>
+        </div>
+      </div>
+      <div class="val-case type-error">
+        <div class="val-case-head">CASE 5 — 계정 정지 / 환불 완료</div>
+        <div class="val-case-body">
+          <div class="val-case-state error">✖ 수강 권한이 없습니다.<br>환불 처리 또는 관리자 정지 시 접근 차단</div>
+          <div class="val-case-msg">플레이어 블러 오버레이 + 고객센터 안내<br>video_id 서버에서 미반환 처리</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer">
+    <div class="footer-logo">UNICORN CLASS</div>
+    <div class="footer-info">
+      <strong>상호</strong>유니콘클래스&nbsp;&nbsp;<strong>대표</strong>홍길동&nbsp;&nbsp;<strong>사업자등록번호</strong>000-00-00000<br>
+      <strong>주소</strong>서울특별시 OO구 OO로 000, OOO호&nbsp;&nbsp;<strong>대표전화</strong>000-0000-0000&nbsp;&nbsp;<strong>이메일</strong>info@unicornclass.co.kr
+    </div>
+    <div class="footer-links">
+      <a href="#">이용약관</a><a href="#" class="em">개인정보처리방침</a><a href="#">회사소개</a><a href="#">고객센터</a>
+    </div>
+    <div class="footer-copy">© 2026 유니콘클래스. All rights reserved.</div>
+  </div>
+
+</div>
+
+<div class="desc-panel">
+  <div class="desc-panel-head">Description</div>
+  <div class="desc-list">
+
+    <div class="desc-divider">▸ 페이지 구성</div>
+
+    <div class="desc-item" onclick="activateAnn('vp-1')">
+      <div class="desc-num" data-desc="vp-1">1</div>
+      <div class="desc-text"><strong>브레드크럼</strong>: 홈 › 내 강의 › 강의명 › 영상 수강</div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('vp-2')">
+      <div class="desc-num" data-desc="vp-2">2</div>
+      <div class="desc-text"><strong>Vimeo 플레이어</strong>: 16:9 비율 고정<br><code>&lt;iframe&gt;</code> embed 방식<br>video_id는 서버에서 결제 확인 후 반환<br>비인가 접근 시 블러 오버레이 노출</div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('vp-3')">
+      <div class="desc-num" data-desc="vp-3">3</div>
+      <div class="desc-text"><strong>강의 정보 바</strong>: 강의명 (1줄 말줄임) + 카테고리 배지 + 강사명</div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('vp-4')">
+      <div class="desc-num" data-desc="vp-4">4</div>
+      <div class="desc-text"><strong>하단 2단 레이아웃</strong>: 좌(챕터+강의소개) / 우(강사·오픈채팅·결제정보) sticky</div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('vp-5')">
+      <div class="desc-num" data-desc="vp-5">5</div>
+      <div class="desc-text"><strong>챕터 목록</strong>: 현재 재생 중인 챕터 활성화<br>클릭 시 해당 영상으로 전환<br>챕터별 재생시간 표시<br>순차 잠금 없이 자유 수강<br>완료한 챕터 체크 표시 (lc_progress 기반)</div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('vp-5b')">
+      <div class="desc-num" data-desc="vp-5b">5-1</div>
+      <div class="desc-text">
+        <strong>강의 자료</strong> <span style="font-size:10px;background:#e8f4fd;color:#2980b9;padding:1px 6px;border-radius:3px;font-weight:700;">클라이언트 피드백 반영</span><br><br>
+        <strong>① 첨부 파일</strong> (진한 파란 아이콘)<br>
+        관리자에서 파일 업로드<br>
+        결제 완료 회원만 다운로드 활성화<br>
+        비로그인/미구매 시 클릭 → 로그인 유도<br>
+        파일명 · 용량 표시<br>
+        DB: <code>lc_class_file</code> (type='file', file_path)<br><br>
+        <strong>② 외부 링크</strong> (파란 아이콘, 새 탭 열기)<br>
+        관리자에서 제목 + URL 입력<br>
+        클릭 시 <code>target="_blank"</code>로 새 탭 오픈<br>
+        결제 완료 회원에게만 노출<br>
+        DB: <code>lc_class_file</code> (type='link', link_url)
+      </div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('vp-6')">
+      <div class="desc-num" data-desc="vp-6">6</div>
+      <div class="desc-text"><strong>강사 카드</strong>: 사이드 고정 표시</div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('vp-7')">
+      <div class="desc-num" data-desc="vp-7">7</div>
+      <div class="desc-text">
+        <strong>오픈채팅 링크</strong>: 결제 완료 회원에게만 노출<br>
+        카카오 오픈채팅 URL 연결<br><br>
+        <strong>📊 클릭 추적</strong><br>
+        버튼 클릭 시 DB에 기록<br>
+        저장값: <code>member_idx</code> · <code>class_idx</code> · <code>clicked_at</code><br>
+        테이블: <code>lc_openchat_log</code><br>
+        관리자 페이지에서 강의별 클릭 현황 확인 가능
+      </div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('vp-8')">
+      <div class="desc-num" data-desc="vp-8">8</div>
+      <div class="desc-text"><strong>결제 정보</strong>: 주문번호 · 결제금액 · 결제일 · 수강기간</div>
+    </div>
+
+    <div class="desc-divider">▸ 접근 유효성</div>
+
+    <div class="desc-item" onclick="activateAnn('vp-9')">
+      <div class="desc-num" data-desc="vp-9">9</div>
+      <div class="desc-text">
+        <strong>접근 제어 5가지</strong><br>
+        1. 정상 수강 → 플레이어 노출<br>
+        2. 비회원 → 로그인 유도 오버레이<br>
+        3. 미구매 → 결제하기 유도 오버레이<br>
+        4. 수강기간 만료 → 안내 (현재 무제한)<br>
+        5. 계정 정지/환불 → 차단 오버레이<br>
+        <strong>공통</strong>: video_id 서버 미반환으로 URL 직접 접근도 차단
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+<script>
+const overlayContent = {
+  ok: null,
+  nonmember: {
+    icon:'🔒',
+    title:'로그인이 필요합니다',
+    desc:'이 강의는 로그인 후<br>수강할 수 있습니다.',
+    btn1:{ label:'로그인하기', cls:'red', action:'#' },
+    btn2:{ label:'회원가입', cls:'gray', action:'#' },
+  },
+  unpaid: {
+    icon:'🎟',
+    title:'구매 후 수강 가능합니다',
+    desc:'이 강의는 결제 완료 회원만<br>시청하실 수 있습니다.',
+    btn1:{ label:'결제하기', cls:'red', action:'#' },
+    btn2:{ label:'강의 소개 보기', cls:'gray', action:'#' },
+  },
+  expired: {
+    icon:'⏰',
+    title:'수강기간이 만료되었습니다',
+    desc:'수강기간이 종료된 강의입니다.<br>재구매 또는 연장 후 이용해 주세요.',
+    btn1:{ label:'재구매하기', cls:'red', action:'#' },
+    btn2:{ label:'고객센터 문의', cls:'gray', action:'#' },
+  },
+  suspended: {
+    icon:'🚫',
+    title:'수강 권한이 없습니다',
+    desc:'환불 처리 또는 계정 정지로<br>이 강의에 접근할 수 없습니다.',
+    btn1:{ label:'고객센터 문의', cls:'red', action:'#' },
+    btn2:null,
+  },
+};
+
+function showOverlay(key) {
+  const overlay = document.getElementById('player-overlay');
+  const box = document.getElementById('overlay-box');
+  document.querySelectorAll('.csw-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  if (key === 'ok') { overlay.style.display = 'none'; return; }
+  const c = overlayContent[key];
+  if (!c) return;
+  box.innerHTML = `
+    <div class="overlay-icon">${c.icon}</div>
+    <div class="overlay-title">${c.title}</div>
+    <div class="overlay-desc">${c.desc}</div>
+    ${c.btn1 ? `<button class="overlay-btn ${c.btn1.cls}" onclick="location.href='${c.btn1.action}'">${c.btn1.label}</button>` : ''}
+    ${c.btn2 ? `<button class="overlay-btn ${c.btn2.cls}" onclick="location.href='${c.btn2.action}'">${c.btn2.label}</button>` : ''}
+  `;
+  overlay.style.display = 'flex';
+  document.getElementById('player-wrap').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+document.querySelectorAll('.chapter-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.chapter-item').forEach(i => i.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+function activateAnn(id) {
+  const bubble = document.querySelector(`.ann-bubble[data-ann="${id}"]`);
+  const isActive = bubble && bubble.classList.contains('active');
+  document.querySelectorAll('.ann-bubble[data-ann]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-num[data-desc]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+  if (isActive) return;
+  if (bubble) {
+    bubble.classList.add('active');
+    const annHost = bubble.closest('.ann-host');
+    if (annHost) {
+      const rect = annHost.getBoundingClientRect();
+      window.scrollTo({ top: window.scrollY + rect.top - 120, behavior:'smooth' });
+      annHost.style.outline = '2.5px solid #c0392b';
+      annHost.style.outlineOffset = '4px';
+      annHost.style.borderRadius = '4px';
+      setTimeout(() => { annHost.style.outline = ''; annHost.style.outlineOffset = ''; }, 1800);
+    } else {
+      const el = document.getElementById(bubble.dataset.scroll);
+      if (el) window.scrollTo({ top: window.scrollY + el.getBoundingClientRect().top - 70, behavior:'smooth' });
+    }
+  }
+  const descNum = document.querySelector(`.desc-num[data-desc="${id}"]`);
+  if (descNum) {
+    descNum.classList.add('active');
+    const item = descNum.closest('.desc-item');
+    if (item) {
+      item.classList.add('active');
+      const panel = item.closest('.desc-panel');
+      if (panel) panel.scrollTo({ top: item.offsetTop - (panel.querySelector('.desc-panel-head')?.offsetHeight || 0) - 12, behavior:'smooth' });
+    }
+  }
+}
+</script>
+</body>
+</html>

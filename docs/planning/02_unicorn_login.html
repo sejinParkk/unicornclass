@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유니콘클래스 — 로그인/회원가입</title>
+<link rel="stylesheet" href="./noto-sans.css" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+/* ══════════════════════════════
+   로그인 화면 공통 배경
+══════════════════════════════ */
+.login-bg {
+  background:radial-gradient(ellipse at center, #6b6b6b 0%, #4a4a4a 40%, #3a3a3a 100%);
+  display:flex; align-items:center; justify-content:center;
+  padding:48px 20px;
+}
+
+/* 카드 */
+.login-card {
+  background:#fff; border-radius:16px;
+  width:380px; padding:36px 36px 32px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.35);
+}
+
+/* 로고 */
+.login-logo { margin-bottom:28px; }
+.logo-placeholder {
+  display:inline-flex; align-items:center; gap:8px;
+}
+.logo-icon {
+  width:36px; height:36px; background:#c0392b; border-radius:6px;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.logo-icon span {
+  color:#fff; font-size:6.5px; font-weight:900;
+  letter-spacing:0.3px; line-height:1.3; text-align:center;
+}
+.logo-text-wrap .l1 { font-size:18px; font-weight:900; color:#1a1a1a; letter-spacing:-0.5px; }
+.logo-text-wrap .l2 { font-size:9px; letter-spacing:3px; color:#999; text-transform:uppercase; }
+
+/* 소셜 버튼 */
+.social-btns { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+.btn-kakao {
+  width:100%; height:48px; background:#FEE500; border-radius:8px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-size:14px; font-weight:700; color:#3A1D1D; transition:filter .15s;
+}
+.btn-kakao:hover { filter:brightness(.95); }
+.kakao-icon {
+  width:22px; height:22px; background:#3A1D1D; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; color:#FEE500; font-weight:900;
+}
+.btn-naver {
+  width:100%; height:48px; background:#03C75A; border-radius:8px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-size:14px; font-weight:700; color:#fff; transition:filter .15s;
+}
+.btn-naver:hover { filter:brightness(.92); }
+.naver-icon {
+  width:22px; height:22px; background:#fff; border-radius:3px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:900; color:#03C75A;
+}
+
+/* 구분선 */
+.divider {
+  display:flex; align-items:center; gap:10px; margin-bottom:16px;
+}
+.divider::before, .divider::after { content:''; flex:1; height:1px; background:#eee; }
+.divider span { font-size:12px; color:#bbb; white-space:nowrap; }
+
+/* 인풋 */
+.input-group { margin-bottom:10px; position:relative; }
+.input-group input {
+  width:100%; height:46px;
+  border:1px solid #e0e0e0; border-radius:8px;
+  padding:0 14px; font-size:14px; color:#333;
+  font-family:inherit; outline:none; transition:border-color .15s;
+}
+.input-group input::placeholder { color:#bbb; }
+.input-group input:focus { border-color:#c0392b; }
+.input-group.error input { border-color:#c0392b; }
+.error-msg {
+  font-size:12px; color:#c0392b; margin-top:5px; padding-left:2px;
+}
+
+/* 로그인 버튼 */
+.btn-login {
+  width:100%; height:48px; margin-top:6px;
+  background:#c0392b; border-radius:8px;
+  color:#fff; font-size:15px; font-weight:700; transition:background .15s;
+}
+.btn-login:hover { background:#a93226; }
+
+/* 하단 링크 */
+.login-links {
+  display:flex; justify-content:center; align-items:center; gap:0; margin-top:18px;
+}
+.login-links a {
+  font-size:12.5px; color:#888; padding:0 10px;
+  border-right:1px solid #ddd; line-height:1;
+}
+.login-links a:last-child { border-right:none; }
+.login-links a:hover { color:#c0392b; }
+
+/* ══════════════════════════════
+   아이디 찾기 화면 특화
+══════════════════════════════ */
+/* 뒤로가기 + 타이틀 헤더 */
+.find-card-header {
+  display:flex; align-items:center; gap:0; margin-bottom:28px;
+}
+.back-btn {
+  width:32px; height:32px; border-radius:50%;
+  background:#f5f5f5; border:1px solid #e8e8e8;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; color:#555; cursor:pointer; flex-shrink:0;
+  transition:background .15s;
+}
+.back-btn:hover { background:#eee; }
+.find-card-title { font-size:18px; font-weight:800; color:#1a1a1a; }
+
+/* 인풋 레이블 */
+.field-label {
+  font-size:13px; font-weight:600; color:#333; margin-bottom:7px;
+  display:flex; align-items:center; gap:4px;
+}
+.required { color:#c0392b; font-size:13px; }
+
+/* 인풋 + 버튼 행 */
+.input-row {
+  display:flex; gap:8px; margin-bottom:6px;
+  position:relative;
+}
+.input-row input {
+  width:212px; flex:none; height:52px;
+  border:1px solid #e0e0e0; border-radius:10px;
+  padding:0 16px; font-size:15px; color:#333;
+  font-family:inherit; outline:none; transition:border-color .15s;
+}
+.input-row input::placeholder { color:#bbb; }
+.input-row input:focus { border-color:#c0392b; }
+.input-row input:disabled { background:#f8f8f8; color:#bbb; }
+/* 타이머: 인풋 안 우측에 겹치게 (버튼 바로 왼쪽 인풋 영역 안) */
+.timer-display {
+  position:absolute;
+  /* 버튼(인증하기 ~80px) + gap(8px) 을 제외한 인풋 영역 우측 패딩 안 */
+  right:calc(80px + 8px + 12px);
+  top:50%; transform:translateY(-50%);
+  font-size:13px; font-weight:700; color:#c0392b;
+  font-variant-numeric:tabular-nums;
+  pointer-events:none; z-index:5;
+  letter-spacing:0.5px;
+}
+
+.btn-request {
+  height:52px; width:88px; flex-shrink:0;
+  background:#e88080; border-radius:10px;
+  color:#fff; font-size:14px; font-weight:700;
+  transition:background .15s; white-space:nowrap;
+}
+.btn-request:hover { background:#c0392b; }
+.btn-request:disabled { background:#ddd; color:#aaa; cursor:default; }
+
+/* timer-display → .input-row 내 재정의 */
+
+/* 인증 성공 메시지 */
+.success-msg {
+  font-size:12px; color:#27ae60; margin-top:5px; padding-left:2px;
+}
+
+/* 다음 버튼 */
+.btn-next {
+  width:100%; height:52px; margin-top:16px;
+  background:#c0392b; border-radius:10px;
+  color:#fff; font-size:16px; font-weight:700; transition:background .15s;
+}
+.btn-next:hover { background:#a93226; }
+.btn-next:disabled { background:#ddd; color:#aaa; cursor:default; }
+
+/* 화면 구분 라벨 */
+.screen-state-label {
+  background:#f7f7f7; border-bottom:1px solid #eee;
+  padding:7px 20px; font-size:11px; color:#999; font-weight:600; letter-spacing:.5px;
+}
+.screen-state-label span { color:#c0392b; }
+
+/* 필드 블록 */
+.field-block { margin-bottom:20px; }
+
+
+/* ══════════════════════════════
+   팝업 모달
+══════════════════════════════ */
+.modal-overlay {
+  position:absolute; inset:0;
+  background:rgba(0,0,0,0.55);
+  display:flex; align-items:center; justify-content:center;
+  z-index:100; border-radius:0;
+}
+.modal-card {
+  background:#fff;
+  border-radius:12px;
+  width:340px;
+  padding:32px 28px 24px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  position:relative;
+}
+.modal-close {
+  position:absolute; top:14px; right:16px;
+  background:none; border:none; font-size:18px; color:#999;
+  cursor:pointer; line-height:1; padding:4px;
+}
+.modal-close:hover { color:#333; }
+.modal-title {
+  font-size:18px; font-weight:800; color:#1a1a1a;
+  text-align:center; margin-bottom:12px; line-height:1.4;
+}
+.modal-desc {
+  font-size:13.5px; color:#666; text-align:center;
+  line-height:1.7; margin-bottom:24px;
+}
+.modal-btn {
+  width:100%; height:50px;
+  background:#1a1a1a; border-radius:8px;
+  color:#fff; font-size:15px; font-weight:700;
+  cursor:pointer; border:none; transition:background .15s;
+}
+.modal-btn:hover { background:#333; }
+/* 로그인 배경 컨테이너에 position:relative 필요 */
+.login-bg { position:relative; }
+
+/* section-divider sticky 감지용 sentinel */
+.sd-sentinel {
+  height:1px;
+  margin-top:-1px;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+/* 비밀번호 찾기 - 단독 인풋 (버튼 없는 행) */
+.pw-single-input {
+  width:100%; height:52px;
+  border:1px solid #e0e0e0; border-radius:10px;
+  padding:0 16px; font-size:15px; color:#333;
+  font-family:inherit; outline:none;
+  transition:border-color .15s;
+  display:block;
+}
+.pw-single-input::placeholder { color:#bbb; }
+.pw-single-input:focus { border-color:#c0392b; }
+.pw-single-input:disabled { background:#f8f8f8; color:#bbb; }
+
+/* ── 회원가입 전용 ── */
+/* 아이디 중복검사 행 */
+.id-check-row {
+  display:flex; gap:8px; margin-bottom:4px;
+}
+.id-check-row input {
+  flex:1; height:52px;
+  border:1px solid #e0e0e0; border-radius:10px;
+  padding:0 16px; font-size:15px; color:#333;
+  font-family:inherit; outline:none; transition:border-color .15s;
+}
+.id-check-row input:focus { border-color:#c0392b; }
+.id-check-row input::placeholder { color:#bbb; }
+.btn-dup {
+  height:52px; width:88px; flex-shrink:0;
+  background:#555; border-radius:10px;
+  color:#fff; font-size:13px; font-weight:700;
+  transition:background .15s;
+}
+.btn-dup:hover { background:#333; }
+.field-hint { font-size:11.5px; color:#aaa; margin-top:5px; padding-left:2px; }
+
+/* 비밀번호 눈 아이콘 행 */
+.pw-eye-wrap { position:relative; margin-bottom:10px; }
+.pw-eye-wrap input {
+  width:100%; height:52px;
+  border:1px solid #e0e0e0; border-radius:10px;
+  padding:0 44px 0 16px; font-size:15px; color:#333;
+  font-family:inherit; outline:none; transition:border-color .15s;
+}
+.pw-eye-wrap input:focus { border-color:#c0392b; }
+.pw-eye-wrap input::placeholder { color:#bbb; }
+.pw-eye-wrap input.err { border-color:#c0392b; }
+.eye-btn {
+  position:absolute; right:14px; top:50%; transform:translateY(-50%);
+  background:none; border:none; cursor:pointer;
+  font-size:16px; color:#bbb; padding:4px;
+  line-height:1;
+}
+.eye-btn:hover { color:#888; }
+
+/* 약관 체크박스 */
+.terms-wrap { margin:20px 0 20px; }
+.check-all {
+  display:flex; align-items:center; gap:8px;
+  padding:12px 14px; background:#f5f5f5; border-radius:8px;
+  margin-bottom:10px; cursor:pointer;
+}
+.check-all .ca-label { font-size:14px; font-weight:700; color:#1a1a1a; }
+.term-row {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 6px; border-bottom:1px solid #f0f0f0;
+}
+.term-row:last-child { border-bottom:none; }
+.term-label { font-size:13px; color:#444; flex:1; }
+.term-req { color:#c0392b; font-size:12px; margin-left:2px; }
+.term-opt { color:#999; font-size:12px; margin-left:2px; }
+.btn-terms-view {
+  height:28px; padding:0 10px; font-size:12px; font-weight:600;
+  background:#fff; border:1px solid #ddd; border-radius:5px; color:#666;
+  flex-shrink:0; cursor:pointer; transition:all .15s;
+}
+.btn-terms-view:hover { border-color:#c0392b; color:#c0392b; }
+
+/* 커스텀 체크박스 */
+.cbox {
+  width:18px; height:18px; border-radius:4px;
+  border:2px solid #ddd; background:#fff; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .15s;
+}
+.cbox.checked { background:#c0392b; border-color:#c0392b; }
+.cbox.checked::after { content:'✓'; color:#fff; font-size:11px; font-weight:700; }
+
+/* 약관 모달 */
+.terms-modal-overlay {
+  position:absolute; inset:0;
+  background:rgba(0,0,0,0.55);
+  display:flex; align-items:flex-end;
+  z-index:100;
+}
+.terms-modal-sheet {
+  background:#fff; width:100%; border-radius:16px 16px 0 0;
+  padding:24px 24px 32px; position:relative;
+  max-height:75%; overflow-y:auto;
+}
+.terms-modal-title {
+  font-size:16px; font-weight:800; color:#1a1a1a; margin-bottom:16px;
+  padding-bottom:12px; border-bottom:1px solid #eee;
+}
+.terms-content {
+  font-size:12px; color:#666; line-height:1.9;
+  max-height:200px; overflow-y:auto;
+  border:1px solid #eee; border-radius:6px;
+  padding:12px 14px; margin-bottom:16px; background:#fafafa;
+}
+.btn-terms-agree {
+  width:100%; height:48px; background:#c0392b; border-radius:8px;
+  color:#fff; font-size:15px; font-weight:700; border:none; cursor:pointer;
+}
+
+/* 섹션 show/hide */
+.section-panel { display:none; }
+.section-panel.active { display:block; }
+</style>
+</head>
+<body>
+
+<!-- ══ 기획서 헤더 ══ -->
+<div class="doc-header">
+  <div>
+    <div class="doc-proj">Project — 유니콘클래스 기획서 v3.0</div>
+    <div class="doc-title">로그인 / 회원가입</div>
+  </div>
+</div>
+
+<!-- ══ 탭 네비게이션 ══ -->
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <div class="tab-btn" onclick="location.href='/unicornclass'">메인</div>
+    <div class="tab-btn active" onclick="location.href='/unicornclass/02_unicorn_login.html'">로그인 / 회원가입</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/03_unicorn_class_list.html'">클래스 리스트</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/04_unicorn_class_detail.html'">클래스 상세</div>
+	<div class="tab-btn" onclick="location.href='/unicornclass/05_unicorn_class_vimeo_player.html'">영상 화면</div>
+	<div class="tab-btn" onclick="location.href='/unicornclass/06_unicorn_about.html'">회사소개</div>
+	<div class="tab-btn" onclick="location.href='/unicornclass/07_unicorn_instructor.html'">강사 리스트</div>
+	<div class="tab-btn" onclick="location.href='/unicornclass/08_unicorn_instructor_detail.html'">강사 상세</div>
+	<div class="tab-btn" onclick="location.href='/unicornclass/09_unicorn_support.html'">고객센터</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/10_unicorn_mypage.html'">마이페이지</div>
+	<div class="tab-btn" onclick="location.href='/unicornclass/11_unicorn_search.html'">검색결과</div>
+  </div>
+</nav>
+
+
+<!-- ══ 2뎁스 서브탭 ══ -->
+<div class="sub-tab-nav">
+  <div class="sub-tab-btn active" onclick="showSection('login')">로그인</div>
+  <div class="sub-tab-btn" onclick="showSection('findid')">아이디 찾기</div>
+  <div class="sub-tab-btn" onclick="showSection('findpw')">비밀번호 찾기</div>
+  <div class="sub-tab-btn" onclick="showSection('register')">회원가입</div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     SECTION A : 로그인
+████████████████████████████████████████ -->
+<div class="section-panel active" id="panel-login">
+<div class="sd-sentinel" id="sentinel-login"></div>
+<div class="section-divider" data-section="login">
+  <div class="s-title">로그인</div>
+  <span class="s-url">/login</span>
+  <div class="s-desc">기본 · 에러 4가지 상태</div>
+</div>
+<div class="section-body">
+  <!-- 화면 -->
+  <div class="screen-col">
+
+    <div class="screen-state-label">상태 <span>①</span> 기본 (Default)</div>
+    <div class="login-bg">
+      <div class="login-card">
+        <div class="login-logo ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="login-1" onclick="activateAnn('login-1')">1</div></div>
+          <div class="logo-placeholder">
+            <div class="logo-icon"><span>UNICORN<br>CLASS</span></div>
+            <div class="logo-text-wrap">
+              <div class="l1">UNICORN</div>
+              <div class="l2">CLASS</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:#ccc;margin-top:5px">※ 로고 이미지로 대체 예정</div>
+        </div>
+
+        <div class="social-btns">
+          <div class="ann-host" style="display:block">
+            <div class="ann"><div class="ann-bubble" data-ann="login-2" onclick="activateAnn('login-2')">2</div></div>
+            <button class="btn-kakao"><div class="kakao-icon">💬</div>카카오로 3초만에 시작하기</button>
+          </div>
+          <div class="ann-host" style="display:block">
+            <div class="ann"><div class="ann-bubble" data-ann="login-3" onclick="activateAnn('login-3')">3</div></div>
+            <button class="btn-naver"><div class="naver-icon">N</div>네이버로 시작하기</button>
+          </div>
+        </div>
+
+        <div class="divider"><span>또는 아이디로 로그인</span></div>
+
+        <div class="input-group ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="login-4" onclick="activateAnn('login-4')">4</div></div>
+          <input type="text" placeholder="아이디를 입력해주세요">
+        </div>
+        <div class="input-group ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="login-5" onclick="activateAnn('login-5')">5</div></div>
+          <input type="password" placeholder="비밀번호를 입력해주세요">
+        </div>
+
+        <div class="ann-host" style="display:block">
+          <div class="ann"><div class="ann-bubble" data-ann="login-6" onclick="activateAnn('login-6')">6</div></div>
+          <button class="btn-login">로그인</button>
+        </div>
+
+        <div class="login-links ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="login-7" onclick="activateAnn('login-7')">7</div></div>
+          <a href="#">아이디 찾기</a>
+          <a href="#">비밀번호 찾기</a>
+          <a href="#">일반회원 가입하기</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-state-label">상태 <span>②</span> 유효성 에러 (Validation Error)</div>
+    <div class="login-bg" style="padding:32px 20px">
+      <div class="login-card">
+        <div class="login-logo">
+          <div class="logo-placeholder">
+            <div class="logo-icon"><span>UNICORN<br>CLASS</span></div>
+            <div class="logo-text-wrap">
+              <div class="l1">UNICORN</div><div class="l2">CLASS</div>
+            </div>
+          </div>
+        </div>
+        <div class="social-btns">
+          <button class="btn-kakao"><div class="kakao-icon">💬</div>카카오로 3초만에 시작하기</button>
+          <button class="btn-naver"><div class="naver-icon">N</div>네이버로 시작하기</button>
+        </div>
+        <div class="divider"><span>또는 아이디로 로그인</span></div>
+        <div class="input-group error ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="login-8" onclick="activateAnn('login-8')">8</div></div>
+          <input type="text" value="ab" placeholder="아이디를 입력해주세요">
+          <div class="error-msg">아이디는 최소 3자 이상이어야 합니다</div>
+        </div>
+        <div class="input-group error">
+          <input type="password" value="1234" placeholder="비밀번호를 입력해주세요">
+          <div class="error-msg">비밀번호는 최소 8자 이상이어야 합니다</div>
+        </div>
+        <button class="btn-login">로그인</button>
+        <div class="login-links">
+          <a href="#">아이디 찾기</a><a href="#">비밀번호 찾기</a><a href="#">일반회원 가입하기</a>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 상태 ③ 탈퇴한 계정 로그인 시도 → 팝업 -->
+    <div class="screen-state-label">상태 <span>③</span> 탈퇴 계정 로그인 시도</div>
+    <div class="login-bg" style="padding:32px 20px">
+      <div class="login-card" style="filter:brightness(0.6) blur(1px); pointer-events:none">
+        <div class="login-logo">
+          <div class="logo-placeholder">
+            <div class="logo-icon"><span>UNICORN<br>CLASS</span></div>
+            <div class="logo-text-wrap"><div class="l1">UNICORN</div><div class="l2">CLASS</div></div>
+          </div>
+        </div>
+        <div class="social-btns">
+          <button class="btn-kakao"><div class="kakao-icon">💬</div>카카오로 3초만에 시작하기</button>
+          <button class="btn-naver"><div class="naver-icon">N</div>네이버로 시작하기</button>
+        </div>
+        <div class="divider"><span>또는 아이디로 로그인</span></div>
+        <div class="input-group"><input type="text" value="hong1234" placeholder="아이디를 입력해주세요"></div>
+        <div class="input-group"><input type="password" value="password" placeholder="비밀번호를 입력해주세요"></div>
+        <button class="btn-login">로그인</button>
+        <div class="login-links">
+          <a href="#">아이디 찾기</a><a href="#">비밀번호 찾기</a><a href="#">일반회원 가입하기</a>
+        </div>
+      </div>
+      <!-- 모달 -->
+      <div class="modal-overlay">
+        <div class="modal-card ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="login-9" onclick="activateAnn('login-9')">9</div></div>
+          <button class="modal-close">×</button>
+          <div class="modal-title">이미 탈퇴한 계정입니다.</div>
+          <div class="modal-desc">
+            해당 계정은 회원 탈퇴가 완료되어<br>더 이상 이용하실 수 없습니다.<br>
+            관련 문의는 고객센터로 연락해 주세요.
+          </div>
+          <button class="modal-btn">확인</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 상태 ④ 일치하는 정보 없음 → 팝업 -->
+    <div class="screen-state-label">상태 <span>④</span> 아이디 또는 비밀번호 불일치</div>
+    <div class="login-bg" style="padding:32px 20px">
+      <div class="login-card" style="filter:brightness(0.6) blur(1px); pointer-events:none">
+        <div class="login-logo">
+          <div class="logo-placeholder">
+            <div class="logo-icon"><span>UNICORN<br>CLASS</span></div>
+            <div class="logo-text-wrap"><div class="l1">UNICORN</div><div class="l2">CLASS</div></div>
+          </div>
+        </div>
+        <div class="social-btns">
+          <button class="btn-kakao"><div class="kakao-icon">💬</div>카카오로 3초만에 시작하기</button>
+          <button class="btn-naver"><div class="naver-icon">N</div>네이버로 시작하기</button>
+        </div>
+        <div class="divider"><span>또는 아이디로 로그인</span></div>
+        <div class="input-group"><input type="text" value="wronguser" placeholder="아이디를 입력해주세요"></div>
+        <div class="input-group"><input type="password" value="wrongpass1" placeholder="비밀번호를 입력해주세요"></div>
+        <button class="btn-login">로그인</button>
+        <div class="login-links">
+          <a href="#">아이디 찾기</a><a href="#">비밀번호 찾기</a><a href="#">일반회원 가입하기</a>
+        </div>
+      </div>
+      <!-- 모달 -->
+      <div class="modal-overlay">
+        <div class="modal-card">
+          <button class="modal-close">×</button>
+          <div class="modal-title">일치하는 정보가 없습니다.</div>
+          <div class="modal-desc">
+            아이디 또는 비밀번호를 다시 확인해 주세요.<br>
+            5회 이상 실패 시 계정이 잠길 수 있습니다.
+          </div>
+          <button class="modal-btn">확인</button>
+        </div>
+      </div>
+    </div>
+
+	<div class="screen-state-label">상태 <span>⑤</span> 카카오 로그인 — 채널 추가 동의 화면</div>
+    <div class="login-bg" style="padding:32px 20px">
+      <div class="login-card">
+        <div class="login-logo">
+          <div class="logo-placeholder">
+            <div class="logo-icon"><span>UNICORN<br>CLASS</span></div>
+            <div class="logo-text-wrap"><div class="l1">UNICORN</div><div class="l2">CLASS</div></div>
+          </div>
+        </div>
+        <!-- 카카오 동의 화면 시뮬레이션 -->
+        <div class="ann-host" style="border:1px solid #eee;border-radius:12px;overflow:hidden;margin-bottom:16px;">
+          <div class="ann"><div class="ann-bubble" data-ann="login-10" onclick="activateAnn('login-10')">10</div></div>
+          <!-- 카카오 동의 헤더 -->
+          <div style="background:#FEE500;padding:16px;text-align:center;">
+            <div style="font-size:13px;font-weight:700;color:#3A1D1D;">카카오 계정으로 로그인</div>
+            <div style="font-size:11px;color:#7a5800;margin-top:3px;">유니콘클래스에서 아래 정보 제공에 동의합니다</div>
+          </div>
+          <!-- 동의 항목 -->
+          <div style="padding:14px 16px;background:#fff;">
+            <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:10px;">필수 동의 항목</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f5;">
+              <div style="width:16px;height:16px;border-radius:50%;background:#c0392b;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;flex-shrink:0;">✓</div>
+              <span style="font-size:12px;color:#333;">닉네임 / 프로필 사진</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f5;">
+              <div style="width:16px;height:16px;border-radius:50%;background:#c0392b;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;flex-shrink:0;">✓</div>
+              <span style="font-size:12px;color:#333;">카카오계정(이메일)</span>
+            </div>
+            <!-- 카카오채널 추가 (선택) -->
+            <div style="margin-top:12px;">
+              <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:8px;">선택 동의 항목</div>
+              <div class="ann-host" style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:#fffdf0;border:1px solid #ffe082;border-radius:8px;">
+                <div class="ann" style="top:-11px;left:-11px;"><div class="ann-bubble" data-ann="login-11" onclick="activateAnn('login-11')">11</div></div>
+                <!-- 체크박스 (선택됨 상태) -->
+                <div style="width:18px;height:18px;border-radius:4px;background:#FEE500;border:2px solid #e6b800;display:flex;align-items:center;justify-content:center;color:#3A1D1D;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">✓</div>
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:#3A1D1D;">카카오톡 채널 추가</div>
+                  <div style="font-size:11px;color:#7a5800;margin-top:2px;line-height:1.5;">유니콘클래스 카카오톡 채널을 추가하고<br>소식 및 혜택 알림을 받을 수 있습니다</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 동의 버튼 -->
+          <div style="padding:12px 16px;background:#fff;display:flex;gap:8px;">
+            <button style="flex:1;height:42px;background:#f5f5f5;border-radius:8px;font-size:13px;font-weight:700;color:#666;">취소</button>
+            <button style="flex:2;height:42px;background:#FEE500;border-radius:8px;font-size:13px;font-weight:700;color:#3A1D1D;">동의하고 계속하기</button>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#aaa;text-align:center;line-height:1.6;">
+          카카오 공식 로그인 동의 화면 예시<br>실제 UI는 카카오에서 제공
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.screen-col -->
+
+  <!-- Description -->
+  <div class="desc-col ver2">
+    <div class="desc-col-head">Description — 로그인</div>
+    <div class="desc-list">
+      <div class="desc-item" onclick="activateAnn('login-1')">
+        <div class="desc-num" data-desc="login-1">1</div>
+        <div class="desc-text"><strong>로고</strong>: 유니콘클래스 로고 이미지 대체 예정<br>클릭 시 메인(/)으로 이동</div>
+      </div>
+      <div class="desc-item" onclick="activateAnn('login-2')">
+        <div class="desc-num" data-desc="login-2">2</div>
+        <div class="desc-text"><strong>카카오 로그인</strong> (배경 #FEE500)<br>→ 카카오 OAuth 인증<br>수신 정보: 이름 · 연락처 · 이메일<br>신규: 수신 정보로 즉시 가입 완료<br>기존: 바로 로그인 처리<br>성공 시 무조건 <strong>메인(/)</strong>으로 이동</div>
+      </div>
+      <div class="desc-item" onclick="activateAnn('login-3')">
+        <div class="desc-num" data-desc="login-3" >3</div>
+        <div class="desc-text"><strong>네이버 로그인</strong> (배경 #03C75A)<br>→ 네이버 OAuth 인증<br>수신 정보: 이름 · 연락처 · 이메일<br>신규/기존 분기 처리 카카오와 동일<br>성공 시 무조건 <strong>메인(/)</strong>으로 이동</div>
+      </div>
+      <div class="desc-item" onclick="activateAnn('login-4')">
+        <div class="desc-num" data-desc="login-4">4</div>
+        <div class="desc-text"><strong>아이디 인풋</strong><br>포커스 시 테두리 <strong>#c0392b</strong><br>최소 3자 유효성 (blur 시점 검사)<br>placeholder: "아이디를 입력해주세요"</div>
+      </div>
+      <div class="desc-item" onclick="activateAnn('login-5')">
+        <div class="desc-num" data-desc="login-5">5</div>
+        <div class="desc-text"><strong>비밀번호 인풋</strong> <code>type="password"</code><br>최소 8자 유효성 검사<br>우측 눈 아이콘으로 표시/숨김 토글 (선택)</div>
+      </div>
+      <div class="desc-item" onclick="activateAnn('login-6')">
+        <div class="desc-num" data-desc="login-6">6</div>
+        <div class="desc-text"><strong>로그인 버튼</strong><br>클릭 → 서버 인증 요청 (POST /api/login)<br>실패: 인풋 에러 상태 + 에러 메시지<br>성공: 무조건 <strong>메인(/)</strong>으로 이동<br>로딩 중 버튼 비활성화 처리</div>
+      </div>
+      <div class="desc-item" onclick="activateAnn('login-7')">
+        <div class="desc-num" data-desc="login-7">7</div>
+        <div class="desc-text"><strong>하단 링크 3개</strong><br>아이디 찾기 → <code>/find-id</code><br>비밀번호 찾기 → <code>/find-password</code><br>일반회원 가입하기 → <code>/register</code></div>
+      </div>      
+      <div class="desc-item" onclick="activateAnn('login-8')">
+        <div class="desc-num" data-desc="login-8">8</div>
+        <div class="desc-text"><strong>유효성 에러</strong> (상태 ② 참조)<br>인풋 테두리: <strong>#c0392b</strong><br>에러 메시지: 인풋 하단 빨강 텍스트<br>· 아이디: 3자 미만<br>· 비밀번호: 8자 미만</div>
+      </div>
+      <div class="desc-item" onclick="activateAnn('login-9')">
+        <div class="desc-num" data-desc="login-9">9</div>
+        <div class="desc-text">
+          <strong>서버 응답 팝업</strong> (상태 ③④ 참조)<br>
+          로그인 버튼 클릭 → 서버 인증 요청 후<br>
+          응답 코드에 따라 팝업 분기:<br><br>
+          <strong>[탈퇴 계정]</strong> (상태 ③)<br>
+          · 조건: 탈퇴 처리된 계정으로 로그인 시도<br>
+          · 제목: "이미 탈퇴한 계정입니다."<br>
+          · 내용: 이용 불가 안내 + 고객센터 연락 유도<br>
+          · 확인 클릭 → 팝업 닫힘, 로그인 페이지 유지<br><br>
+          <strong>[정보 불일치]</strong> (상태 ④)<br>
+          · 조건: 아이디 없음 또는 비밀번호 불일치<br>
+          · 제목: "일치하는 정보가 없습니다."<br>
+          · 내용: 재확인 유도 + 5회 실패 시 계정 잠금 경고<br>
+          · 확인 클릭 → 팝업 닫힘, 인풋 초기화<br><br>
+          <strong>공통 팝업 UX</strong><br>
+          · 배경 딤처리 (rgba 0,0,0,0.55)<br>
+          · 우측 상단 X 버튼으로 닫기<br>
+          · 확인 버튼: 검정 배경 (#1a1a1a)
+        </div>
+      </div>
+	  <div class="desc-item" onclick="activateAnn('login-10')">
+        <div class="desc-num" data-desc="login-10">10</div>
+        <div class="desc-text">
+          <strong>카카오 로그인 동의 화면</strong> (상태 ⑤ 참조)<br>
+          카카오 버튼 클릭 → 카카오 공식 동의 화면으로 이동<br>
+          필수 항목: 닉네임, 프로필, 이메일<br>
+          선택 항목: 카카오톡 채널 추가 (plusfriends scope)<br><br>
+          <strong>설정 방법</strong><br>
+          카카오 개발자 콘솔 → 동의항목 →<br>
+          "카카오톡 채널 추가 상태 및 내역" 선택 동의 활성화<br>
+          카카오 채널 연결 선행 필요
+        </div>
+      </div>
+      <div class="desc-item" onclick="activateAnn('login-11')">
+        <div class="desc-num" data-desc="login-11">11</div>
+        <div class="desc-text">
+          <strong>카카오톡 채널 추가 — 선택 동의</strong><br>
+          동의 시 → 유니콘클래스 카카오 채널 자동 추가<br>
+          미동의 시 → 채널 미추가, 로그인은 정상 진행<br>
+          <strong>선택 동의</strong>이므로 사용자가 체크 해제 가능<br><br>
+          채널 추가 동의 여부는 <code>plusfriends</code> scope로 확인<br>
+          나중에 마이페이지 등에서 재동의 유도 가능
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     SECTION B : 아이디 찾기
+████████████████████████████████████████ -->
+</div><!-- /#panel-login -->
+
+<div class="section-panel" id="panel-findid">
+<div class="sd-sentinel" id="sentinel-findid"></div>
+<div class="section-divider" data-section="find-id">
+  <div class="s-title">아이디 찾기</div>
+  <span class="s-url">/find-id</span>
+  <div class="s-desc">휴대폰 SMS 인증 방식</div>
+</div>
+<div class="section-body">
+  <!-- 화면 -->
+  <div class="screen-col">
+
+    <!-- 상태 1: 초기 -->
+    <div class="screen-state-label">상태 <span>①</span> 초기 — 번호 입력 전</div>
+    <div class="login-bg">
+      <div class="login-card">
+        <div class="find-card-header ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="findid-1" onclick="activateAnn('findid-1')">1</div></div>
+          <span class="find-card-title">아이디 찾기</span>
+        </div>
+
+        <!-- 휴대전화번호 -->
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="findid-2" onclick="activateAnn('findid-2')">2</div></div>
+            휴대전화번호 <span class="required">*</span>
+          </div>
+          <div class="input-row">
+            <input type="tel" id="phone-demo1" placeholder="010-0000-0000" maxlength="13" oninput="autoHyphen(this)">
+            <button class="btn-request" disabled>인증요청</button>
+          </div>
+        </div>
+
+        <!-- 인증번호 -->
+        <div class="field-block">
+          <div class="field-label">인증 번호</div>
+          <div class="input-row timer-wrap ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="findid-3" onclick="activateAnn('findid-3')">3</div></div>
+            <input type="text" placeholder="인증요청 후 인증번호를 입력하세요" disabled>
+            <button class="btn-request" disabled>인증하기</button>
+          </div>
+        </div>
+
+        <button class="btn-next" disabled>다음</button>
+      </div>
+    </div>
+
+    <!-- 상태 2: 인증번호 발송 후 타이머 작동 -->
+    <div class="screen-state-label">상태 <span>②</span> 인증번호 발송 완료 — 타이머 작동 중</div>
+    <div class="login-bg">
+      <div class="login-card">
+        <div class="find-card-header">
+          <span class="find-card-title">아이디 찾기</span>
+        </div>
+
+        <div class="field-block">
+          <div class="field-label">휴대전화번호 <span class="required">*</span></div>
+          <div class="input-row">
+            <input type="tel" value="010-1234-5678" style="color:#333">
+            <button class="btn-request" style="background:#aaa">재요청</button>
+          </div>
+          <div style="font-size:11.5px;color:#27ae60;margin-top:5px;padding-left:2px">✓ 인증번호가 발송되었습니다</div>
+        </div>
+
+        <div class="field-block">
+          <div class="field-label">인증 번호</div>
+          <div class="input-row timer-wrap ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="findid-4" onclick="activateAnn('findid-4')">4</div></div>
+            <input type="text" placeholder="인증번호 6자리를 입력하세요" id="otp-input-demo" style="padding-right:64px">
+            <div class="timer-display" id="timer-demo">02:58</div>
+            <button class="btn-request">인증하기</button>
+          </div>
+        </div>
+
+        <button class="btn-next" disabled>다음</button>
+      </div>
+    </div>
+
+    <!-- 상태 3: 인증 완료 -->
+    <div class="screen-state-label">상태 <span>③</span> 인증 완료 — 다음 버튼 활성화</div>
+    <div class="login-bg" style="padding:32px 20px">
+      <div class="login-card">
+        <div class="find-card-header">
+          <span class="find-card-title">아이디 찾기</span>
+        </div>
+
+        <div class="field-block">
+          <div class="field-label">휴대전화번호 <span class="required">*</span></div>
+          <div class="input-row">
+            <input type="tel" value="010-1234-5678" disabled style="background:#f8f8f8">
+            <button class="btn-request" style="background:#aaa" disabled>재요청</button>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <div class="field-label">인증 번호</div>
+          <div class="input-row">
+            <input type="text" value="123456" disabled style="background:#f8f8f8">
+            <button class="btn-request" style="background:#bbb;color:#fff" disabled>✓ 인증완료</button>
+          </div>
+          <div class="success-msg ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="findid-5" onclick="activateAnn('findid-5')">5</div></div>
+            ✓ 인증이 완료되었습니다
+          </div>
+        </div>
+
+        <button class="btn-next">다음</button>
+      </div>
+    </div>
+
+
+    <!-- 상태 4: 아이디 찾기 결과 -->
+    <div class="screen-state-label">상태 <span>④</span> 아이디 찾기 결과 — 일반 가입</div>
+    <div class="login-bg" style="padding:32px 20px">
+      <div class="login-card">
+        <div class="find-card-header">
+          <span class="find-card-title">아이디 찾기 결과</span>
+        </div>
+
+        <!-- 안내 문구 -->
+        <p style="font-size:13px;color:#888;margin-bottom:20px;line-height:1.6">
+          입력하신 정보로 가입된 아이디입니다.
+        </p>
+
+        <!-- 아이디 표시 박스 -->
+        <div class="ann-host" style="background:#f8f9fa;border:1px solid #e0e0e0;border-radius:10px;
+             padding:20px;text-align:center;margin-bottom:24px;">
+          <div class="ann"><div class="ann-bubble" data-ann="findid-6" onclick="activateAnn('findid-6')">6</div></div>
+          <div style="font-size:11px;color:#aaa;margin-bottom:6px">아이디</div>
+          <div style="font-size:22px;font-weight:900;color:#1a1a1a;letter-spacing:1px">hong****</div>
+          <div style="font-size:11px;color:#bbb;margin-top:6px">일부 정보는 보안을 위해 마스킹 처리됩니다</div>
+        </div>
+
+        <!-- 버튼 2개 -->
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="ann-host" style="display:block">
+            <div class="ann"><div class="ann-bubble" data-ann="findid-7" onclick="activateAnn('findid-7')">7</div></div>
+            <button class="btn-next" style="margin-top:0">로그인하기</button>
+          </div>
+          <div class="ann-host" style="display:block">
+            <div class="ann"><div class="ann-bubble" data-ann="findid-8" onclick="activateAnn('findid-8')">8</div></div>
+            <button class="btn-next" style="margin-top:0;background:#fff;color:#c0392b;
+              border:1.5px solid #c0392b;">비밀번호 찾기</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 상태 5: SNS 가입 회원 결과 -->
+    <div class="screen-state-label">상태 <span>⑤</span> 아이디 찾기 결과 — SNS 가입 회원</div>
+    <div class="login-bg" style="padding:32px 20px">
+      <div class="login-card">
+        <div class="find-card-header">
+          <span class="find-card-title">아이디 찾기 결과</span>
+        </div>
+
+        <p style="font-size:13px;color:#888;margin-bottom:20px;line-height:1.6">
+          입력하신 휴대폰 번호로 가입된 정보입니다.
+        </p>
+
+        <!-- SNS 가입 안내 박스 -->
+        <div class="ann-host" style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:20px;text-align:center;margin-bottom:24px;">
+          <div class="ann"><div class="ann-bubble" data-ann="findid-9" onclick="activateAnn('findid-9')">9</div></div>
+          <div style="font-size:22px;margin-bottom:10px;">🔗</div>
+          <div style="font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:6px;">카카오 계정으로 가입된 회원입니다</div>
+          <div style="font-size:11.5px;color:#888;line-height:1.6;">별도의 아이디/비밀번호가 없습니다.<br>카카오 로그인 버튼을 이용해 주세요.</div>
+        </div>
+
+        <!-- 카카오 로그인 버튼 -->
+        <button class="btn-kakao" style="width:100%;height:46px;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:700;color:#3A1D1D;background:#FEE500;margin-bottom:10px;">
+          <span style="font-size:16px;">💬</span> 카카오로 로그인
+        </button>
+        <button class="btn-next" style="margin-top:0;background:#fff;color:#555;border:1.5px solid #ddd;font-size:13px;">돌아가기</button>
+
+      </div>
+    </div>
+
+  </div><!-- /.screen-col -->
+
+  <!-- Description -->
+  <div class="desc-col ver2">
+    <div class="desc-col-head">Description — 아이디 찾기</div>
+    <div class="desc-list">
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findid-1" onclick="activateAnn('findid-1')">1</div>
+        <div class="desc-text">
+          <strong>페이지 타이틀</strong>: "아이디 찾기"<br>
+          뒤로가기 버튼 없음<br>
+          로그인 페이지 링크는 하단 "로그인하기" 버튼으로 대체
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findid-2" onclick="activateAnn('findid-2')">2</div>
+        <div class="desc-text">
+          <strong>휴대전화번호 인풋</strong><br>
+          숫자 입력 시 하이픈 자동 삽입<br>
+          포맷: <code>010-XXXX-XXXX</code> (최대 13자)<br>
+          11자리 숫자 입력 완료 시 <strong>인증요청</strong> 버튼 활성화<br>
+          <code>type="tel"</code> 사용 (모바일 숫자 키패드)
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findid-3" onclick="activateAnn('findid-3')">3</div>
+        <div class="desc-text">
+          <strong>인증번호 인풋 (초기)</strong><br>
+          인증요청 전: 인풋 + 인증하기 버튼 <strong>disabled</strong><br>
+          인증요청 클릭 →<br>
+          &nbsp;· SMS 발송 API 호출 (POST /api/sms/send)<br>
+          &nbsp;· 성공 시 인풋 활성화 + 타이머 시작<br>
+          &nbsp;· 실패 시 "발송에 실패했습니다. 다시 시도해주세요"
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findid-4" onclick="activateAnn('findid-4')">4</div>
+        <div class="desc-text">
+          <strong>인증번호 타이머</strong><br>
+          인증요청 성공 시 <strong>3:00</strong>부터 카운트다운 시작<br>
+          인풋 우측 내부에 <strong style="color:#c0392b">MM:SS</strong> 형태로 표시<br>
+          00:00 도달 시 →<br>
+          &nbsp;· 인풋 비활성화<br>
+          &nbsp;· "인증번호가 만료되었습니다. 재요청해주세요"<br>
+          &nbsp;· 재요청 버튼 표시<br>
+          인증번호: 숫자 6자리, 서버에서 발급·검증<br>
+          유효 조건: <strong>3분 이내</strong> + <strong>1회 사용</strong>
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findid-5" onclick="activateAnn('findid-5')">5</div>
+        <div class="desc-text">
+          <strong>인증 완료 상태</strong><br>
+          인증하기 클릭 → POST /api/sms/verify<br>
+          성공 시 →<br>
+          &nbsp;· 두 인풋 모두 disabled<br>
+          &nbsp;· "✓ 인증이 완료되었습니다" (초록)<br>
+          &nbsp;· <strong>다음</strong> 버튼 활성화<br>
+          실패 시 →<br>
+          &nbsp;· "인증번호가 올바르지 않습니다" (빨강)<br>
+          &nbsp;· 타이머 계속 유지, 인풋 재입력 가능
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findid-6" onclick="activateAnn('findid-6')">6</div>
+        <div class="desc-text">
+          <strong>아이디 결과 박스</strong><br>
+          가입된 아이디를 마스킹 처리 후 표시<br>
+          포맷: 앞 4자 + <code>****</code> (예: <code>hong****</code>)<br>
+          가입 이력 없을 시: "가입된 정보를 찾을 수 없습니다"<br>
+          박스 배경: <code>#f8f9fa</code>, 테두리: <code>#e0e0e0</code>
+        </div>
+      </div>
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findid-7" onclick="activateAnn('findid-7')">7</div>
+        <div class="desc-text">
+          <strong>로그인하기 버튼</strong> (빨강)<br>
+          클릭 → <code>/login</code>으로 이동
+        </div>
+      </div>
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findid-8" onclick="activateAnn('findid-8')">8</div>
+        <div class="desc-text">
+          <strong>비밀번호 찾기 버튼</strong> (흰 배경, 빨강 테두리)<br>
+          클릭 → <code>/find-password</code>로 이동
+        </div>
+      </div>
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findid-9" onclick="activateAnn('findid-9')">9</div>
+        <div class="desc-text">
+          <strong>SNS 가입 회원 안내 박스</strong><br>
+          해당 번호가 카카오/네이버 등 SNS로 가입된 경우<br>
+          → 아이디 박스 대신 SNS 안내 박스 노출<br>
+          "OOO 계정으로 가입된 회원입니다" 표시<br>
+          해당 SNS 로그인 버튼 바로 제공<br>
+          카카오/네이버 각각 구분하여 표시
+        </div>
+      </div>
+      <div class="desc-item">
+        <div class="desc-num" style="background:#e67e22">i</div>
+        <div class="desc-text">
+          <strong>보안 정책</strong><br>
+          · 인증요청 횟수 제한: 동일 번호 <strong>5회/일</strong><br>
+          · 인증번호 오류 제한: <strong>5회 초과</strong> 시 해당 코드 무효화<br>
+          · 서버에서 번호 유효성 검사 (010/011/016/017/018/019)<br>
+          · 가입된 회원의 번호와 일치해야 아이디 반환<br>
+          · 일치하지 않을 경우: "가입된 정보를 찾을 수 없습니다"
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ████████████████████████████████████████
+     SECTION C : 비밀번호 찾기
+████████████████████████████████████████ -->
+</div><!-- /#panel-findid -->
+
+<div class="section-panel" id="panel-findpw">
+<div class="sd-sentinel" id="sentinel-findpw"></div>
+<div class="section-divider" data-section="find-password">
+  <div class="s-title">비밀번호 찾기</div>
+  <span class="s-url">/find-password</span>
+  <div class="s-desc">아이디 + 휴대폰 SMS 인증 → 즉시 변경</div>
+</div>
+<div class="section-body">
+  <div class="screen-col">
+
+    <!-- 상태 ① 초기 -->
+    <div class="screen-state-label">상태 <span>①</span> 초기 — 아이디 + 번호 입력 전</div>
+    <div class="login-bg">
+      <div class="login-card">
+        <div class="find-card-header ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="findpw-1" onclick="activateAnn('findpw-1')">1</div></div>
+          <span class="find-card-title">비밀번호 찾기</span>
+        </div>
+
+        <!-- 아이디 -->
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="findpw-2" onclick="activateAnn('findpw-2')">2</div></div>
+            아이디 <span class="required">*</span>
+          </div>
+          <input class="pw-single-input" type="text" placeholder="아이디를 입력해주세요">
+        </div>
+
+        <!-- 휴대전화번호 -->
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="findpw-3" onclick="activateAnn('findpw-3')">3</div></div>
+            휴대전화번호 <span class="required">*</span>
+          </div>
+          <div class="input-row">
+            <input type="tel" placeholder="010-0000-0000" maxlength="13" oninput="autoHyphen(this)">
+            <button class="btn-request" disabled>인증요청</button>
+          </div>
+        </div>
+
+        <!-- 인증번호 -->
+        <div class="field-block">
+          <div class="field-label">인증 번호</div>
+          <div class="input-row ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="findpw-4" onclick="activateAnn('findpw-4')">4</div></div>
+            <input type="text" placeholder="인증요청 후 인증번호를 입력하세요" disabled>
+            <button class="btn-request" disabled>인증하기</button>
+          </div>
+        </div>
+
+        <button class="btn-next" disabled>비밀번호 찾기</button>
+      </div>
+    </div>
+
+    <!-- 상태 ② 인증번호 발송 + 타이머 -->
+    <div class="screen-state-label">상태 <span>②</span> 인증번호 발송 완료 — 타이머 작동 중</div>
+    <div class="login-bg">
+      <div class="login-card">
+        <div class="find-card-header">
+          <span class="find-card-title">비밀번호 찾기</span>
+        </div>
+
+        <div class="field-block">
+          <div class="field-label">아이디 <span class="required">*</span></div>
+          <input class="pw-single-input" type="text" value="hong1234" style="color:#333">
+        </div>
+
+        <div class="field-block">
+          <div class="field-label">휴대전화번호 <span class="required">*</span></div>
+          <div class="input-row">
+            <input type="tel" value="010-1234-5678" style="color:#333">
+            <button class="btn-request" style="background:#aaa">재요청</button>
+          </div>
+          <div style="font-size:11.5px;color:#27ae60;margin-top:5px;padding-left:2px">✓ 인증번호가 발송되었습니다</div>
+        </div>
+
+        <div class="field-block">
+          <div class="field-label">인증 번호</div>
+          <div class="input-row">
+            <input type="text" placeholder="인증번호 6자리를 입력하세요" style="padding-right:64px" id="timer-pw-demo">
+            <div class="timer-display" id="timer-pw">02:59</div>
+            <button class="btn-request">인증하기</button>
+          </div>
+        </div>
+
+        <button class="btn-next" disabled>비밀번호 찾기</button>
+      </div>
+    </div>
+
+    <!-- 상태 ③ 인증 완료 → 비밀번호 변경 폼 -->
+    <div class="screen-state-label">상태 <span>③</span> 인증 완료 — 새 비밀번호 입력</div>
+    <div class="login-bg">
+      <div class="login-card">
+        <div class="find-card-header">
+          <span class="find-card-title">비밀번호 찾기</span>
+        </div>
+
+        <!-- 완료된 필드들 (dimmed) -->
+        <div class="field-block" style="opacity:.45">
+          <div class="field-label">아이디</div>
+          <input class="pw-single-input" type="text" value="hong1234" disabled style="background:#f8f8f8">
+        </div>
+        <div class="field-block" style="opacity:.45">
+          <div class="field-label">휴대전화번호</div>
+          <div class="input-row">
+            <input type="tel" value="010-1234-5678" disabled style="background:#f8f8f8">
+            <button class="btn-request" style="background:#bbb;color:#fff" disabled>✓ 인증완료</button>
+          </div>
+        </div>
+
+        <!-- 구분선 -->
+        <div style="border-top:1px dashed #e0e0e0;margin:16px 0 18px"></div>
+
+        <!-- 새 비밀번호 입력 -->
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="findpw-5" onclick="activateAnn('findpw-5')">5</div></div>
+            새 비밀번호 <span class="required">*</span>
+          </div>
+          <input class="pw-single-input" type="password" placeholder="새 비밀번호를 입력해주세요">
+          <div style="font-size:11px;color:#aaa;margin-top:5px;padding-left:2px">
+            영문 + 숫자 + 특수문자 포함 8자 이상
+          </div>
+        </div>
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="findpw-6" onclick="activateAnn('findpw-6')">6</div></div>
+            새 비밀번호 확인 <span class="required">*</span>
+          </div>
+          <input class="pw-single-input" type="password" placeholder="비밀번호를 한번 더 입력해주세요">
+        </div>
+
+        <button class="btn-next">비밀번호 변경</button>
+      </div>
+    </div>
+
+    <!-- 상태 ③-E 비밀번호 조건 불일치 에러 -->
+    <div class="screen-state-label">상태 <span>③-E</span> 비밀번호 유효성 에러</div>
+    <div class="login-bg" style="padding:28px 20px">
+      <div class="login-card">
+        <div class="find-card-header">
+          <span class="find-card-title">비밀번호 찾기</span>
+        </div>
+        <div class="field-block" style="opacity:.45">
+          <div class="field-label">아이디</div>
+          <input class="pw-single-input" type="text" value="hong1234" disabled style="background:#f8f8f8">
+        </div>
+        <div class="field-block" style="opacity:.45">
+          <div class="field-label">휴대전화번호</div>
+          <div class="input-row">
+            <input type="tel" value="010-1234-5678" disabled style="background:#f8f8f8">
+            <button class="btn-request" style="background:#bbb;color:#fff" disabled>✓ 인증완료</button>
+          </div>
+        </div>
+        <div style="border-top:1px dashed #e0e0e0;margin:16px 0 18px"></div>
+
+        <!-- 에러 상태 새 비밀번호 -->
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="findpw-7" onclick="activateAnn('findpw-7')">7</div></div>
+            새 비밀번호 <span class="required">*</span>
+          </div>
+          <input class="pw-single-input" type="password" value="1234" style="border-color:#c0392b">
+          <div class="error-msg" style="display:block">영문 + 숫자 + 특수문자 포함 8자 이상이어야 합니다</div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">새 비밀번호 확인 <span class="required">*</span></div>
+          <input class="pw-single-input" type="password" value="5678" style="border-color:#c0392b">
+          <div class="error-msg" style="display:block">비밀번호가 일치하지 않습니다</div>
+        </div>
+        <button class="btn-next" disabled style="background:#ddd;color:#aaa">비밀번호 변경</button>
+      </div>
+    </div>
+
+    <!-- 상태 ④ 비밀번호 변경 완료 -->
+    <div class="screen-state-label">상태 <span>④</span> 비밀번호 변경 완료</div>
+    <div class="login-bg" style="padding:32px 20px">
+      <div class="login-card" style="text-align:center">
+        <div class="ann-host" style="display:inline-block;margin:0 auto 20px">
+          <div class="ann" style="top:-11px;left:calc(50% - 11px)"><div class="ann-bubble" data-ann="findpw-8" onclick="activateAnn('findpw-8')">8</div></div>
+          <div style="width:64px;height:64px;border-radius:50%;background:#e8f5e9;
+               display:flex;align-items:center;justify-content:center;
+               font-size:28px;margin:0 auto">✅</div>
+        </div>
+        <div style="font-size:18px;font-weight:800;color:#1a1a1a;margin-bottom:10px">
+          비밀번호가 변경되었습니다!
+        </div>
+        <div style="font-size:13px;color:#888;line-height:1.7;margin-bottom:28px">
+          새 비밀번호로 로그인해 주세요.
+        </div>
+        <button class="btn-next" style="margin-top:0">로그인하기</button>
+      </div>
+    </div>
+
+  </div><!-- /.screen-col -->
+
+  <!-- Description -->
+  <div class="desc-col ver2">
+    <div class="desc-col-head">Description — 비밀번호 찾기</div>
+    <div class="desc-list">
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findpw-1" onclick="activateAnn('findpw-1')">1</div>
+        <div class="desc-text">
+          <strong>페이지 타이틀</strong>: "비밀번호 찾기"<br>
+          아이디 찾기와 동일한 카드 레이아웃<br>
+          뒤로가기 없음, 로그인 링크는 완료 화면에서 제공
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findpw-2" onclick="activateAnn('findpw-2')">2</div>
+        <div class="desc-text">
+          <strong>아이디 인풋</strong> (아이디 찾기 대비 추가 필드)<br>
+          <code>type="text"</code>, 최소 3자 유효성 검사<br>
+          번호 인증 전까지 수정 가능<br>
+          인증 완료 후 disabled 처리
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findpw-3" onclick="activateAnn('findpw-3')">3</div>
+        <div class="desc-text">
+          <strong>휴대전화번호 인풋</strong><br>
+          숫자 입력 시 하이픈 자동 삽입 (<code>010-XXXX-XXXX</code>)<br>
+          아이디 + 11자리 번호 모두 입력 완료 시 인증요청 버튼 활성화<br>
+          서버: 아이디와 번호가 일치하는 회원 존재 여부 선검증 후 SMS 발송
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findpw-4" onclick="activateAnn('findpw-4')">4</div>
+        <div class="desc-text">
+          <strong>인증번호 인풋 + 타이머</strong><br>
+          아이디 찾기와 동일한 구조<br>
+          인증요청 성공 시 <strong>3:00</strong> 카운트다운<br>
+          인풋 우측 내부에 <strong style="color:#c0392b">MM:SS</strong> 표시<br>
+          만료 시 재요청 버튼 활성화
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findpw-5" onclick="activateAnn('findpw-5')">5</div>
+        <div class="desc-text">
+          <strong>새 비밀번호 인풋</strong> (인증 완료 후 노출)<br>
+          <code>type="password"</code><br>
+          조건: <strong>영문 + 숫자 + 특수문자</strong> 모두 포함, 8자 이상<br>
+          정규식: <code>/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*]).\{8,\}/</code><br>
+          입력 중 실시간 조건 체크 (blur 시점 에러 표시)
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findpw-6" onclick="activateAnn('findpw-6')">6</div>
+        <div class="desc-text">
+          <strong>새 비밀번호 확인 인풋</strong><br>
+          위 비밀번호와 일치 여부 검사<br>
+          불일치 시: "비밀번호가 일치하지 않습니다" (빨강)<br>
+          두 인풋 모두 유효해야 <strong>비밀번호 변경</strong> 버튼 활성화
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findpw-7" onclick="activateAnn('findpw-7')">7</div>
+        <div class="desc-text">
+          <strong>비밀번호 유효성 에러</strong> (상태 ③-E 참조)<br>
+          · 조건 미충족: "영문 + 숫자 + 특수문자 포함 8자 이상"<br>
+          · 불일치: "비밀번호가 일치하지 않습니다"<br>
+          · 에러 시 변경 버튼 <strong>disabled + 회색</strong>
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="findpw-8" onclick="activateAnn('findpw-8')">8</div>
+        <div class="desc-text">
+          <strong>변경 완료 화면</strong><br>
+          POST /api/password/reset 성공 시 완료 화면 전환<br>
+          완료 아이콘 + "비밀번호가 변경되었습니다!" 메시지<br>
+          <strong>로그인하기</strong> 버튼 → <code>/login</code>으로 이동<br>
+          완료 후 인증 세션 즉시 만료 처리
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" style="background:#e67e22;cursor:default">i</div>
+        <div class="desc-text">
+          <strong>보안 정책</strong><br>
+          · 아이디 + 번호 불일치 시 SMS 미발송 (서버 선검증)<br>
+          · 인증요청 횟수 제한: 동일 번호 <strong>5회/일</strong><br>
+          · 인증번호 오류 제한: <strong>5회 초과</strong> 시 코드 무효화<br>
+          · 최근 사용한 비밀번호 재사용 불가 (선택 정책)<br>
+          · 변경 완료 후 기존 세션 전체 만료
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ████████████████████████████████████████
+     SECTION D : 회원가입
+████████████████████████████████████████ -->
+</div><!-- /#panel-findpw -->
+
+<div class="section-panel" id="panel-register">
+<div class="sd-sentinel" id="sentinel-register"></div>
+<div class="section-divider" data-section="register">
+  <div class="s-title">회원가입</div>
+  <span class="s-url">/register</span>
+  <div class="s-desc">휴대폰 인증 → 정보 입력 → 완료</div>
+</div>
+<div class="section-body">
+  <div class="screen-col">
+
+    <!-- ── STEP 1: 휴대폰 인증 ── -->
+    <div class="screen-state-label">STEP <span>1-①</span> 휴대폰 인증 — 초기</div>
+    <div class="login-bg">
+      <div class="login-card">
+        <div class="find-card-header ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="reg-1" onclick="activateAnn('reg-1')">1</div></div>
+          <span class="find-card-title">휴대폰 인증</span>
+        </div>
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="reg-2" onclick="activateAnn('reg-2')">2</div></div>
+            휴대전화번호 <span class="required">*</span>
+          </div>
+          <div class="input-row">
+            <input type="tel" placeholder="010-0000-0000" maxlength="13" oninput="autoHyphen(this)">
+            <button class="btn-request" disabled>인증요청</button>
+          </div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">인증 번호</div>
+          <div class="input-row ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="reg-3" onclick="activateAnn('reg-3')">3</div></div>
+            <input type="text" placeholder="인증요청 후 인증번호를 입력하세요" disabled>
+            <button class="btn-request" disabled>인증하기</button>
+          </div>
+        </div>
+        <button class="btn-next" disabled>다음</button>
+      </div>
+    </div>
+
+    <div class="screen-state-label">STEP <span>1-②</span> 휴대폰 인증 — 타이머 작동 중</div>
+    <div class="login-bg">
+      <div class="login-card">
+        <div class="find-card-header">
+          <span class="find-card-title">휴대폰 인증</span>
+        </div>
+        <div class="field-block">
+          <div class="field-label">휴대전화번호 <span class="required">*</span></div>
+          <div class="input-row">
+            <input type="tel" value="010-1234-5678" style="color:#333">
+            <button class="btn-request" style="background:#aaa">재요청</button>
+          </div>
+          <div style="font-size:11.5px;color:#27ae60;margin-top:5px;padding-left:2px">✓ 인증번호가 발송되었습니다</div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">인증 번호</div>
+          <div class="input-row">
+            <input type="text" placeholder="인증번호 6자리를 입력하세요" style="padding-right:64px">
+            <div class="timer-display" id="timer-reg">02:59</div>
+            <button class="btn-request">인증하기</button>
+          </div>
+        </div>
+        <button class="btn-next" disabled>다음</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: 회원가입 폼 ── -->
+    <div class="screen-state-label">STEP <span>2-①</span> 회원가입 정보 입력</div>
+    <div class="login-bg" style="padding:32px 20px">
+      <div class="login-card">
+        <div class="find-card-header">
+          <span class="find-card-title">회원가입</span>
+        </div>
+
+        <!-- 아이디 -->
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="reg-4" onclick="activateAnn('reg-4')">4</div></div>
+            아이디 <span class="required">*</span>
+          </div>
+          <div class="id-check-row">
+            <input type="text" placeholder="아이디를 입력해주세요 (소문자/숫자)">
+            <button class="btn-dup ann-host">
+              <div class="ann"><div class="ann-bubble" data-ann="reg-5" onclick="activateAnn('reg-5')">5</div></div>
+              중복검사
+            </button>
+          </div>
+          <div class="field-hint">로그인에 사용할 아이디입니다. (소문자/숫자만)</div>
+        </div>
+
+        <!-- 이메일 -->
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="reg-6" onclick="activateAnn('reg-6')">6</div></div>
+            이메일 <span class="required">*</span>
+          </div>
+          <input class="pw-single-input" type="email" placeholder="이메일 주소를 입력해주세요">
+        </div>
+
+        <!-- 비밀번호 -->
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="reg-7" onclick="activateAnn('reg-7')">7</div></div>
+            비밀번호 <span class="required">*</span>
+          </div>
+          <div class="pw-eye-wrap">
+            <input type="password" placeholder="영어, 숫자, 특수 문자 8자 이상 조합을 입력해 주세요.">
+            <button class="eye-btn">👁</button>
+          </div>
+          <div class="pw-eye-wrap">
+            <input type="password" placeholder="비밀번호 확인을 위해 다시 한 번 입력해 주세요.">
+            <button class="eye-btn">👁</button>
+          </div>
+        </div>
+
+        <!-- 이름 -->
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="reg-8" onclick="activateAnn('reg-8')">8</div></div>
+            이름 <span class="required">*</span>
+          </div>
+          <input class="pw-single-input" type="text" placeholder="이름을 입력해주세요">
+        </div>
+
+        <!-- 휴대전화번호 (수정 불가) -->
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="reg-9" onclick="activateAnn('reg-9')">9</div></div>
+            휴대전화번호
+          </div>
+          <input class="pw-single-input" type="tel" value="010-1234-5678" disabled style="background:#f5f5f5;color:#888">
+          <div class="field-hint">✓ 인증 완료된 번호입니다. 수정할 수 없습니다.</div>
+        </div>
+
+        <!-- 약관 -->
+        <div class="terms-wrap ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="reg-10" onclick="activateAnn('reg-10')">10</div></div>
+          <div class="check-all">
+            <div class="cbox"></div>
+            <span class="ca-label">모두 동의</span>
+          </div>
+          <div class="term-row">
+            <div class="cbox"></div>
+            <span class="term-label">개인정보 처리 약관 동의<span class="term-req"> (필수) *</span></span>
+            <button class="btn-terms-view">보기</button>
+          </div>
+          <div class="term-row">
+            <div class="cbox"></div>
+            <span class="term-label">광고성 정보 수신 동의<span class="term-opt"> (선택)</span></span>
+            <button class="btn-terms-view">보기</button>
+          </div>
+        </div>
+
+        <button class="btn-next" disabled style="background:#ddd;color:#aaa">회원가입</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2-E: 에러 상태 ── -->
+    <div class="screen-state-label">STEP <span>2-E</span> 정보 입력 에러 상태</div>
+    <div class="login-bg" style="padding:28px 20px">
+      <div class="login-card">
+        <div class="find-card-header">
+          <span class="find-card-title">회원가입</span>
+        </div>
+        <!-- 아이디 중복 에러 -->
+        <div class="field-block">
+          <div class="field-label ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="reg-11" onclick="activateAnn('reg-11')">11</div></div>
+            아이디 <span class="required">*</span>
+          </div>
+          <div class="id-check-row">
+            <input type="text" value="hong" style="border-color:#c0392b">
+            <button class="btn-dup">중복검사</button>
+          </div>
+          <div class="error-msg" style="display:block">이미 사용 중인 아이디입니다</div>
+        </div>
+        <!-- 이메일 형식 에러 -->
+        <div class="field-block">
+          <div class="field-label">이메일 <span class="required">*</span></div>
+          <input class="pw-single-input" type="email" value="hong@" style="border-color:#c0392b">
+          <div class="error-msg" style="display:block">올바른 이메일 형식이 아닙니다</div>
+        </div>
+        <!-- 비밀번호 조건 에러 -->
+        <div class="field-block">
+          <div class="field-label">비밀번호 <span class="required">*</span></div>
+          <div class="pw-eye-wrap">
+            <input type="password" value="1234" class="err" placeholder="">
+            <button class="eye-btn">👁</button>
+          </div>
+          <div class="error-msg" style="display:block">영문 + 숫자 + 특수문자 포함 8자 이상이어야 합니다</div>
+          <div class="pw-eye-wrap" style="margin-top:8px">
+            <input type="password" value="5678" class="err" placeholder="">
+            <button class="eye-btn">👁</button>
+          </div>
+          <div class="error-msg" style="display:block">비밀번호가 일치하지 않습니다</div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">이름 <span class="required">*</span></div>
+          <input class="pw-single-input" type="text" placeholder="이름을 입력해주세요">
+          <div class="error-msg" style="display:block">이름을 입력해주세요</div>
+        </div>
+        <div class="field-block">
+          <div class="field-label">휴대전화번호</div>
+          <input class="pw-single-input" type="tel" value="010-1234-5678" disabled style="background:#f5f5f5;color:#888">
+        </div>
+        <div class="terms-wrap" style="margin-top:12px">
+          <div class="check-all"><div class="cbox"></div><span class="ca-label">모두 동의</span></div>
+          <div class="term-row"><div class="cbox"></div><span class="term-label">개인정보 처리 약관 동의<span class="term-req"> (필수) *</span></span><button class="btn-terms-view">보기</button></div>
+          <div class="term-row"><div class="cbox"></div><span class="term-label">광고성 정보 수신 동의<span class="term-opt"> (선택)</span></span><button class="btn-terms-view">보기</button></div>
+        </div>
+        <div class="error-msg" style="display:block;margin-bottom:8px">필수 약관에 동의해주세요</div>
+        <button class="btn-next" disabled style="background:#ddd;color:#aaa">회원가입</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2-T: 약관 보기 팝업 ── -->
+    <div class="screen-state-label">STEP <span>2-T</span> 약관 보기 팝업 (바텀시트)</div>
+    <div class="login-bg" style="padding:32px 20px">
+      <div style="position:relative;width:380px">
+        <!-- 뒤 카드 (흐림) -->
+        <div class="login-card" style="filter:brightness(0.55) blur(1px);pointer-events:none">
+          <div class="find-card-header"><span class="find-card-title">회원가입</span></div>
+          <div class="field-block"><div class="field-label">아이디</div><input class="pw-single-input" type="text" placeholder="아이디"></div>
+          <div class="field-block"><div class="field-label">이메일</div><input class="pw-single-input" type="email" placeholder="이메일"></div>
+          <div class="terms-wrap">
+            <div class="check-all"><div class="cbox"></div><span class="ca-label">모두 동의</span></div>
+            <div class="term-row"><div class="cbox checked"></div><span class="term-label">개인정보 처리 약관 동의<span class="term-req"> (필수) *</span></span><button class="btn-terms-view">보기</button></div>
+          </div>
+        </div>
+        <!-- 바텀시트 모달 -->
+        <div class="terms-modal-overlay" style="position:absolute">
+          <div class="terms-modal-sheet ann-host">
+            <div class="ann"><div class="ann-bubble" data-ann="reg-12" onclick="activateAnn('reg-12')">12</div></div>
+            <button class="modal-close" style="top:12px;right:12px">×</button>
+            <div class="terms-modal-title">개인정보 처리 약관</div>
+            <div class="terms-content">
+              제1조 (목적)<br>
+              본 약관은 유니콘클래스(이하 "회사")가 제공하는 서비스 이용에 있어 회원의 개인정보 수집, 이용, 보관, 파기에 관한 사항을 규정합니다.<br><br>
+              제2조 (수집하는 개인정보)<br>
+              회사는 서비스 제공을 위해 아래 정보를 수집합니다.<br>
+              · 필수: 아이디, 이메일, 비밀번호, 이름, 휴대전화번호<br>
+              · 선택: 광고성 정보 수신 동의<br><br>
+              제3조 (개인정보의 이용 목적)<br>
+              수집한 개인정보는 회원 관리, 서비스 제공, 공지사항 전달 목적으로만 활용됩니다.<br><br>
+              제4조 (보유 및 이용 기간)<br>
+              회원 탈퇴 시 즉시 파기하며, 법령에 의해 보존이 필요한 경우 해당 기간 동안 보관합니다.<br><br>
+              [ 이하 생략 ]
+            </div>
+            <button class="btn-terms-agree">동의하고 닫기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: 가입 완료 ── -->
+    <div class="screen-state-label">STEP <span>3</span> 회원가입 완료</div>
+    <div class="login-bg" style="padding:32px 20px">
+      <div class="login-card" style="text-align:center;padding:48px 36px">
+        <div class="ann-host" style="display:inline-block;margin:0 auto 20px">
+          <div class="ann" style="top:-11px;left:calc(50% - 11px)">
+            <div class="ann-bubble" data-ann="reg-13" onclick="activateAnn('reg-13')">13</div>
+          </div>
+          <div style="width:70px;height:70px;border-radius:50%;background:#e8f5e9;
+               display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto">🎉</div>
+        </div>
+        <div style="font-size:20px;font-weight:900;color:#1a1a1a;margin-bottom:10px">
+          가입이 완료되었습니다!
+        </div>
+        <div style="font-size:13.5px;color:#888;line-height:1.8;margin-bottom:32px">
+          유니콘클래스에 오신 것을 환영합니다.<br>지금 바로 강의를 둘러보세요.
+        </div>
+        <button class="btn-next" style="margin-top:0;margin-bottom:10px">강의 둘러보기</button>
+        <button class="btn-next" style="margin-top:0;background:#fff;color:#c0392b;border:1.5px solid #c0392b">로그인하기</button>
+      </div>
+    </div>
+
+  </div><!-- /.screen-col -->
+
+  <!-- Description -->
+  <div class="desc-col ver2">
+    <div class="desc-col-head">Description — 회원가입</div>
+    <div class="desc-list">
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-1" onclick="activateAnn('reg-1')">1</div>
+        <div class="desc-text">
+          <strong>STEP 1 타이틀</strong>: "휴대폰 인증"<br>
+          회원가입 전 번호 인증 선행<br>
+          인증 완료된 번호는 STEP 2에 자동 입력 + disabled 처리
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-2" onclick="activateAnn('reg-2')">2</div>
+        <div class="desc-text">
+          <strong>휴대전화번호 인풋</strong><br>
+          숫자 입력 시 하이픈 자동 삽입<br>
+          11자리 완성 시 인증요청 버튼 활성화<br>
+          이미 가입된 번호: "이미 가입된 번호입니다" 안내
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-3" onclick="activateAnn('reg-3')">3</div>
+        <div class="desc-text">
+          <strong>인증번호 인풋 + 타이머</strong><br>
+          인증요청 성공 → <strong>3:00</strong> 카운트다운<br>
+          인풋 우측 내부에 <strong style="color:#c0392b">MM:SS</strong> 표시<br>
+          인증 완료 → "다음" 버튼 활성화
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-4" onclick="activateAnn('reg-4')">4</div>
+        <div class="desc-text">
+          <strong>아이디 인풋</strong><br>
+          소문자 영문 + 숫자 조합, 최소 4자<br>
+          실시간 유효성: 특수문자 입력 시 즉시 에러 표시<br>
+          중복검사 버튼 클릭 필수 (검사 전 가입 버튼 비활성)
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-5" onclick="activateAnn('reg-5')">5</div>
+        <div class="desc-text">
+          <strong>중복검사 버튼</strong><br>
+          클릭 → GET /api/check-id?id=xxx<br>
+          사용 가능: "사용 가능한 아이디입니다" (초록)<br>
+          중복: "이미 사용 중인 아이디입니다" (빨강)<br>
+          아이디 수정 시 검사 결과 초기화
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-6" onclick="activateAnn('reg-6')">6</div>
+        <div class="desc-text">
+          <strong>이메일 인풋</strong><br>
+          <code>type="email"</code>, 형식 유효성 검사<br>
+          blur 시점에 에러 표시<br>
+          이메일 중복 서버 검증 (가입 시점)
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-7" onclick="activateAnn('reg-7')">7</div>
+        <div class="desc-text">
+          <strong>비밀번호 인풋 × 2</strong><br>
+          조건: <strong>영문 + 숫자 + 특수문자</strong> 모두 포함, 8자 이상<br>
+          우측 눈 아이콘으로 표시/숨김 토글<br>
+          확인 인풋은 위 비밀번호와 일치 여부 검사<br>
+          두 인풋 모두 통과해야 가입 버튼 활성화
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-8" onclick="activateAnn('reg-8')">8</div>
+        <div class="desc-text">
+          <strong>이름 인풋</strong><br>
+          최소 2자, 한글/영문만 허용<br>
+          숫자·특수문자 입력 시 즉시 에러
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-9" onclick="activateAnn('reg-9')">9</div>
+        <div class="desc-text">
+          <strong>휴대전화번호 (수정 불가)</strong><br>
+          STEP 1 인증 완료 번호 자동 입력<br>
+          <code>disabled</code> + 회색 배경으로 수정 불가 표시<br>
+          "✓ 인증 완료된 번호입니다" 안내 문구
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-10" onclick="activateAnn('reg-10')">10</div>
+        <div class="desc-text">
+          <strong>약관 동의 영역</strong><br>
+          · 모두 동의: 하위 항목 전체 체크/해제<br>
+          · 개인정보 처리 약관 <strong style="color:#c0392b">(필수)</strong>: 미동의 시 가입 불가<br>
+          · 광고성 정보 수신 (선택): 미동의 가능<br>
+          각 항목 우측 <strong>보기</strong> 버튼 → 약관 팝업(바텀시트)
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-11" onclick="activateAnn('reg-11')">11</div>
+        <div class="desc-text">
+          <strong>에러 상태</strong> (STEP 2-E 참조)<br>
+          · 아이디 중복: "이미 사용 중인 아이디입니다"<br>
+          · 이메일 형식 오류: "올바른 이메일 형식이 아닙니다"<br>
+          · 비밀번호 조건 미충족 / 불일치<br>
+          · 이름 미입력<br>
+          · 필수 약관 미동의<br>
+          → 모든 조건 충족 시에만 <strong>회원가입</strong> 버튼 활성화
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-12" onclick="activateAnn('reg-12')">12</div>
+        <div class="desc-text">
+          <strong>약관 팝업 (바텀시트)</strong><br>
+          보기 버튼 클릭 → 하단에서 슬라이드업<br>
+          배경 딤처리 (rgba 0,0,0,0.55)<br>
+          약관 내용 스크롤 영역<br>
+          "동의하고 닫기" 클릭 → 해당 항목 자동 체크 + 닫힘<br>
+          X 버튼 → 체크 없이 닫힘
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" data-desc="reg-13" onclick="activateAnn('reg-13')">13</div>
+        <div class="desc-text">
+          <strong>가입 완료 화면</strong><br>
+          POST /api/register 성공 응답 후 전환<br>
+          완료 아이콘 🎉 + 환영 메시지<br>
+          <strong>강의 둘러보기</strong> → <code>/</code> (메인)<br>
+          <strong>로그인하기</strong> → <code>/login</code>
+        </div>
+      </div>
+
+      <div class="desc-item">
+        <div class="desc-num" style="background:#e67e22;cursor:default">i</div>
+        <div class="desc-text">
+          <strong>보안 정책</strong><br>
+          · 이미 가입된 번호: SMS 미발송, 안내 메시지 표시<br>
+          · 인증번호: 5회 오류 시 코드 무효화<br>
+          · 동일 번호 인증요청: <strong>5회/일</strong> 제한<br>
+          · 아이디 중복검사 미완료 시 서버에서 재검증<br>
+          · 가입 성공 후 자동 로그인 처리 (선택 정책)
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div><!-- /#panel-register -->
+
+<script>
+
+// ── 2뎁스 서브탭 전환 ──
+function showSection(key) {
+  // 패널 전환
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-' + key);
+  if (panel) panel.classList.add('active');
+
+  // 탭 active
+  document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.sub-tab-btn[onclick="showSection('${key}')"]`);
+  if (btn) btn.classList.add('active');
+
+  // 페이지 상단으로 (section-divider 위치로)
+  const divider = panel && panel.querySelector('.section-divider');
+  if (divider) {
+    const top = divider.getBoundingClientRect().top + window.scrollY - 136;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+
+  // 이전 섹션 active 뱃지 초기화
+  document.querySelectorAll('.ann-bubble.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-num.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+}
+
+// ── 하이픈 자동 삽입 ──
+function autoHyphen(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length < 4)      el.value = v;
+  else if (v.length < 8) el.value = v.slice(0,3) + '-' + v.slice(3);
+  else                   el.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7);
+  const btn = el.closest('.input-row').querySelector('.btn-request');
+  if (btn) btn.disabled = v.length < 11;
+}
+
+// ── 데모 타이머 ──
+(function(){
+  let s = 178;
+  const el = document.getElementById('timer-demo');
+  if (!el) return;
+  setInterval(()=>{
+    if (s <= 0) { el.textContent = '00:00'; el.style.color='#e74c3c'; return; }
+    s--;
+    const m = String(Math.floor(s/60)).padStart(2,'0');
+    const sec = String(s%60).padStart(2,'0');
+    el.textContent = `${m}:${sec}`;
+  }, 1000);
+})();
+
+// ── reg 데모 타이머 ──
+(function(){
+  let s = 179;
+  const el = document.getElementById('timer-reg');
+  if (!el) return;
+  setInterval(()=>{
+    if (s <= 0) { el.textContent = '00:00'; el.style.color='#e74c3c'; return; }
+    s--;
+    el.textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+  }, 1000);
+})();
+
+// ── findpw 데모 타이머 ──
+(function(){
+  let s = 179;
+  const el = document.getElementById('timer-pw');
+  if (!el) return;
+  setInterval(()=>{
+    if (s <= 0) { el.textContent = '00:00'; el.style.color='#e74c3c'; return; }
+    s--;
+    el.textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+  }, 1000);
+})();
+
+// ── section-divider sticky 색상 전환 (IntersectionObserver) ──
+(function() {
+  const STICKY_TOP = 93; // doc-header + tab-nav 높이
+
+  document.querySelectorAll('.sd-sentinel').forEach(sentinel => {
+    const divider = sentinel.nextElementSibling;
+    if (!divider || !divider.classList.contains('section-divider')) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // sentinel이 뷰포트 밖으로 나가면(stuck) is-stuck 추가
+        divider.classList.toggle('is-stuck', !entry.isIntersecting);
+      },
+      {
+        rootMargin: `-${STICKY_TOP}px 0px 0px 0px`,
+        threshold: 0,
+      }
+    );
+    observer.observe(sentinel);
+  });
+})();
+
+// ── ann-bubble ↔ desc-item 양방향 액티브 연동 ──
+function activateAnn(id) {
+  const bubble = document.querySelector(`.ann-bubble[data-ann="${id}"]`);
+  const isActive = bubble && bubble.classList.contains('active');
+
+  // 같은 섹션 내 모든 active 해제
+  const prefix = id.split('-')[0];
+  document.querySelectorAll(`.ann-bubble[data-ann^="${prefix}-"]`).forEach(el => el.classList.remove('active'));
+  document.querySelectorAll(`.desc-num[data-desc^="${prefix}-"]`).forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+
+  if (isActive) return; // 토글 off
+
+  // ── bubble 활성화 + 화면 스크롤 ──
+  if (bubble) {
+    bubble.classList.add('active');
+
+    // ann-host 기준으로 화면에서의 위치 계산
+    const annHost = bubble.closest('.ann-host') || bubble.closest('[data-ann]');
+    const target = bubble.closest('.ann-host');
+    if (target) {
+      // sticky 헤더들 높이: doc-header(44) + tab-nav(48) + section-divider(~50) = ~142
+      const HEADER_H = 142;
+      const rect = target.getBoundingClientRect();
+      const scrollY = window.scrollY + rect.top - HEADER_H - 104;
+      window.scrollTo({ top: scrollY, behavior: 'smooth' });
+
+      // 화면 요소 하이라이트 링
+      target.style.outline = '2.5px solid #c0392b';
+      target.style.outlineOffset = '4px';
+      target.style.borderRadius = '6px';
+      target.style.transition = 'outline 0.2s';
+      // 1.8초 후 링 제거
+      setTimeout(() => {
+        target.style.outline = '';
+        target.style.outlineOffset = '';
+      }, 1800);
+    }
+  }
+
+  // ── desc-item 활성화 + desc-col 스크롤 ──
+  const descNum = document.querySelector(`.desc-num[data-desc="${id}"]`);
+  if (descNum) {
+    descNum.classList.add('active');
+    const item = descNum.closest('.desc-item');
+    if (item) {
+      item.classList.add('active');
+      const col = item.closest('.desc-col');
+      if (col) {
+        const headH = col.querySelector('.desc-col-head')?.offsetHeight || 0;
+        col.scrollTo({ top: item.offsetTop - headH - 12, behavior: 'smooth' });
+      }
+    }
+  }
+}
+</script>
+</body>
+</html>

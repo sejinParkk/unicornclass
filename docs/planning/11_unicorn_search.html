@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유니콘클래스 — 검색결과</title>
+<link rel="stylesheet" href="./noto-sans.css" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+/* ══ 클래스 카드 — 03_unicorn_class_list.html과 동일 구조 */
+.class-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.class-card { border-radius:8px; overflow:hidden; cursor:pointer; border:1px solid #eee; background:#fff; transition:box-shadow .15s, transform .15s; }
+.class-card:hover { box-shadow:0 6px 20px rgba(0,0,0,0.1); transform:translateY(-2px); }
+.card-thumb { position:relative; aspect-ratio:16/9; overflow:hidden; }
+.card-thumb-inner { width:100%; height:100%; }
+.card-info { padding:10px 12px 14px; }
+.card-tags { display:flex; gap:3px; margin-bottom:6px; flex-wrap:wrap; }
+.ctag { font-size:10px; font-weight:700; padding:2px 6px; border-radius:2px; }
+.ct-hot     { background:#fdecea; color:#c0392b; }
+.ct-new     { background:#e8f5e9; color:#27ae60; }
+.ct-free    { background:#e8f5e9; color:#27ae60; }
+.ct-premium { background:#f3e8ff; color:#8e44ad; }
+.card-title-text { font-size:13px; font-weight:700; color:#1a1a1a; line-height:1.4; margin-bottom:4px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; white-space:normal; }
+.card-title-text mark { background:#fff3cd; color:#c0392b; font-style:normal; border-radius:2px; padding:0 1px; }
+.card-meta { font-size:11.5px; color:#999; }
+
+/* ══ 강사 카드 — 07_unicorn_instructor.html과 동일 구조 */
+.instructor-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
+.i-card-wrap { padding:12px 10px; cursor:pointer; }
+.i-card { position:relative; transition:transform .28s ease; }
+.i-card-wrap:hover .i-card { transform:translateY(-8px); }
+.i-photo-wrap { position:relative; width:100%; height:240px; overflow:hidden; background:#e8eef4; }
+.i-photo-wrap::after { content:''; position:absolute; bottom:0; left:0; right:0; height:70%; background:linear-gradient(to top, rgba(192,57,43,0.88) 0%, rgba(231,76,60,0.45) 45%, transparent 100%); opacity:0; transition:opacity .28s ease; z-index:1; }
+.i-card-wrap:hover .i-photo-wrap::after { opacity:1; }
+.i-photo-ph { position:absolute; inset:0; background:linear-gradient(160deg,#e8eef4 0%,#c8d8e8 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; }
+.i-photo-ph .person-icon { font-size:64px; line-height:1; color:#b0c4d8; }
+.i-photo-ph small { font-size:10px; color:#aaa; }
+.i-social-hover { position:absolute; bottom:12px; left:0; right:0; display:none; justify-content:center; gap:6px; z-index:2; opacity:0; transition:opacity .28s ease; }
+.i-card-wrap:hover .i-social-hover { display:flex; opacity:1; }
+.i-social-btn { width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,0.92); display:flex; align-items:center; justify-content:center; font-size:11px; color:#333; }
+.i-info { padding:10px 2px 6px; }
+.i-name { font-size:15px; font-weight:800; color:#111; margin-bottom:5px; }
+.i-name mark { background:#fff3cd; color:#c0392b; font-style:normal; border-radius:2px; padding:0 1px; }
+.i-desc-list { list-style:none; margin-bottom:8px; }
+.i-desc-list li { font-size:11px; color:#666; line-height:1.55; padding-left:10px; position:relative; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-bottom:2px; }
+.i-desc-list li::before { content:'•'; position:absolute; left:0; color:#e74c3c; font-weight:700; }
+.i-social-fixed { display:flex; gap:5px; }
+.i-social-icon { width:22px; height:22px; border-radius:50%; background:#f0f0f0; border:1px solid #e0e0e0; display:flex; align-items:center; justify-content:center; font-size:11px; color:#666; }
+.i-class-count { font-size:11px; color:#1a3a5c; font-weight:600; margin-top:6px; }
+
+/* ══ 검색결과 헤더 */
+.search-result-header { padding:24px 32px; background:#fff; border-bottom:2px solid #eee; }
+.search-keyword-wrap { display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+.search-keyword-label { font-size:13px; color:#888; }
+.search-keyword { font-size:22px; font-weight:900; color:#111; letter-spacing:-0.5px; }
+.search-keyword em { color:#c0392b; font-style:normal; }
+.search-result-count { font-size:13px; color:#aaa; }
+.search-result-count.ver2 { font-size:19px; }
+.search-result-count strong { color:#c0392b; font-weight:700; }
+
+/* ══ 검색결과 섹션 */
+.search-section { padding:28px 32px 0; background:#fff; }
+.search-section-pb { padding-bottom:48px; }
+.search-section-title { font-size:14px; font-weight:700; color:#333; display:flex; align-items:center; gap:8px; margin-bottom:20px; padding-bottom:12px; border-bottom:2px solid #111; }
+.search-section-title::before { content:''; width:4px; height:16px; background:#c0392b; border-radius:2px; flex-shrink:0; }
+.search-section-count { font-size:12px; font-weight:400; color:#aaa; margin-left:4px; }
+.search-divider { height:8px; background:#f5f6f8; }
+
+/* ══ 결과 없음 */
+.empty-state { text-align:center; padding:80px 20px; background:#fff; }
+.empty-icon { font-size:52px; margin-bottom:16px; }
+.empty-title { font-size:18px; font-weight:700; color:#333; margin-bottom:8px; }
+.empty-desc { font-size:13px; color:#aaa; line-height:1.8; margin-bottom:28px; }
+.empty-suggestions { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.suggestion-tag { padding:6px 14px; background:#f5f5f5; color:#555; border-radius:20px; font-size:12px; cursor:pointer; transition:all .15s; }
+.suggestion-tag:hover { background:#fef0ee; color:#c0392b; }
+</style>
+</head>
+<body>
+
+<!-- ══ 기획서 헤더 ══ -->
+<div class="doc-header">
+  <div><div class="doc-proj">Project — 유니콘클래스 기획서 v3.0</div><div class="doc-title">검색결과</div></div>
+</div>
+
+<!-- ══ 탭 네비 ══ -->
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <div class="tab-btn" onclick="location.href='./'">메인</div>
+    <div class="tab-btn" onclick="location.href='./02_unicorn_login.html'">로그인 / 회원가입</div>
+    <div class="tab-btn" onclick="location.href='./03_unicorn_class_list.html'">클래스 리스트</div>
+    <div class="tab-btn" onclick="location.href='./04_unicorn_class_detail.html'">클래스 상세</div>
+	<div class="tab-btn" onclick="location.href='./05_unicorn_class_vimeo_player.html'">영상 화면</div>
+	<div class="tab-btn" onclick="location.href='./06_unicorn_about.html'">회사소개</div>
+	<div class="tab-btn" onclick="location.href='./07_unicorn_instructor.html'">강사 리스트</div>
+	<div class="tab-btn" onclick="location.href='./08_unicorn_instructor_detail.html'">강사 상세</div>
+	<div class="tab-btn" onclick="location.href='./12_unicorn_instructor_apply.html'">강사 지원</div>
+	<div class="tab-btn" onclick="location.href='./09_unicorn_support.html'">고객센터</div>
+    <div class="tab-btn" onclick="location.href='./10_unicorn_mypage.html'">마이페이지</div>
+	<div class="tab-btn active" onclick="location.href='./11_unicorn_search.html'">검색결과</div>
+  </div>
+</nav>
+
+<!-- ══ 2뎁스 서브탭 ══ -->
+<div class="sub-tab-nav">
+  <div class="sub-tab-btn active" onclick="showSection('search-result')">검색 결과</div>
+  <div class="sub-tab-btn"        onclick="showSection('search-empty')">결과 없음</div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 1 · 검색 결과
+════════════════════════════════════ -->
+<div id="panel-search-result" class="section-panel active">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider">
+    <span class="s-title">검색 결과</span>
+    <span class="s-url">/search?q=홍길동</span>
+    <span class="s-desc">클래스 + 강사 통합 결과</span>
+  </div>
+  <div class="section-body">
+    <div class="screen-col">
+
+      <!-- GNB -->
+      <div id="site-header" class="ann-host">
+        <div class="ann" style="left:0;top:0;"><div class="ann-bubble" data-ann="si-1" onclick="activateAnn('si-1')">1</div></div>
+        <div class="header-inner">
+          <div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div>
+          <nav class="gnb">
+            <div class="gnb-item">클래스<div class="gnb-dropdown"><a href="#">무료강의</a><a href="#">프리미엄강의</a></div></div>
+            <div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div>
+          </nav>
+          <div class="header-right">
+		  	<a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a>
+            <div class="ann-host search-box search-box-active">
+              <div class="ann"><div class="ann-bubble" data-ann="si-2" onclick="activateAnn('si-2')">2</div></div>
+              <input type="text" value="홍길동">
+              <button>🔍</button>
+            </div>
+            <span class="login-btn">로그인</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 검색 결과 헤더 -->
+      <div class="ann-host search-result-header">
+        <div class="ann" style="left:0;top:0;"><div class="ann-bubble" data-ann="si-3" onclick="activateAnn('si-3')">3</div></div>
+        <div class="search-result-count ver2"><strong>홍길동</strong>에 대한 <strong>4</strong>개의 검색 결과</div>
+      </div>
+
+      <!-- 클래스 섹션 -->
+      <div class="search-section">
+        <div class="ann-host search-section-title">
+          <div class="ann"><div class="ann-bubble" data-ann="si-4" onclick="activateAnn('si-4')">4</div></div>
+          클래스 <span class="search-section-count">3개</span>
+        </div>
+        <div class="class-grid">
+
+          <div class="ann-host class-card">
+            <div class="ann"><div class="ann-bubble" data-ann="si-5" onclick="activateAnn('si-5')">5</div></div>
+            <div class="card-thumb"><div class="card-thumb-inner" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364)"></div></div>
+            <div class="card-info">
+              <div class="card-tags"><span class="ctag ct-hot">HOT</span><span class="ctag ct-premium">프리미엄</span></div>
+              <div class="card-title-text"><mark>홍길동</mark>의 월 1000만원 달성 비법 완전정복</div>
+              <div class="card-meta">홍길동 · 커머스</div>
+            </div>
+          </div>
+
+          <div class="class-card">
+            <div class="card-thumb"><div class="card-thumb-inner" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)"></div></div>
+            <div class="card-info">
+              <div class="card-tags"><span class="ctag ct-premium">프리미엄</span></div>
+              <div class="card-title-text"><mark>홍길동</mark>의 쿠팡 로켓배송 입점 완전정복 A to Z</div>
+              <div class="card-meta">홍길동 · 커머스 &nbsp;|&nbsp; 148,000원</div>
+            </div>
+          </div>
+
+          <div class="class-card">
+            <div class="card-thumb"><div class="card-thumb-inner" style="background:linear-gradient(135deg,#0d1f0d,#153015,#1a4a1a)"></div></div>
+            <div class="card-info">
+              <div class="card-tags"><span class="ctag ct-free">무료</span></div>
+              <div class="card-title-text"><mark>홍길동</mark>의 스마트스토어 시작하기 무료 특강</div>
+              <div class="card-meta">홍길동 · 커머스 &nbsp;|&nbsp; 무료</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="search-divider"></div>
+
+      <!-- 강사 섹션 -->
+      <div class="search-section search-section-pb">
+        <div class="ann-host search-section-title">
+          <div class="ann"><div class="ann-bubble" data-ann="si-6" onclick="activateAnn('si-6')">6</div></div>
+          강사 <span class="search-section-count">1명</span>
+        </div>
+        <div class="instructor-grid">
+          <div class="ann-host i-card-wrap">
+            <div class="ann"><div class="ann-bubble" data-ann="si-7" onclick="activateAnn('si-7')">7</div></div>
+            <div class="i-card">
+              <div class="i-photo-wrap">
+                <div class="i-photo-ph"><div class="person-icon">👤</div><small>강사 사진 (300×200px)</small></div>
+                <div class="i-social-hover"><div class="i-social-btn">📷</div><div class="i-social-btn">▶</div></div>
+              </div>
+              <div class="i-info">
+                <div class="i-name"><mark>홍길동</mark></div>
+                <ul class="i-desc-list">
+                  <li>연매출 30억 이커머스 회사 이사...</li>
+                </ul>
+                <div class="i-social-fixed"><div class="i-social-icon">📷</div><div class="i-social-icon">▶</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+	  <!-- FOOTER -->
+		<div id="footer">
+		  <div class="footer-logo">UNICORN CLASS</div>
+		  <div class="footer-info">
+			<strong>상호</strong>유니콘클래스&nbsp;&nbsp;<strong>대표</strong>홍길동&nbsp;&nbsp;<strong>사업자등록번호</strong>000-00-00000<br>
+			<strong>주소</strong>서울특별시 OO구 OO로 000, OOO호&nbsp;&nbsp;<strong>대표전화</strong>000-0000-0000&nbsp;&nbsp;<strong>이메일</strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a2cbccc4cde2d7cccbc1cdd0ccc1cec3d1d18cc1cd8cc9d0">[email&#160;protected]</a>
+		  </div>
+		  <div class="footer-links">
+			<a href="#">이용약관</a>
+			<a href="#" class="em">개인정보처리방침</a>
+			<a href="#">회사소개</a>
+			<a href="#">고객센터</a>
+		  </div>
+		  <div class="footer-copy">© 2026 유니콘클래스. All rights reserved.</div>
+		</div>
+
+    </div><!-- /screen-col -->
+
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 검색 결과</div>
+      <div class="desc-list">
+
+        <div class="desc-item" onclick="activateAnn('si-1')"><div class="desc-num" data-desc="si-1">1</div><div class="desc-text"><strong>GNB</strong><br>검색 후에도 GNB 유지<br>검색창 border #c0392b 활성 표시</div></div>
+
+        <div class="desc-item" onclick="activateAnn('si-2')"><div class="desc-num" data-desc="si-2">2</div><div class="desc-text"><strong>검색 입력창 활성 상태</strong><br>검색어 유지 + bold<br>수정 후 Enter / 🔍 → 재검색<br>빈칸 검색 → 전체 클래스 목록 이동</div></div>
+
+        <div class="desc-item" onclick="activateAnn('si-3')"><div class="desc-num" data-desc="si-3">3</div><div class="desc-text"><strong>검색 결과 헤더</strong><br>"<strong>검색어</strong>에 대한 <strong>N</strong>개의 검색 결과" 형식<br>클래스 수 + 강사 수 합산 표시<br>URL: <code>/search?q=검색어</code></div></div>
+
+        <div class="desc-item" onclick="activateAnn('si-4')"><div class="desc-num" data-desc="si-4">4</div><div class="desc-text"><strong>클래스 섹션</strong><br>검색 로직 (OR 조건):<br>① 강사명 일치 → 해당 강사의 전체 클래스<br><code>lc_instructor.name LIKE '%q%'</code> → instructor_id로 클래스 조회<br>② 클래스명 일치 → 해당 클래스<br><code>lc_class.title LIKE '%q%'</code><br>두 결과 합산 후 중복 제거 (UNION)<br>is_active = 1 필수<br>정렬: 관련도순 (강사명 완전일치 우선)</div></div>
+
+        <div class="desc-item" onclick="activateAnn('si-5')"><div class="desc-num" data-desc="si-5">5</div><div class="desc-text"><strong>클래스 카드</strong><br>기존 클래스 리스트와 동일 구조<br>제목 내 검색어 <code>&lt;mark&gt;</code> 하이라이트<br>(강사명 검색 시 강사명이 포함된 부분 하이라이트)<br>클릭 → <code>/class/:id</code></div></div>
+
+        <div class="desc-item" onclick="activateAnn('si-6')"><div class="desc-num" data-desc="si-6">6</div><div class="desc-text"><strong>강사 섹션</strong><br>검색어와 강사명 LIKE 매칭된 강사 목록<br><code>lc_instructor.name LIKE '%q%'</code><br>강사명에 <code>&lt;mark&gt;</code> 하이라이트<br>클래스명 검색 시에도 관련 강사 노출 (클래스 결과의 instructor_id DISTINCT)</div></div>
+
+        <div class="desc-item" onclick="activateAnn('si-7')"><div class="desc-num" data-desc="si-7">7</div><div class="desc-text"><strong>강사 카드</strong><br>기존 강사소개 페이지와 동일 구조<br>이름에 <code>&lt;mark&gt;</code> 하이라이트<br>클릭 → <code>/instructor/:id</code></div></div>
+
+        <div class="desc-item"><div class="desc-num" style="background:#e67e22;cursor:default">i</div><div class="desc-text"><strong>API</strong><br><code>GET /api/search?q=검색어</code><br>응답: { classes:[], instructors:[], total:N }<br><br><strong>검색 로그</strong><br><code>lc_search_log</code> (keyword, searched_at, result_count)<br>결과 없는 검색어 → 관리자 콘솔 확인<br>추후 인기 검색어 / 자동완성 확장</div></div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 2 · 결과 없음
+════════════════════════════════════ -->
+<div id="panel-search-empty" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider">
+    <span class="s-title">결과 없음</span>
+    <span class="s-url">/search?q=abcxyz</span>
+    <span class="s-desc">검색 결과가 없는 상태</span>
+  </div>
+  <div class="section-body">
+    <div class="screen-col">
+
+      <!-- GNB -->
+      <div id="site-header">
+        <div class="header-inner">
+          <div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div>
+          <nav class="gnb"><div class="gnb-item">클래스</div><div class="gnb-item">회사소개</div><div class="gnb-item">강사진</div><div class="gnb-item">고객센터</div></nav>
+          <div class="header-right">
+		  	<a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a>
+            <div class="search-box search-box-active"><input type="text" value="abcxyz"><button>🔍</button></div>
+            <span class="login-btn">로그인</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 검색 결과 헤더 -->
+      <div class="ann-host search-result-header" style="border-bottom:none;">
+        <div class="ann" style="left:0;"><div class="ann-bubble" data-ann="se-1" onclick="activateAnn('se-1')">1</div></div>
+        <div class="search-keyword-wrap">
+          <span class="search-keyword-label">검색 결과 —</span>
+          <span class="search-keyword">"<em>abcxyz</em>"</span>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="ann-host empty-state">
+        <div class="ann" style="left:0;"><div class="ann-bubble" data-ann="se-2" onclick="activateAnn('se-2')">2</div></div>
+        <div class="empty-icon">🔍</div>
+        <div class="empty-title">"abcxyz"에 대한 검색 결과가 없습니다</div>
+        <div class="empty-desc">검색어의 철자가 정확한지 확인해 보세요.<br>강사명 또는 클래스명으로 검색하실 수 있습니다.</div>
+        <div class="ann-host empty-suggestions">
+          <div class="ann"><div class="ann-bubble" data-ann="se-3" onclick="activateAnn('se-3')">3</div></div>
+          <div class="suggestion-tag">스마트스토어</div>
+          <div class="suggestion-tag">AI 자동화</div>
+          <div class="suggestion-tag">유튜브</div>
+          <div class="suggestion-tag">인스타그램</div>
+          <div class="suggestion-tag">쿠팡</div>
+        </div>
+      </div>
+
+	  <!-- FOOTER -->
+		<div id="footer">
+		  <div class="footer-logo">UNICORN CLASS</div>
+		  <div class="footer-info">
+			<strong>상호</strong>유니콘클래스&nbsp;&nbsp;<strong>대표</strong>홍길동&nbsp;&nbsp;<strong>사업자등록번호</strong>000-00-00000<br>
+			<strong>주소</strong>서울특별시 OO구 OO로 000, OOO호&nbsp;&nbsp;<strong>대표전화</strong>000-0000-0000&nbsp;&nbsp;<strong>이메일</strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a2cbccc4cde2d7cccbc1cdd0ccc1cec3d1d18cc1cd8cc9d0">[email&#160;protected]</a>
+		  </div>
+		  <div class="footer-links">
+			<a href="#">이용약관</a>
+			<a href="#" class="em">개인정보처리방침</a>
+			<a href="#">회사소개</a>
+			<a href="#">고객센터</a>
+		  </div>
+		  <div class="footer-copy">© 2026 유니콘클래스. All rights reserved.</div>
+		</div>
+
+    </div><!-- /screen-col -->
+
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 결과 없음</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('se-1')"><div class="desc-num" data-desc="se-1">1</div><div class="desc-text"><strong>결과 없음 헤더</strong><br>검색어 표시 동일<br>결과 수 대신 빨간 에러 텍스트<br>내부 탭 없음</div></div>
+        <div class="desc-item" onclick="activateAnn('se-2')"><div class="desc-num" data-desc="se-2">2</div><div class="desc-text"><strong>Empty State</strong><br>아이콘 + 제목 + 안내 문구<br>강사명/클래스명 검색 가능 안내</div></div>
+        <div class="desc-item" onclick="activateAnn('se-3')"><div class="desc-num" data-desc="se-3">3</div><div class="desc-text"><strong>추천 검색어 태그</strong><br>클릭 시 해당 검색어로 재검색<br>관리자에서 등록/관리<br>DB: <code>lc_search_suggest</code> (keyword, sort_order, is_active)</div></div>
+        <div class="desc-item"><div class="desc-num" style="background:#e67e22;cursor:default">i</div><div class="desc-text"><strong>검색어 로깅</strong><br><code>lc_search_log</code>에 키워드 저장<br>(keyword, searched_at, result_count)<br>추후 인기 검색어 / 자동완성 확장</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showSection(key) {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-' + key);
+  if (panel) panel.classList.add('active');
+  document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.sub-tab-btn[onclick="showSection('${key}')"]`);
+  if (btn) btn.classList.add('active');
+  const divider = panel && panel.querySelector('.section-divider');
+  if (divider) {
+    const top = divider.getBoundingClientRect().top + window.scrollY - 136;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+  document.querySelectorAll('.ann-bubble.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-num.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+}
+
+function activateAnn(id) {
+  const bubble = document.querySelector(`.ann-bubble[data-ann="${id}"]`);
+  const isActive = bubble && bubble.classList.contains('active');
+  const parts = id.split('-');
+  const prefix = parts.slice(0, parts.length - 1).join('-');
+  document.querySelectorAll(`.ann-bubble[data-ann^="${prefix}-"]`).forEach(el => el.classList.remove('active'));
+  document.querySelectorAll(`.desc-num[data-desc^="${prefix}-"]`).forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+  if (isActive) return;
+  if (bubble) {
+    bubble.classList.add('active');
+    const target = bubble.closest('.ann-host');
+    if (target) {
+      window.scrollTo({ top: window.scrollY + target.getBoundingClientRect().top - 160 - 54, behavior: 'smooth' });
+      target.style.outline = '2.5px solid #c0392b';
+      target.style.outlineOffset = '4px';
+      target.style.borderRadius = '6px';
+      setTimeout(() => { target.style.outline = ''; target.style.outlineOffset = ''; }, 1800);
+    }
+  }
+  const descNum = document.querySelector(`.desc-num[data-desc="${id}"]`);
+  if (descNum) {
+    descNum.classList.add('active');
+    const item = descNum.closest('.desc-item');
+    if (item) {
+      item.classList.add('active');
+      const col = item.closest('.desc-col');
+      if (col) col.scrollTo({ top: item.offsetTop - (col.querySelector('.desc-col-head')?.offsetHeight || 0) - 12, behavior: 'smooth' });
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const STICKY_TOP = 92;
+  document.querySelectorAll('.sd-sentinel').forEach(sentinel => {
+    const divider = sentinel.nextElementSibling;
+    if (!divider?.classList.contains('section-divider')) return;
+    new IntersectionObserver(
+      ([entry]) => { divider.classList.toggle('is-stuck', !entry.isIntersecting); },
+      { rootMargin: `-${STICKY_TOP + 1}px 0px 0px 0px`, threshold: 0 }
+    ).observe(sentinel);
+  });
+});
+</script>
+</body>
+</html>

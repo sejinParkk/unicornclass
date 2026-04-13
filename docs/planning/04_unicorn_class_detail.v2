@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유니콘클래스 — 클래스 상세</title>
+<link rel="stylesheet" href="./noto-sans.css" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+/* 장바구니 아이콘 */
+.cart-icon {
+  position:relative; cursor:pointer; padding:4px 6px;
+  display:flex; align-items:center; font-size:22px; color:#333;
+  transition:color .15s;
+}
+.cart-icon:hover { color:#c0392b; }
+.cart-badge {
+  position:absolute; top:0; right:0;
+  width:16px; height:16px; border-radius:50%;
+  background:#c0392b; color:#fff;
+  font-size:9px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+  border:2px solid #fff;
+}
+
+/* 마이페이지 드롭다운 */
+.mypage-wrap {
+  position:relative; z-index:110;
+}
+.mypage-btn {
+  display:flex; align-items:center; gap:6px; cursor:pointer;
+  padding:4px 10px; border-radius:20px;
+  border:1px solid #e0e0e0; background:#fff;
+  font-size:13px; font-weight:600; color:#1a1a1a;
+  transition:all .15s;
+}
+.mypage-btn:hover { border-color:#c0392b; color:#c0392b; }
+.mypage-avatar {
+  width:24px; height:24px; border-radius:50%;
+  background:#c0392b; color:#fff;
+  font-size:10px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.mypage-dropdown {
+  position:absolute; top:100%; right:0;
+  padding-top:8px; /* 시각적 간격은 padding으로 */
+  background:transparent;
+  display:none; z-index:120; min-width:160px;
+}
+.mypage-dropdown-inner {
+  background:#fff; border:1px solid #e0e0e0;
+  border-top:2px solid #c0392b;
+  border-radius:0 0 6px 6px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.1);
+  padding:4px 0;
+}
+.mypage-wrap:hover .mypage-dropdown { display:block; }
+.mypage-dropdown a {
+  display:block; padding:9px 16px;
+  font-size:12.5px; color:#333; font-weight:400;
+  border-bottom:1px solid #f5f5f5;
+}
+.mypage-dropdown a:last-child { border-bottom:none; }
+.mypage-dropdown a:hover { background:#fff5f5; color:#c0392b; }
+.mypage-dropdown .md-logout {
+  color:#999; border-top:1px solid #eee; margin-top:2px;
+}
+
+/* ══════════════════════════════ 서브배너 */
+#sub-banner {
+  position:relative;
+  background:linear-gradient(105deg,#0d0d0d 0%,#1a1a2e 60%,#0f2027 100%);
+  padding:32px 32px 28px; overflow:hidden;
+}
+.sub-banner-bg {
+  position:absolute; inset:0;
+  background:linear-gradient(105deg, rgba(192,57,43,0.15) 0%, transparent 60%);
+  pointer-events:none;
+}
+.sub-banner-label { font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:2px; margin-bottom:6px; }
+.sub-banner-title { font-size:28px; font-weight:900; color:#fff; letter-spacing:-1px; }
+
+/* ══════════════════════════════ 클래스 탭 */
+#class-tabs {
+  background:#fff; border-bottom:2px solid #eee;
+  padding:0 32px; display:flex;
+}
+.class-tab {
+  padding:0 4px; height:50px; margin-right:24px;
+  display:flex; align-items:center;
+  font-size:14px; font-weight:600; color:#999; cursor:pointer;
+  border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .15s;
+}
+.class-tab.active { color:#c0392b; border-bottom-color:#c0392b; }
+
+/* ══════════════════════════════ 브레드크럼 */
+#breadcrumb {
+  padding:10px 32px; font-size:12px; color:#aaa;
+  border-bottom:1px solid #f5f5f5;
+}
+#breadcrumb span { color:#888; }
+#breadcrumb span + span::before { content:' > '; color:#ccc; margin:0 4px; }
+#breadcrumb span.cur { color:#555; font-weight:600; }
+
+/* ══════════════════════════════ 상세 본문 2단 */
+#detail-wrap {
+  display:flex; gap:28px; padding:28px 32px 0; align-items:flex-start;
+  position:relative;
+}
+/* 좌: 썸네일 + 탭 + 내용 */
+.detail-left { flex:1; min-width:0; }
+.detail-thumb {
+  width:100%; aspect-ratio:16/9; border-radius:6px; overflow:hidden;
+  background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
+  margin-bottom:0;
+}
+/* 내용 탭 */
+.detail-tabs {
+  display:flex; border-bottom:2px solid #eee; margin-bottom:0;
+  position:sticky; top:44px; z-index:90; background:#fff;
+}
+.detail-tab {
+  flex:0 0 50%; text-align:center; justify-content:center;
+  padding:0; height:44px; display:flex; align-items:center;
+  font-size:13.5px; font-weight:600; color:#999; cursor:pointer;
+  border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .15s;
+}
+.detail-tab.active { color:#c0392b; border-bottom-color:#c0392b; }
+.detail-content-area {
+  min-height:320px; background:#f5f5f5;
+  display:flex; align-items:center; justify-content:center;
+  color:#aaa; font-size:12px; border-radius:0 0 4px 4px;
+  padding:20px;
+}
+
+/* ══════════════════════════════ 우: 신청/결제 박스 */
+.detail-right {
+  width:260px; flex-shrink:0;  
+}
+.ann-host.detail-right {position:sticky !important; top:100px; align-self:flex-start;}
+.detail-box {
+  border:1px solid #e0e0e0; border-radius:8px;
+  overflow:hidden; background:#fff;
+  box-shadow:0 2px 12px rgba(0,0,0,0.08);
+}
+.detail-box-badges { padding:14px 16px 0; display:flex; gap:4px; }
+.dbadge { font-size:10px; font-weight:700; padding:2px 7px; border-radius:2px; }
+.db-hot { background:#fdecea; color:#c0392b; }
+.db-new { background:#e8f5e9; color:#27ae60; }
+.db-free { background:#e8f0ff; color:#3b5bdb; }
+.db-premium { background:#f3e8ff; color:#8e44ad; }
+.detail-box-title {
+  padding:10px 16px 14px; font-size:15px; font-weight:800; color:#1a1a1a;
+  line-height:1.45; border-bottom:1px solid #f0f0f0;
+}
+
+/* 찜하기 / 링크복사 */
+.detail-box-actions {
+  display:flex; gap:6px; padding:10px 16px;
+  border-bottom:1px solid #f0f0f0;
+}
+.action-btn {
+  display:flex; align-items:center; gap:4px;
+  height:30px; padding:0 10px; border-radius:15px;
+  border:1px solid #e0e0e0; background:#fff;
+  font-size:12px; font-weight:600; color:#555; cursor:pointer;
+  transition:all .15s;
+}
+.action-btn:hover { border-color:#c0392b; color:#c0392b; }
+.action-btn.liked { border-color:#c0392b; color:#c0392b; background:#fff5f5; }
+.action-btn .icon { font-size:14px; }
+
+/* 탭 콘텐츠 영역 */
+.detail-content-area { min-height:320px; background:#f5f5f5; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:12px; border-radius:0 0 4px 4px; padding:20px; }
+.detail-tab-content { display:none; }
+.detail-tab-content.active { display:block; }
+.detail-box-inst {
+  padding:10px 16px; display:flex; justify-content:space-between;
+  font-size:12.5px; color:#888; border-bottom:1px solid #f0f0f0;
+}
+.detail-box-inst span { color:#333; font-weight:600; }
+.detail-box-date {
+  padding:12px 16px; display:flex; align-items:center; gap:8px;
+  border-bottom:1px solid #f0f0f0;
+}
+.date-icon { font-size:14px; }
+.date-label { font-size:11.5px; color:#888; }
+.date-val { font-size:12.5px; font-weight:700; color:#1a1a1a; margin-left:auto; }
+.detail-box-timer {
+  padding:10px 16px; background:#fff9f9;
+  border-bottom:1px solid #f0f0f0;
+  text-align:center; font-size:11.5px; color:#888;
+}
+.timer-val { font-size:17px; font-weight:900; color:#c0392b; letter-spacing:1px; margin-top:2px; }
+
+/* 가격 (유료) */
+.detail-box-price {
+  padding:12px 16px; border-bottom:1px solid #f0f0f0;
+}
+.price-original { font-size:12px; color:#bbb; text-decoration:line-through; margin-bottom:2px; }
+.price-discount { display:flex; align-items:baseline; gap:6px; }
+.price-rate { font-size:14px; font-weight:900; color:#c0392b; }
+.price-val { font-size:20px; font-weight:900; color:#1a1a1a; }
+
+/* 신청/결제 버튼 */
+.detail-box-btn { padding:14px 16px 16px; }
+.btn-apply {
+  width:100%; height:46px; border-radius:6px;
+  background:#c0392b; color:#fff;
+  font-size:15px; font-weight:800; cursor:pointer;
+  transition:background .15s; border:none;
+  margin-bottom:8px;
+}
+.btn-apply:hover { background:#a93226; }
+.btn-apply.free { background:#3b5bdb; }
+.btn-apply.free:hover { background:#2f4abf; }
+.btn-cart {
+  width:100%; height:42px; border-radius:6px;
+  background:#fff; color:#c0392b;
+  border:2px solid #c0392b;
+  font-size:14px; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  transition:all .15s;
+}
+.btn-cart:hover { background:#fff5f5; }
+.btn-cart.added { background:#fdecea; color:#a93226; border-color:#a93226; }
+.cart-note { font-size:11px; color:#aaa; text-align:center; margin-top:6px; }
+
+/* 유효성 상태 박스 */
+.state-box {
+  margin:0 16px 14px; padding:10px 12px;
+  border-radius:6px; font-size:12px; line-height:1.6;
+  display:flex; gap:8px; align-items:flex-start;
+}
+.state-icon { font-size:14px; flex-shrink:0; margin-top:1px; }
+.state-box.info   { background:#e8f0ff; color:#1a3a8a; border:1px solid #c5d5f5; }
+.state-box.warn   { background:#fff8e1; color:#7a5800; border:1px solid #ffe082; }
+.state-box.error  { background:#fdecea; color:#922b21; border:1px solid #f5c6c2; }
+.state-box.success{ background:#e8f5e9; color:#1a6b2e; border:1px solid #c3e6cb; }
+
+/* ══════════════════════════════ 강사 소개 (하단) */
+#inst-intro {
+  margin:32px 0 0; padding:20px;
+  border:1px solid #eee; border-radius:8px;
+  position:relative;
+}
+.inst-intro-head {
+  font-size:14px; font-weight:800; color:#1a1a1a;
+  margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid #f0f0f0;
+}
+.inst-row {
+  display:flex; align-items:center; justify-content:space-between;
+}
+.inst-profile { display:flex; align-items:center; gap:12px; }
+.inst-avatar {
+  width:40px; height:40px; border-radius:50%;
+  background:linear-gradient(135deg,#888,#bbb);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:10px; font-weight:700; flex-shrink:0;
+}
+.inst-profile-name { font-size:14px; font-weight:800; }
+.inst-profile-sub  { font-size:11.5px; color:#888; margin-top:1px; }
+.inst-expand-btn {
+  width:28px; height:28px; border-radius:50%; border:1px solid #ddd;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; color:#888; cursor:pointer; transition:all .15s;
+}
+.inst-expand-btn:hover { border-color:#c0392b; color:#c0392b; }
+
+/* ══════════════════════════════ 마케팅·면책 */
+#terms-area {
+  margin:40px 32px 0; position:relative;
+}
+.terms-block { margin-bottom:20px; }
+.terms-title { font-size:13px; font-weight:800; color:#1a1a1a; margin-bottom:8px; }
+.terms-body { font-size:12px; color:#666; line-height:1.8; background:#f9f9f9; padding:12px 14px; border-radius:6px; border:1px solid #eee; }
+
+/* ══════════════════════════════ 섹션 구분선 */
+.section-sep {
+  margin:40px 32px 0;
+  padding:12px 16px;
+  background:#1a3a5c; color:#fff;
+  border-radius:6px 6px 0 0;
+  font-size:13px; font-weight:700; letter-spacing:0.5px;
+  display:flex; align-items:center; gap:8px;
+}
+.section-sep .sep-badge {
+  background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:10px;
+  font-size:10px; letter-spacing:1px;
+}
+
+/* ══════════════════════════════ 결제 프로세스 */
+#payment-process {
+  margin:0 32px 0; padding:24px;
+  border:1px solid #d0dae8; border-top:none; border-radius:0 0 6px 6px;
+  background:#fafcff; position:relative;
+}
+#free-process {
+  margin:0 32px 0; padding:24px;
+  border:1px solid #d0dae8; border-top:none; border-radius:0 0 6px 6px;
+  background:#fafcff; position:relative;
+}
+
+/* 결제 플로우 스텝 */
+.pay-steps {
+  display:flex; align-items:center; gap:0; margin-bottom:28px;
+}
+.pay-step {
+  flex:1; text-align:center; position:relative;
+}
+.pay-step-circle {
+  width:32px; height:32px; border-radius:50%;
+  background:#e0e0e0; color:#999; font-size:12px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 6px; position:relative; z-index:1;
+}
+.pay-step.done .pay-step-circle { background:#27ae60; color:#fff; }
+.pay-step.active .pay-step-circle { background:#c0392b; color:#fff; box-shadow:0 0 0 4px rgba(192,57,43,0.15); }
+.pay-step-label { font-size:11px; color:#aaa; font-weight:600; }
+.pay-step.active .pay-step-label { color:#c0392b; font-weight:700; }
+.pay-step.done .pay-step-label { color:#27ae60; }
+.pay-step-line {
+  position:absolute; top:16px; left:calc(50% + 16px); right:calc(-50% + 16px);
+  height:2px; background:#e0e0e0; z-index:0;
+}
+.pay-step.done .pay-step-line { background:#27ae60; }
+
+/* 결제 패널들 */
+.pay-panel { display:none; }
+.pay-panel.active { display:block; }
+.free-panel { display:none; }
+.free-panel.active { display:block; }
+.pay-panel-title {
+  font-size:14px; font-weight:800; color:#1a3a5c;
+  margin-bottom:16px; padding-bottom:10px;
+  border-bottom:2px solid #e8eef5;
+}
+
+/* 상품 확인 */
+.order-product {
+  display:flex; gap:14px; align-items:center;
+  padding:14px; background:#fff; border:1px solid #e8e8e8; border-radius:6px;
+  margin-bottom:14px;
+}
+.order-thumb {
+  width:80px; height:45px; border-radius:4px; flex-shrink:0;
+  background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
+}
+.order-info-title { font-size:13px; font-weight:700; color:#1a1a1a; margin-bottom:3px; }
+.order-info-meta  { font-size:11.5px; color:#888; }
+.order-price-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 14px; background:#fff; border:1px solid #e8e8e8; border-radius:6px;
+  margin-bottom:6px; font-size:13px;
+}
+.order-price-row .label { color:#666; }
+.order-price-row .val   { font-weight:700; color:#1a1a1a; }
+.order-price-row.total  { background:#fff5f5; border-color:#f5c6c2; }
+.order-price-row.total .val { color:#c0392b; font-size:15px; }
+
+/* 결제수단 */
+.pay-method-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px;
+}
+.pay-method-item {
+  border:2px solid #e0e0e0; border-radius:6px; padding:12px 8px;
+  text-align:center; cursor:pointer; transition:all .15s;
+  background:#fff;
+}
+.pay-method-item:hover { border-color:#c0392b; }
+.pay-method-item.selected { border-color:#c0392b; background:#fff5f5; }
+.pay-method-icon { font-size:20px; margin-bottom:4px; }
+.pay-method-label { font-size:11.5px; font-weight:600; color:#333; }
+.pay-method-note  { font-size:10px; color:#999; margin-top:2px; }
+
+/* PG 미정 안내 */
+.pg-notice {
+  padding:10px 14px; background:#fff8e1;
+  border:1px solid #ffe082; border-radius:6px;
+  font-size:11.5px; color:#7a5800; line-height:1.6; margin-bottom:16px;
+}
+
+/* 입력 필드 */
+.pay-field { margin-bottom:12px; }
+.pay-field label { display:block; font-size:12px; font-weight:700; color:#555; margin-bottom:4px; }
+.pay-field input, .pay-field select {
+  width:100%; height:38px; border:1px solid #ddd; border-radius:5px;
+  padding:0 12px; font-size:13px; font-family:inherit; color:#333; outline:none;
+  transition:border-color .15s; background:#fff;
+}
+.pay-field input:focus, .pay-field select:focus { border-color:#c0392b; }
+.pay-field-row { display:flex; gap:8px; }
+.pay-field-row .pay-field { flex:1; }
+
+/* 약관 동의 */
+.pay-agree { margin-bottom:16px; }
+.agree-all {
+  padding:10px 14px; background:#f5f5f5; border-radius:6px;
+  margin-bottom:8px; display:flex; align-items:center; gap:8px;
+  font-size:13px; font-weight:700; cursor:pointer;
+}
+.agree-item {
+  padding:6px 14px; display:flex; align-items:center; gap:8px;
+  font-size:12px; color:#555; cursor:pointer;
+}
+.agree-item a { color:#c0392b; text-decoration:underline; margin-left:4px; }
+input[type=checkbox] { accent-color:#c0392b; width:14px; height:14px; cursor:pointer; }
+
+/* 완료/실패 화면 */
+.pay-result {
+  text-align:center; padding:32px 20px;
+}
+.pay-result-icon { font-size:48px; margin-bottom:16px; }
+.pay-result-title { font-size:18px; font-weight:900; margin-bottom:8px; }
+.pay-result-desc  { font-size:13px; color:#888; line-height:1.7; margin-bottom:20px; }
+.pay-result-detail {
+  background:#f9f9f9; border:1px solid #eee; border-radius:6px;
+  padding:14px 16px; text-align:left; margin-bottom:20px;
+}
+.pay-result-row {
+  display:flex; justify-content:space-between;
+  font-size:12.5px; padding:4px 0; border-bottom:1px solid #f0f0f0;
+}
+.pay-result-row:last-child { border-bottom:none; }
+.pay-result-row .rl { color:#888; }
+.pay-result-row .rv { font-weight:700; color:#1a1a1a; }
+
+/* 유효성 케이스 섹션 */
+#validation-cases {
+  margin:0 32px 0; padding:24px;
+  border:1px solid #d0dae8; border-top:none;
+  background:#fff; position:relative;
+}
+.val-case-grid {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:12px;
+}
+.val-case {
+  border:1px solid #e0e0e0; border-radius:6px; overflow:hidden;
+  background:#fff;
+}
+.val-case-head {
+  padding:8px 14px; font-size:11px; font-weight:700; letter-spacing:0.5px;
+  border-bottom:1px solid #eee;
+}
+.val-case.type-info .val-case-head   { background:#e8f0ff; color:#1a3a8a; }
+.val-case.type-warn .val-case-head   { background:#fff8e1; color:#7a5800; }
+.val-case.type-error .val-case-head  { background:#fdecea; color:#922b21; }
+.val-case.type-success .val-case-head{ background:#e8f5e9; color:#1a6b2e; }
+.val-case-body { padding:10px 14px; }
+.val-case-btn {
+  display:block; width:100%; height:36px;
+  border-radius:5px; font-size:13px; font-weight:700;
+  cursor:pointer; border:none; margin-bottom:8px;
+}
+.val-case-btn.red   { background:#c0392b; color:#fff; }
+.val-case-btn.blue  { background:#3b5bdb; color:#fff; }
+.val-case-btn.gray  { background:#e0e0e0; color:#999; cursor:not-allowed; }
+.val-case-msg { font-size:11.5px; color:#666; line-height:1.6; }
+.val-case-state {
+  margin-top:8px; padding:8px 10px; border-radius:4px;
+  font-size:11.5px; line-height:1.5;
+}
+.val-case-state.info   { background:#e8f0ff; color:#1a3a8a; }
+.val-case-state.warn   { background:#fff8e1; color:#7a5800; }
+.val-case-state.error  { background:#fdecea; color:#922b21; }
+.val-case-state.success{ background:#e8f5e9; color:#1a6b2e; }
+
+/* 결제 네비 버튼 */
+.pay-nav { display:flex; gap:10px; margin-top:20px; pointer-events:auto;}
+.pay-nav-btn {
+  flex:1; height:42px; border-radius:6px; font-size:14px; font-weight:700;
+  cursor:pointer; border:none; transition:all .15s;
+}
+.pay-nav-btn.prev { background:#f0f0f0; color:#555; }
+.pay-nav-btn.prev:hover { background:#e0e0e0; }
+.pay-nav-btn.next { background:#c0392b; color:#fff; }
+.pay-nav-btn.next:hover { background:#a93226; }
+.pay-nav-btn.free-next { background:#3b5bdb; color:#fff; }
+.pay-nav-btn.free-next:hover { background:#2f4abf; }
+</style>
+</head>
+<body>
+
+<!-- ── 기획서 헤더 ── -->
+<div class="doc-header">
+  <div>
+    <div class="doc-proj">Project — 유니콘클래스 기획서 v2.0</div>
+    <div class="doc-title">클래스 상세</div>
+  </div>
+</div>
+
+<!-- ══ 탭 네비게이션 ══ -->
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <div class="tab-btn" onclick="location.href='./01_unicorn_main.html'">메인</div>
+    <div class="tab-btn" onclick="location.href='./02_unicorn_login.html'">로그인 / 회원가입</div>
+    <div class="tab-btn" onclick="location.href='./03_unicorn_class_list.html'">클래스 리스트</div>
+    <div class="tab-btn active" onclick="location.href='./04_unicorn_class_detail.html'">클래스 상세</div>
+	<div class="tab-btn" onclick="location.href='./05_unicorn_class_vimeo_player.html'">영상 화면</div>
+	<div class="tab-btn" onclick="location.href='./06_unicorn_about.html'">회사소개</div>
+	<div class="tab-btn" onclick="location.href='./07_unicorn_instructor.html'">강사 리스트</div>
+	<div class="tab-btn" onclick="location.href='./08_unicorn_instructor_detail.html'">강사 상세</div>
+	<div class="tab-btn" onclick="location.href='./12_unicorn_instructor_apply.html'">강사 지원</div>
+	<div class="tab-btn" onclick="location.href='./09_unicorn_support.html'">고객센터</div>
+    <div class="tab-btn" onclick="location.href='./10_unicorn_mypage.html'">마이페이지</div>
+	<div class="tab-btn" onclick="location.href='./11_unicorn_search.html'">검색결과</div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+<div class="screen-wrap">
+
+  <!-- HEADER -->
+  <div id="site-header">
+    <div class="header-inner">
+      <div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div>
+      <nav class="gnb">
+        <div class="gnb-item active">클래스
+          <div class="gnb-dropdown"><a href="#">무료강의</a><a href="#">프리미엄강의</a></div>
+        </div>
+        <div class="gnb-item">회사소개</div>
+        <div class="gnb-item">강사진</div>
+        <div class="gnb-item">고객센터
+          <div class="gnb-dropdown"><a href="#">공지사항</a><a href="#">FAQ</a></div>
+        </div>
+      </nav>
+      <div class="header-right">
+	  	<a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a>
+        <div class="search-box">
+          <input type="text" placeholder="강사 / 과정명을 입력해 주세요.">
+          <button>🔍</button>
+        </div>
+          <!-- 장바구니 -->
+          <div class="cart-icon">🛒<div class="cart-badge">2</div></div>
+          <!-- 마이페이지 -->
+          <div class="mypage-wrap">
+            <div class="mypage-btn">
+              <div class="mypage-avatar">홍</div>
+              홍길동 님 ▾
+            </div>
+            <div class="mypage-dropdown">
+              <div class="mypage-dropdown-inner">
+                <a href="#">마이페이지</a>
+                <a href="#">내 강의</a>
+                <a href="#">장바구니</a>
+                <a href="#">결제 내역</a>
+                <a href="#">1:1 문의</a>
+                <a href="#" class="md-logout">로그아웃</a>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- 서브배너 -->
+  <div id="sub-banner">
+    <div class="sub-banner-bg"></div>
+    <div class="sub-banner-label">지금 진행중인</div>
+    <div class="sub-banner-title">클래스</div>
+  </div>
+
+  <!-- 클래스 탭 -->
+  <div id="class-tabs">
+    <div class="class-tab active">무료강의</div>
+    <div class="class-tab">프리미엄강의</div>
+    <div class="class-tab">VOD강의</div>
+  </div>
+
+  <!-- ① 브레드크럼 -->
+  <div id="breadcrumb" class="ann-host">
+    <div class="ann" style="left:10px;top:0"><div class="ann-bubble" data-ann="cd-1" onclick="activateAnn('cd-1')">1</div></div>
+    <span>홈</span><span>클래스 무료강의</span><span class="cur">[뾴공략] 월 5000만원, 누구나 하루 한대로 월급 만드는 폰 창업</span>
+  </div>
+
+  <!-- ② 상세 본문 2단 -->
+  <div id="detail-wrap">
+    <div class="ann" style="left:20px;top:5px">
+      <div class="ann-bubble" data-ann="cd-2" data-scroll="detail-wrap" onclick="activateAnn('cd-2')">2</div>
+    </div>
+
+    <!-- 좌: 썸네일 + 내용탭 -->
+    <div class="detail-left">
+
+      <!-- ③ 썸네일 -->
+      <div class="detail-thumb ann-host">
+        <div class="ann" style="top:5px;left:10px"><div class="ann-bubble" data-ann="cd-3" onclick="activateAnn('cd-3')">3</div></div>
+      </div>
+
+      <!-- ④ 내용 탭 -->
+      <div class="detail-tabs ann-host">
+        <div class="ann" style="left:10px"><div class="ann-bubble" data-ann="cd-4" onclick="activateAnn('cd-4')">4</div></div>
+        <div class="detail-tab active" onclick="scrollToSection('section-class')">클래스 소개</div>
+        <div class="detail-tab" onclick="scrollToSection('section-inst')">강사 소개</div>
+      </div>
+
+      <!-- 클래스 소개 섹션 -->
+      <div id="section-class">
+        <div class="detail-content-area">
+          [ 클래스 소개 이미지 / 상세 내용 영역 ]<br>
+          <span style="font-size:11px;margin-top:6px;display:block;">에디터 또는 HTML 이미지 삽입 방식</span>
+        </div>
+      </div>
+
+      <!-- 강사 소개 섹션 -->
+      <div id="section-inst">
+        <div id="inst-intro" class="ann-host">
+          <div class="ann" style="left:0;top:0"><div class="ann-bubble" data-ann="cd-7" onclick="activateAnn('cd-7')">7</div></div>
+          <div class="inst-intro-head">강사 소개</div>
+          <div class="inst-row">
+            <div class="inst-profile">
+              <div class="inst-avatar">강사</div>
+              <div>
+                <div class="inst-profile-name">뾴공략</div>
+                <div class="inst-profile-sub">폰 창업 · AI 수익화 전문가</div>
+              </div>
+            </div>
+            <div class="inst-expand-btn">+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑤ 우: 신청/결제 박스 -->
+    <div class="detail-right ann-host">
+      <div class="ann" style="top:5px"><div class="ann-bubble" data-ann="cd-5" onclick="activateAnn('cd-5')">5</div></div>
+
+      <!-- 무료강의 케이스 -->
+      <div class="detail-box" style="margin-bottom:12px;">
+        <div style="background:#e8f0ff;padding:6px 16px;font-size:10.5px;font-weight:700;color:#3b5bdb;letter-spacing:0.5px;">무료강의 케이스</div>
+        <div class="detail-box-badges">
+          <span class="dbadge db-hot">HOT</span>
+          <span class="dbadge db-free">무료강의</span>
+        </div>
+        <div class="detail-box-title">[뾴공략] 월 5000만원, 누구나 하루 한대로<br>월급 만드는 폰 창업</div>
+        <div class="detail-box-actions">
+          <button class="action-btn" id="like-btn-free" onclick="toggleLike(this)"><span class="icon">🤍</span> 찜하기</button>
+          <button class="action-btn" onclick="copyLink()"><span class="icon">🔗</span> 링크복사</button>
+        </div>
+        <div class="detail-box-inst">강사 <span>뾴공략</span></div>
+        <div class="detail-box-date">
+          <span class="date-icon">📅</span>
+          <span class="date-label">무료강의일</span>
+          <span class="date-val">3/24 (화) 19시 30분</span>
+        </div>
+        <div class="detail-box-timer">
+          무료강의까지
+          <div class="timer-val">0일 02시간 26분 57초</div>
+        </div>
+        <!-- [추가] 로그인 필수 + 시트 연동 안내 -->
+        <div style="display:flex;align-items:center;gap:6px;padding:7px 16px;background:#fff8e1;border-bottom:1px solid #ffe082;font-size:11px;font-weight:700;color:#7a5800;">
+          🔒 로그인 후 신청 가능 &nbsp;·&nbsp; 신청 정보 시트 자동 저장
+        </div>
+        <div class="detail-box-btn">
+          <button class="btn-apply free">무료강의 신청하기</button>
+        </div>
+      </div>
+
+      <!-- 유료강의 케이스 -->
+      <div class="ann-host">
+        <div class="ann" style="top:-11px;left:-11px"><div class="ann-bubble" data-ann="cd-6" onclick="activateAnn('cd-6')">6</div></div>
+        <div class="detail-box">
+          <div style="background:#fdecea;padding:6px 16px;font-size:10.5px;font-weight:700;color:#c0392b;letter-spacing:0.5px;">유료강의 케이스</div>
+          <div class="detail-box-badges">
+            <span class="dbadge db-hot">HOT</span>
+            <span class="dbadge db-premium">Premium</span>
+          </div>
+          <div class="detail-box-title">[뾴공략] 월 5000만원 폰 창업<br>프리미엄 마스터클래스</div>
+          <div class="detail-box-actions">
+            <button class="action-btn" id="like-btn-paid" onclick="toggleLike(this)"><span class="icon">🤍</span> 찜하기</button>
+            <button class="action-btn" onclick="copyLink()"><span class="icon">🔗</span> 링크복사</button>
+          </div>
+          <div class="detail-box-inst">강사 <span>뾴공략</span></div>
+          <div class="detail-box-price">
+            <div class="price-original">198,000원</div>
+            <div class="price-discount">
+              <span class="price-rate">30%</span>
+              <span class="price-val">138,600원</span>
+            </div>
+          </div>
+          <!-- 할부 개월수 -->
+          <div class="ann-host" style="padding:8px 16px;border-top:1px solid #f5f5f5;background:#fafafa;">
+            <div class="ann" style="top:0;left:0"><div class="ann-bubble" data-ann="cd-6b" onclick="activateAnn('cd-6b')">6-1</div></div>
+            <div style="font-size:11px;color:#888;margin-bottom:4px;">할부 안내</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:11px;background:#f0f0f0;border-radius:4px;padding:3px 8px;color:#555;">일시불</span>
+              <span style="font-size:11px;background:#f0f0f0;border-radius:4px;padding:3px 8px;color:#555;">2개월</span>
+              <span style="font-size:11px;background:#f0f0f0;border-radius:4px;padding:3px 8px;color:#555;">3개월</span>
+              <span style="font-size:11px;background:#f0f0f0;border-radius:4px;padding:3px 8px;color:#555;">6개월</span>
+              <span style="font-size:11px;background:#f0f0f0;border-radius:4px;padding:3px 8px;color:#555;">12개월</span>
+            </div>
+            <div style="font-size:10.5px;color:#bbb;margin-top:4px;">무이자 할부 가능 여부는 카드사마다 상이</div>
+          </div>
+          <!-- 강의 자료 첨부 -->
+          <div class="ann-host" style="padding:10px 16px;border-top:1px solid #f5f5f5;">
+            <div class="ann" style="top:0;left:0"><div class="ann-bubble" data-ann="cd-6c" onclick="activateAnn('cd-6c')">6-2</div></div>
+            <div style="font-size:11px;color:#888;margin-bottom:8px;">📎 강의 자료</div>
+
+            <!-- 파일 첨부 행 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;padding:8px 12px;margin-bottom:6px;">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:#333;">수익화 전략 요약 자료.pdf</div>
+                <div style="font-size:10.5px;color:#aaa;">2.3MB · 로그인 후 다운로드 가능</div>
+              </div>
+              <button style="height:30px;padding:0 12px;background:#1a3a5c;color:#fff;border-radius:5px;font-size:11px;font-weight:700;">다운로드</button>
+            </div>
+
+            <!-- 외부 링크 행 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#f0f4ff;border:1px solid #c5d5f5;border-radius:6px;padding:8px 12px;">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:#1a3a8a;">셀프체크리스트.xlsx (구글 시트)</div>
+                <div style="font-size:10.5px;color:#7a8ab8;">외부 링크 · 로그인 후 이동 가능</div>
+              </div>
+              <a href="#" style="height:30px;padding:0 12px;background:#3b5bdb;color:#fff;border-radius:5px;font-size:11px;font-weight:700;display:flex;align-items:center;text-decoration:none;">열기 →</a>
+            </div>
+          </div>
+          <div class="detail-box-btn">
+            <button class="btn-apply">결제하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ 마케팅·면책 -->
+  <div id="terms-area" class="ann-host">
+    <div class="ann" style="left:-19px;top:-17px"><div class="ann-bubble" data-ann="cd-8" onclick="activateAnn('cd-8')">8</div></div>
+    <div class="terms-block">
+      <div class="terms-title">마케팅 수신 동의</div>
+      <div class="terms-body">
+        무료강의를 신청하면 개인정보 수집 및 마케팅 메세지 수신에 동의하는 것으로 간주합니다.<br>
+        이를 원하지 않을 경우 무료강의 신청이 어려울 점 양해 부탁드립니다.
+      </div>
+    </div>
+    <div class="terms-block">
+      <div class="terms-title">면책조항</div>
+      <div class="terms-body">
+        저희는 콘텐츠 이득을 약속하지 않습니다.<br>
+        제시된 모든 기준은 불법이 아닌 도덕·윤리를 준수 할 수 있는 것으로 간주합니다.<br>
+        이 강의는 '당신만의 역량'이 아닌 반드기 되고자 하는 기술을 습득 가능을 설명합니다.<br>
+        저희는 결과가 사용자의 노력에 따라 달라진다는 면책 조항을 포함합니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       유효성 케이스 섹션
+  ════════════════════════════════════════ -->
+  <div class="section-sep" style="margin-top:40px;">
+    <span>⚠</span> 신청 / 결제 유효성 케이스
+    <span class="sep-badge">VALIDATION</span>
+  </div>
+
+  <div id="validation-cases" class="ann-host">
+    <div class="ann" style="top:5px;">
+      <div class="ann-bubble" data-ann="cd-9" data-scroll="validation-cases" onclick="activateAnn('cd-9')">9</div>
+    </div>
+
+    <div class="val-case-grid">
+
+      <!-- 비회원 -->
+      <div class="val-case type-warn">
+        <div class="val-case-head">CASE 1 — 비회원 접근 (무료 · 유료 공통)</div>
+        <div class="val-case-body">
+          <button class="val-case-btn red" disabled style="cursor:not-allowed;opacity:.6">무료강의 신청하기</button>
+          <div class="val-case-state warn">⚠ 로그인 후 이용 가능합니다.<br><a href="#" style="color:#7a5800;font-weight:700;text-decoration:underline;">로그인 하러 가기 →</a></div>
+          <div class="val-case-msg" style="margin-top:8px;">
+            <strong>무료강의 · 유료강의 모두 로그인 필수</strong><br>
+            버튼 클릭 시 로그인 페이지 이동 (returnUrl 포함)<br>
+            무료강의 신청 완료 시 회원 정보를 구글 시트에 저장하기 위해 로그인 필수
+          </div>
+        </div>
+      </div>
+
+      <!-- 이미 신청 완료 (무료) -->
+      <div class="val-case type-success">
+        <div class="val-case-head">CASE 2 — 이미 신청 완료 (무료)</div>
+        <div class="val-case-body">
+          <button class="val-case-btn gray">신청 완료</button>
+          <div class="val-case-state success">✅ 이미 신청하셨습니다.<br>강의 당일 카카오톡으로 링크가 전송됩니다.</div>
+          <div class="val-case-msg" style="margin-top:8px;">버튼 비활성화 + 완료 상태 표시<br>마이페이지에서 확인 가능</div>
+        </div>
+      </div>
+
+      <!-- 이미 구매 완료 (유료) -->
+      <div class="val-case type-success">
+        <div class="val-case-head">CASE 3 — 이미 구매 완료 (유료)</div>
+        <div class="val-case-body">
+          <button class="val-case-btn gray">구매 완료</button>
+          <div class="val-case-state success">✅ 이미 구매하셨습니다.<br>마이페이지 > 내 강의에서 수강할 수 있습니다.</div>
+          <div class="val-case-msg" style="margin-top:8px;">버튼 비활성화<br>'수강하러 가기' 버튼으로 교체 옵션</div>
+        </div>
+      </div>
+
+      <!-- 신청 기간 전 -->
+      <div class="val-case type-info">
+        <div class="val-case-head">CASE 4 — 신청 기간 전</div>
+        <div class="val-case-body">
+          <button class="val-case-btn gray">신청 대기중</button>
+          <div class="val-case-state info">ℹ 신청 기간이 아직 시작되지 않았습니다.<br>신청 시작: 2026.04.01 10:00</div>
+          <div class="val-case-msg" style="margin-top:8px;">버튼 비활성화 + 시작 일시 표시<br>오픈 알림 신청 기능 추가 검토</div>
+        </div>
+      </div>
+
+      <!-- 신청 기간 종료 -->
+      <div class="val-case type-error">
+        <div class="val-case-head">CASE 5 — 신청 기간 종료</div>
+        <div class="val-case-body">
+          <button class="val-case-btn gray">신청 마감</button>
+          <div class="val-case-state error">✖ 신청이 마감되었습니다.<br>다음 강의 일정을 확인해 보세요.</div>
+          <div class="val-case-msg" style="margin-top:8px;">버튼 비활성화<br>'다음 강의 보러 가기' 링크 제공</div>
+        </div>
+      </div>
+
+      <!-- 결제 실패 -->
+      <div class="val-case type-error">
+        <div class="val-case-head">CASE 6 — 결제 실패 (유료)</div>
+        <div class="val-case-body">
+          <button class="val-case-btn red">결제하기</button>
+          <div class="val-case-state error">✖ 결제에 실패했습니다.<br>카드 정보를 확인하거나 다른 수단을 이용해 주세요.</div>
+          <div class="val-case-msg" style="margin-top:8px;">PG사 응답 코드별 메시지 분기<br>재시도 버튼 제공</div>
+        </div>
+      </div>
+
+      <!-- 서버 오류 -->
+      <div class="val-case type-warn">
+        <div class="val-case-head">CASE 7 — 서버 / 네트워크 오류</div>
+        <div class="val-case-body">
+          <button class="val-case-btn gray">처리중...</button>
+          <div class="val-case-state warn">⚠ 일시적인 오류가 발생했습니다.<br>잠시 후 다시 시도해 주세요.</div>
+          <div class="val-case-msg" style="margin-top:8px;">중복 결제 방지: 처리 중 버튼 비활성화<br>오류 로그 서버 기록</div>
+        </div>
+      </div>
+
+      <!-- [추가] 구글 시트 저장 실패 -->
+      <div class="val-case type-warn">
+        <div class="val-case-head">CASE 8 — 구글 시트 저장 실패 <span style="background:#e8f5e9;color:#1a6b2e;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;">신규</span></div>
+        <div class="val-case-body">
+          <button class="val-case-btn blue">신청 완료 (시트 실패)</button>
+          <div class="val-case-state warn">⚠ 신청은 완료되었으나 데이터 저장 중 오류가 발생했습니다.<br>관리자에게 자동 알림이 발송됩니다.</div>
+          <div class="val-case-msg" style="margin-top:8px;">
+            lc_enrollment 저장은 정상 완료<br>
+            Google Sheets API 실패 시에도 신청 취소 안 함<br>
+            실패 로그 DB 기록 → 관리자 재처리
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       무료 수강 신청 플로우
+  ════════════════════════════════════════ -->
+  <div class="section-sep">
+    <span>🎟</span> 무료강의 신청 플로우
+    <span class="sep-badge">FREE APPLY FLOW</span>
+  </div>
+
+  <div id="free-process" class="ann-host">
+    <div class="ann" style="top:5px;">
+      <div class="ann-bubble" data-ann="cd-10" data-scroll="free-process" onclick="activateAnn('cd-10')">10</div>
+    </div>
+
+    <!-- 스텝 인디케이터 -->
+    <div class="pay-steps" id="free-steps">
+      <div class="pay-step active" id="fstep-ind-1">
+        <div class="pay-step-circle">1</div>
+        <div class="pay-step-label">신청 확인</div>
+        <div class="pay-step-line"></div>
+      </div>
+      <div class="pay-step" id="fstep-ind-2">
+        <div class="pay-step-circle">2</div>
+        <div class="pay-step-label">동의</div>
+        <div class="pay-step-line"></div>
+      </div>
+      <div class="pay-step" id="fstep-ind-3">
+        <div class="pay-step-circle">3</div>
+        <div class="pay-step-label">신청 완료</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: 신청 확인 -->
+    <div class="free-panel active" id="free-panel-1">
+      <div class="pay-panel-title">📋 신청 강의 확인</div>
+      <div class="order-product">
+        <div class="order-thumb"></div>
+        <div>
+          <div class="order-info-title">[뾴공략] 월 5000만원, 누구나 하루 한대로 월급 만드는 폰 창업</div>
+          <div class="order-info-meta">뾴공략 · AI · 무료강의</div>
+        </div>
+      </div>
+      <div class="order-price-row">
+        <span class="label">강의일</span>
+        <span class="val">2026.03.24 (화) 오후 7시 30분</span>
+      </div>
+      <div class="order-price-row">
+        <span class="label">수강 방식</span>
+        <span class="val">카카오 오픈채팅 링크 (신청 완료 후 공개)</span>
+      </div>
+      <div class="order-price-row total">
+        <span class="label" style="font-weight:700;">수강료</span>
+        <span class="val" style="color:#3b5bdb;">무료</span>
+      </div>
+      <div class="pay-nav">
+        <button class="pay-nav-btn prev" onclick="goFreeStep(1)">취소</button>
+        <button class="pay-nav-btn free-next" onclick="goFreeStep(2)">다음 — 동의하기</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: 동의 -->
+    <div class="free-panel" id="free-panel-2">
+      <div class="pay-panel-title">📄 마케팅 수신 및 약관 동의</div>
+      <div style="background:#fff9f0;border:1px solid #ffe0b2;border-radius:6px;padding:12px 14px;font-size:12px;color:#7a4a00;line-height:1.7;margin-bottom:16px;">
+        ⚠ 무료강의를 신청하면 아래 항목에 동의하는 것으로 간주합니다.<br>
+        이를 원하지 않을 경우 무료강의 신청이 어려울 점 양해 부탁드립니다.
+      </div>
+      <div class="pay-agree">
+        <label class="agree-all"><input type="checkbox" id="fchk-all" onchange="toggleFreeAll(this)"> 아래 항목에 모두 동의합니다</label>
+        <label class="agree-item"><input type="checkbox" class="fchk-item"> [필수] 개인정보 수집 및 이용 동의<a href="#">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="fchk-item"> [필수] 마케팅 메시지 수신 동의 (카카오·문자·이메일)<a href="#">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="fchk-item"> [필수] 면책조항 확인<a href="#">보기</a></label>
+      </div>
+      <div class="pay-nav">
+        <button class="pay-nav-btn prev" onclick="goFreeStep(1)">이전</button>
+        <button class="pay-nav-btn free-next" onclick="goFreeStep(3)">무료강의 신청하기</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: 신청 완료 -->
+    <div class="free-panel" id="free-panel-3">
+      <div class="pay-result">
+        <div class="pay-result-icon">✅</div>
+        <div class="pay-result-title">신청이 완료되었습니다!</div>
+        <div class="pay-result-desc">신청해 주셔서 감사합니다.<br>아래 오픈채팅 링크로 입장하시면 강의 당일 알림을 받으실 수 있습니다.</div>
+        <div class="pay-result-detail">
+          <div class="pay-result-row"><span class="rl">신청번호</span><span class="rv">UC-FREE-20260324-00456</span></div>
+          <div class="pay-result-row"><span class="rl">강의명</span><span class="rv">[뾴공략] 폰 창업 무료특강</span></div>
+          <div class="pay-result-row"><span class="rl">강의일</span><span class="rv">2026.03.24 (화) 19:30</span></div>
+          <div class="pay-result-row"><span class="rl">신청일시</span><span class="rv">2026.03.24 17:00:00</span></div>
+        </div>
+        <!-- [추가] 구글 시트 저장 완료 안내 -->
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#e8f5e9;border:1px solid #c3e6cb;border-radius:6px;font-size:11.5px;font-weight:700;color:#1a6b2e;margin-bottom:14px;text-align:left;">
+          <span style="font-size:16px;flex-shrink:0;">📊</span>
+          <div>
+            <div>신청자 정보가 관리 시트에 저장되었습니다.</div>
+            <div style="font-weight:400;font-size:10.5px;color:#2e7d32;margin-top:2px;">저장 항목: 신청일시 · 회원ID · 이름 · 이메일 · 연락처 · 강의명</div>
+          </div>
+        </div>
+        <!-- 오픈채팅 링크 공개 -->
+        <div style="background:#fff9e6;border:1px solid #ffe082;border-radius:8px;padding:14px 16px;margin-bottom:16px;text-align:left;">
+          <div style="font-size:12px;font-weight:700;color:#7a5800;margin-bottom:10px;">🔓 오픈채팅 링크가 공개되었습니다</div>
+          <a href="#" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:44px;border-radius:6px;background:#fee500;color:#3c1e1e;font-size:14px;font-weight:800;text-decoration:none;" onclick="markOpenchatRead(this)">
+            💬 카카오 오픈채팅 입장하기
+          </a>
+          <div style="font-size:11px;color:#aaa;text-align:center;margin-top:8px;">링크는 마이페이지 &gt; 내 강의에서도 확인 가능합니다</div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="pay-nav-btn prev" style="flex:1" onclick="location.href='#'">← 메인으로</button>
+          <button class="pay-nav-btn free-next" style="flex:1" onclick="location.href='#'">내 강의 보기</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#free-process -->
+
+  <!-- ════════════════════════════════════════
+       결제 프로세스 섹션
+  ════════════════════════════════════════ -->
+  <div class="section-sep">
+    <span>💳</span> 결제 프로세스 플로우
+    <span class="sep-badge">PAYMENT FLOW</span>
+  </div>
+
+  <div id="payment-process" class="ann-host">
+    <div class="ann" style="top:5px;">
+      <div class="ann-bubble" data-ann="cd-11" data-scroll="payment-process" onclick="activateAnn('cd-11')">11</div>
+    </div>
+
+    <!-- 스텝 인디케이터 -->
+    <div class="pay-steps" id="pay-steps">
+      <div class="pay-step active" id="step-ind-1">
+        <div class="pay-step-circle">1</div>
+        <div class="pay-step-label">주문 확인</div>
+        <div class="pay-step-line"></div>
+      </div>
+      <div class="pay-step" id="step-ind-2">
+        <div class="pay-step-circle">2</div>
+        <div class="pay-step-label">결제 수단</div>
+        <div class="pay-step-line"></div>
+      </div>
+      <div class="pay-step" id="step-ind-3">
+        <div class="pay-step-circle">3</div>
+        <div class="pay-step-label">정보 입력</div>
+        <div class="pay-step-line"></div>
+      </div>
+      <div class="pay-step" id="step-ind-4">
+        <div class="pay-step-circle">4</div>
+        <div class="pay-step-label">약관 동의</div>
+        <div class="pay-step-line"></div>
+      </div>
+      <div class="pay-step" id="step-ind-5">
+        <div class="pay-step-circle">5</div>
+        <div class="pay-step-label">완료</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: 주문 확인 -->
+    <div class="pay-panel active" id="pay-panel-1">
+      <div class="pay-panel-title">📋 주문 상품 확인</div>
+      <div class="order-product">
+        <div class="order-thumb"></div>
+        <div>
+          <div class="order-info-title">[뾴공략] 월 5000만원, 누구나 하루 한대로 월급 만드는 폰 창업</div>
+          <div class="order-info-meta">뾴공략 · AI · 프리미엄강의</div>
+        </div>
+      </div>
+      <div class="order-price-row"><span class="label">정가</span><span class="val" style="text-decoration:line-through;color:#bbb;">198,000원</span></div>
+      <div class="order-price-row"><span class="label">할인 (얼리버드 30%)</span><span class="val" style="color:#27ae60;">-59,400원</span></div>
+      <div class="order-price-row total"><span class="label" style="font-weight:700;">최종 결제금액</span><span class="val">138,600원</span></div>
+      <div class="pay-nav">
+        <button class="pay-nav-btn prev" onclick="goPayStep(1)">취소</button>
+        <button class="pay-nav-btn next" onclick="goPayStep(2)">다음 — 결제 수단 선택</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: 결제 수단 -->
+    <div class="pay-panel" id="pay-panel-2">
+      <div class="pay-panel-title">💳 결제 수단 선택</div>
+      <div class="pg-notice">⚠ PG사 미정 — 실제 연동 시 PG사 SDK 팝업 또는 인라인 결제창으로 대체됩니다. 현재는 UI 기획 목적의 표시입니다.</div>
+      <div class="pay-method-grid">
+        <div class="pay-method-item selected" onclick="selectMethod(this)">
+          <div class="pay-method-icon">💳</div>
+          <div class="pay-method-label">신용/체크카드</div>
+          <div class="pay-method-note">국내외 카드</div>
+        </div>
+        <div class="pay-method-item" onclick="selectMethod(this)">
+          <div class="pay-method-icon">📱</div>
+          <div class="pay-method-label">간편결제</div>
+          <div class="pay-method-note">카카오·네이버·토스</div>
+        </div>
+        <div class="pay-method-item" onclick="selectMethod(this)">
+          <div class="pay-method-icon">🏦</div>
+          <div class="pay-method-label">계좌이체</div>
+          <div class="pay-method-note">실시간 이체</div>
+        </div>
+        <div class="pay-method-item" onclick="selectMethod(this)">
+          <div class="pay-method-icon">📲</div>
+          <div class="pay-method-label">휴대폰 결제</div>
+          <div class="pay-method-note">통신사 소액결제</div>
+        </div>
+        <div class="pay-method-item" onclick="selectMethod(this)">
+          <div class="pay-method-icon">🏧</div>
+          <div class="pay-method-label">가상계좌</div>
+          <div class="pay-method-note">입금 확인 후 처리</div>
+        </div>
+        <div class="pay-method-item" onclick="selectMethod(this)">
+          <div class="pay-method-icon">🎟</div>
+          <div class="pay-method-label">쿠폰/포인트</div>
+          <div class="pay-method-note">보유 시 적용</div>
+        </div>
+      </div>
+      <div class="pay-nav">
+        <button class="pay-nav-btn prev" onclick="goPayStep(1)">이전</button>
+        <button class="pay-nav-btn next" onclick="goPayStep(3)">다음 — 정보 입력</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: 정보 입력 -->
+    <div class="pay-panel" id="pay-panel-3">
+      <div class="pay-panel-title">✏️ 주문자 정보 입력</div>
+      <div class="pay-field">
+        <label>이름 <span style="color:#c0392b">*</span></label>
+        <input type="text" placeholder="홍길동">
+      </div>
+      <div class="pay-field-row">
+        <div class="pay-field">
+          <label>이메일 <span style="color:#c0392b">*</span></label>
+          <input type="text" placeholder="hello@email.com">
+        </div>
+        <div class="pay-field">
+          <label>연락처 <span style="color:#c0392b">*</span></label>
+          <input type="text" placeholder="010-0000-0000">
+        </div>
+      </div>
+      <div style="font-size:11.5px;color:#aaa;margin-bottom:16px;padding:8px 10px;background:#f9f9f9;border-radius:4px;">
+        ℹ 회원 정보에서 자동 불러오기. 수정 시 해당 주문에만 적용됩니다.
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#1a3a5c;margin-bottom:10px;">카드 정보 <span style="font-weight:400;color:#aaa;font-size:11px;">(PG사 연동 후 팝업 또는 인라인 입력으로 대체)</span></div>
+      <div class="pay-field">
+        <label>카드 번호</label>
+        <input type="text" placeholder="0000 - 0000 - 0000 - 0000">
+      </div>
+      <div class="pay-field-row">
+        <div class="pay-field"><label>유효기간</label><input type="text" placeholder="MM / YY"></div>
+        <div class="pay-field"><label>CVC</label><input type="text" placeholder="000"></div>
+        <div class="pay-field"><label>할부</label>
+          <select><option>일시불</option><option>2개월</option><option>3개월</option><option>6개월</option><option>12개월</option></select>
+        </div>
+      </div>
+      <div class="pay-nav">
+        <button class="pay-nav-btn prev" onclick="goPayStep(2)">이전</button>
+        <button class="pay-nav-btn next" onclick="goPayStep(4)">다음 — 약관 동의</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: 약관 동의 -->
+    <div class="pay-panel" id="pay-panel-4">
+      <div class="pay-panel-title">📄 약관 동의 및 최종 확인</div>
+      <div class="order-price-row total" style="margin-bottom:14px;"><span class="label" style="font-weight:700;">최종 결제금액</span><span class="val">138,600원</span></div>
+      <div class="pay-agree">
+        <label class="agree-all"><input type="checkbox" id="chk-all" onchange="toggleAll(this)"> 아래 약관에 모두 동의합니다</label>
+        <label class="agree-item"><input type="checkbox" class="chk-item"> [필수] 구매조건 확인 및 결제 진행 동의<a href="#">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="chk-item"> [필수] 개인정보 제3자 제공 동의 (PG사)<a href="#">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="chk-item"> [필수] 전자금융거래 이용약관<a href="#">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="chk-item"> [선택] 마케팅 정보 수신 동의<a href="#">보기</a></label>
+      </div>
+      <div class="pay-nav">
+        <button class="pay-nav-btn prev" onclick="goPayStep(3)">이전</button>
+        <button class="pay-nav-btn next" onclick="goPayStep(5)">138,600원 결제하기</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: 완료 -->
+    <div class="pay-panel" id="pay-panel-5">
+      <div class="pay-result">
+        <div class="pay-result-icon">🎉</div>
+        <div class="pay-result-title">결제가 완료되었습니다!</div>
+        <div class="pay-result-desc">강의 수강 정보가 가입된 이메일로 발송되었습니다.<br>아래 버튼으로 오픈채팅방 입장 및 영상을 바로 수강하실 수 있습니다.</div>
+        <div class="pay-result-detail">
+          <div class="pay-result-row"><span class="rl">주문번호</span><span class="rv">UC-20260324-00123</span></div>
+          <div class="pay-result-row"><span class="rl">강의명</span><span class="rv">[뾴공략] 폰 창업 마스터클래스</span></div>
+          <div class="pay-result-row"><span class="rl">결제금액</span><span class="rv" style="color:#c0392b;">138,600원</span></div>
+          <div class="pay-result-row"><span class="rl">결제수단</span><span class="rv">신용카드 (일시불)</span></div>
+          <div class="pay-result-row"><span class="rl">결제일시</span><span class="rv">2026.03.24 19:30:00</span></div>
+        </div>
+        <!-- 오픈채팅 / 비메오 링크 버튼 -->
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <a href="#" style="flex:1;height:42px;border-radius:6px;background:#fee500;color:#3c1e1e;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;" onclick="markOpenchatRead(this)">
+            💬 카카오 오픈채팅 입장
+          </a>
+          <a href="#" style="flex:1;height:42px;border-radius:6px;background:#1ab7ea;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;">
+            ▶ 비메오 영상 보기
+          </a>
+        </div>
+        <div style="font-size:11px;color:#aaa;text-align:center;margin-bottom:16px;">위 링크는 마이페이지 &gt; 내 강의에서도 언제든 확인하실 수 있습니다.</div>
+        <div style="display:flex;gap:10px;">
+          <button class="pay-nav-btn prev" style="flex:1" onclick="location.href='#'">← 메인으로</button>
+          <button class="pay-nav-btn next" style="flex:1" onclick="location.href='#'">결제 상세 보기</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#payment-process -->
+
+  <!-- FOOTER -->
+  <div id="footer">
+    <div class="footer-logo">UNICORN CLASS</div>
+    <div class="footer-info">
+      <strong>상호</strong>유니콘클래스&nbsp;&nbsp;<strong>대표</strong>홍길동&nbsp;&nbsp;<strong>사업자등록번호</strong>000-00-00000<br>
+      <strong>주소</strong>서울특별시 OO구 OO로 000, OOO호&nbsp;&nbsp;<strong>대표전화</strong>000-0000-0000&nbsp;&nbsp;<strong>이메일</strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="751d1019191a35001b1c161a071b16191406065b161a5b1e07">[email&#160;protected]</a>
+    </div>
+    <div class="footer-links">
+      <a href="#">이용약관</a><a href="#" class="em">개인정보처리방침</a><a href="#">회사소개</a><a href="#">고객센터</a>
+    </div>
+    <div class="footer-copy">© 2026 유니콘클래스. All rights reserved.</div>
+  </div>
+
+</div><!-- /.screen-wrap -->
+
+<!-- ══ 우: Description 패널 ══ -->
+<div class="desc-panel">
+  <div class="desc-panel-head">Description</div>
+  <div class="desc-list">
+
+    <div class="desc-divider">▸ 상세 페이지</div>
+
+    <div class="desc-item" onclick="activateAnn('cd-1')">
+      <div class="desc-num" data-desc="cd-1">1</div>
+      <div class="desc-text"><strong>브레드크럼</strong>: 홈 › 클래스 무료강의 › 강의명<br>클릭 시 각 페이지 이동</div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('cd-2')">
+      <div class="desc-num" data-desc="cd-2">2</div>
+      <div class="desc-text"><strong>상세 2단 레이아웃</strong>: 좌(썸네일+내용) / 우(신청·결제 박스)<br>우측 박스: 스크롤 시 sticky</div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('cd-3')">
+      <div class="desc-num" data-desc="cd-3">3</div>
+      <div class="desc-text"><strong>썸네일</strong>: 16:9 이미지<br>무료강의: 강의일·강사명 오버레이 텍스트 포함</div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('cd-4')">
+      <div class="desc-num" data-desc="cd-4">4</div>
+      <div class="desc-text"><strong>내용 탭</strong>: 클래스 소개 / 강사 소개<br>클래스 소개: HTML 에디터 또는 이미지<br>강사 소개: 강사 프로필 상세 표시</div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('cd-5')">
+      <div class="desc-num" data-desc="cd-5">5</div>
+      <div class="desc-text">
+        <strong>신청·결제 박스 — 무료강의</strong><br>
+        배지(무료강의) + 강의명 + 강사 + 강의일 + 카운트다운 타이머<br>
+        버튼: <code>무료강의 신청하기</code> (파랑)<br><br>
+        <strong>🔒 로그인 필수</strong><br>
+        비로그인 클릭 → 로그인 페이지 이동 (returnUrl 포함)<br>
+        무료/유료 구분 없이 모두 로그인 후 진행<br><br>
+        <strong>📊 구글 시트 연동</strong> <span style="background:#e8f5e9;color:#1a6b2e;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;">신규</span><br>
+        신청 완료 시 강의별 매핑 시트에 회원 정보 행 추가<br>
+        저장 컬럼: 신청일시 / 회원ID / 이름 / 이메일 / 연락처 / 강의명 / 강의ID<br>
+        DB: <code>lc_class.gsheet_id</code>, <code>lc_class.gsheet_tab</code>
+      </div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('cd-6')">
+      <div class="desc-num" data-desc="cd-6">6</div>
+      <div class="desc-text">
+        <strong>신청·결제 박스 — 유료강의</strong><br>
+        배지(Premium) + 강의명 + 강사 + 정가·할인가<br>
+        버튼: <code>결제하기</code> (빨강) — 장바구니 기능 제외
+      </div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('cd-6b')">
+      <div class="desc-num" data-desc="cd-6b">6-1</div>
+      <div class="desc-text">
+        <strong>할부 안내</strong><br>
+        관리자에서 강의 등록 시 할부 가능 개월 설정<br>
+        설정값에 따라 배지 형태로 노출 (일시불·2·3·6·12개월 등)<br>
+        무이자 여부는 카드사마다 상이 — 안내 문구 고정<br>
+        Toss Payments 결제 시 할부 개월 파라미터로 전달
+      </div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('cd-6c')">
+      <div class="desc-num" data-desc="cd-6c">6-2</div>
+      <div class="desc-text">
+        <strong>강의 자료 첨부 — 파일 + 외부 링크 둘 다 지원</strong><br>
+        관리자에서 강의 등록 시 아래 두 가지 방식으로 자료 첨부 가능:<br><br>
+        <strong>① 파일 업로드</strong><br>
+        · PDF, 이미지 등 파일 직접 업로드<br>
+        · 파일명 · 용량 표시, 다운로드 버튼<br>
+        · DB: <code>lc_class_file.file_path</code><br><br>
+        <strong>② 외부 링크</strong><br>
+        · 구글 시트, Notion, 유튜브 등 URL 입력<br>
+        · "열기 →" 버튼으로 새 탭 이동<br>
+        · DB: <code>lc_class_file.external_url</code><br><br>
+        <strong>공통</strong><br>
+        · <strong>로그인한 사용자만</strong> 접근 가능<br>
+        · 비로그인 클릭 시 → 로그인 페이지 이동<br>
+        · 파일/링크 여러 개 등록 가능 (관리자 설정)
+      </div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('cd-7')">
+      <div class="desc-num" data-desc="cd-7">7</div>
+      <div class="desc-text"><strong>강사 소개</strong>: 하단 요약 카드<br>+ 버튼 클릭 시 상세 펼치기 (아코디언)</div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('cd-8')">
+      <div class="desc-num" data-desc="cd-8">8</div>
+      <div class="desc-text"><strong>마케팅 동의 / 면책조항</strong><br>신청·결제 전 필독 안내 텍스트</div>
+    </div>
+
+    <div class="desc-divider">▸ 유효성 케이스</div>
+
+    <div class="desc-item"  onclick="activateAnn('cd-9')">
+      <div class="desc-num" data-desc="cd-9">9</div>
+      <div class="desc-text">
+        <strong>버튼 유효성 8가지</strong><br>
+        1. 비회원 → 로그인 유도 <strong>(무료·유료 공통)</strong><br>
+        2. 무료 신청 완료 → 비활성 + 안내<br>
+        3. 유료 구매 완료 → 수강하기 전환<br>
+        4. 신청 기간 전 → 시작일 표시<br>
+        5. 신청 마감 → 다음 강의 유도<br>
+        6. 결제 실패 → PG 오류 메시지<br>
+        7. 서버 오류 → 재시도 + 중복결제 방지<br>
+        8. 구글 시트 저장 실패 → 신청 유지, 관리자 알림 <span style="background:#e8f5e9;color:#1a6b2e;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;">신규</span>
+      </div>
+    </div>
+
+    <div class="desc-divider">▸ 무료 신청 플로우</div>
+
+    <div class="desc-item" onclick="activateAnn('cd-10')">
+      <div class="desc-num" data-desc="cd-10">10</div>
+      <div class="desc-text">
+        <strong>무료강의 신청 3단계</strong><br>
+        1. 신청 확인 (강의명·일정·수강방식)<br>
+        2. 마케팅·면책 동의 (필수 3항목)<br>
+        3. 완료 → 카카오 오픈채팅 링크 공개<br>
+        완료 후 버튼: 메인으로 / 내 강의 보기<br><br>
+        <strong>📊 구글 시트 저장 (신청 완료 시점)</strong> <span style="background:#e8f5e9;color:#1a6b2e;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;">신규</span><br>
+        lc_enrollment 저장 성공 후 Google Sheets API 호출<br>
+        저장 항목: 신청일시 · 회원ID · 이름 · 이메일 · 연락처 · 강의명 · 강의ID<br>
+        시트는 강의별 매핑 (<code>lc_class.gsheet_id</code> / <code>gsheet_tab</code>)<br>
+        API 실패 시 신청 취소 안 함 — 실패 로그 기록 후 관리자 재처리<br><br>
+        <strong>📊 오픈채팅 클릭 추적 + 읽음 처리</strong> <span style="background:#e8f5e9;color:#1a6b2e;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;">신규</span><br>
+        오픈채팅 입장하기 버튼 <strong>최초 1회 클릭 시</strong> DB 기록<br>
+        저장값: <code>member_idx</code> · <code>class_idx</code> · <code>clicked_at</code><br>
+        <strong>읽음 처리: <code>lc_openchat_log.is_read = 1</code></strong> (최초 클릭 시 SET, 이후 무시)<br>
+        테이블: <code>lc_openchat_log</code><br>
+        관리자 페이지에서 클릭(읽음) 현황 확인 가능
+      </div>
+    </div>
+
+    <div class="desc-divider">▸ 결제 프로세스</div>
+
+    <div class="desc-item" onclick="activateAnn('cd-11')">
+      <div class="desc-num" data-desc="cd-11">11</div>
+      <div class="desc-text">
+        <strong>결제 5단계 플로우</strong><br>
+        1. 주문 확인 (상품·금액·할인)<br>
+        2. 결제 수단 선택 (카드·간편·이체 등)<br>
+        3. 주문자 정보 입력<br>
+        4. 약관 동의 + 최종 확인<br>
+        5. 완료 (주문번호·영수증)<br>
+        <strong>PG사 미정</strong>: 연동 시 SDK 팝업 또는 인라인으로 대체<br><br>
+        <strong>📊 오픈채팅 클릭 추적 + 읽음 처리</strong> <span style="background:#e8f5e9;color:#1a6b2e;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;">신규</span><br>
+        결제 완료 후 노출되는 오픈채팅 버튼 <strong>최초 1회 클릭 시</strong> DB 기록<br>
+        저장값: <code>member_idx</code> · <code>class_idx</code> · <code>clicked_at</code><br>
+        <strong>읽음 처리: <code>lc_openchat_log.is_read = 1</code></strong> (최초 클릭 시 SET, 이후 무시)<br>
+        테이블: <code>lc_openchat_log</code>
+      </div>
+    </div>
+
+    <!-- [추가] 구글 시트 + 읽음 처리 DB 요약 -->
+    <div style="margin:12px 0 0;padding:10px 14px;background:#fef0ee;border-top:2px solid #e8eef4;">
+      <div style="font-size:10px;font-weight:700;color:#e74c3c;letter-spacing:1px;margin-bottom:6px;">📌 구글 시트 연동 / 읽음 처리 DB</div>
+      <div style="font-size:10px;color:#666;line-height:1.9;">
+        <span style="color:#2e7d32;font-weight:700;">lc_class.gsheet_id</span> — Spreadsheet ID <span style="background:#e8f5e9;color:#1a6b2e;padding:1px 4px;border-radius:2px;font-size:9px;">신규</span><br>
+        <span style="color:#2e7d32;font-weight:700;">lc_class.gsheet_tab</span> — 시트 탭명 <span style="background:#e8f5e9;color:#1a6b2e;padding:1px 4px;border-radius:2px;font-size:9px;">신규</span><br>
+        <span style="color:#2e7d32;font-weight:700;">lc_openchat_log.is_read</span> — 오픈채팅 최초 클릭 읽음 여부 (0/1) <span style="background:#e8f5e9;color:#1a6b2e;padding:1px 4px;border-radius:2px;font-size:9px;">신규</span><br>
+        lc_enrollment — 수강 신청 (기존)<br>
+        lc_openchat_log — 오픈채팅 클릭 추적 (기존)
+      </div>
+    </div>
+  </div>
+</div><!-- /.desc-panel -->
+
+</div><!-- /.page-wrap -->
+
+<script>
+// ── 찜하기 토글 ──
+function toggleLike(btn) {
+  const liked = btn.classList.toggle('liked');
+  btn.querySelector('.icon').textContent = liked ? '❤️' : '🤍';
+  btn.childNodes[1].textContent = liked ? ' 찜완료' : ' 찜하기';
+}
+
+// ── 링크복사 ──
+function copyLink() {
+  const ta = document.createElement('textarea');
+  ta.value = window.location.href;
+  ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showCopyToast('🔗 링크가 복사되었습니다!');
+  } catch(e) {
+    showCopyToast('링크 복사에 실패했습니다.');
+  }
+  document.body.removeChild(ta);
+}
+function showCopyToast(msg) {
+  let toast = document.getElementById('copy-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'copy-toast';
+    toast.style.cssText = [
+      'position:fixed','bottom:32px','left:50%',
+      'transform:translateX(-50%)',
+      'background:#1a3a5c','color:#fff',
+      'padding:10px 20px','border-radius:6px',
+      'font-size:13px','font-weight:600',
+      'z-index:9999','box-shadow:0 4px 12px rgba(0,0,0,.25)',
+      'opacity:0','transition:opacity .25s','pointer-events:none'
+    ].join(';');
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2200);
+}
+
+// ── 탭 클릭 → 해당 섹션으로 스크롤 ──
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const tabsEl = document.querySelector('.detail-tabs');
+  const tabsH  = tabsEl ? tabsEl.offsetHeight : 0;
+  const docH   = document.querySelector('.doc-header')?.offsetHeight || 0;
+  const top = window.scrollY + el.getBoundingClientRect().top - docH - tabsH - 4;
+  window.scrollTo({ top, behavior: 'smooth' });
+}
+
+// ── 스크롤 시 탭 active 연동 (scroll 이벤트) ──
+document.addEventListener('DOMContentLoaded', () => {
+  const tabs = document.querySelectorAll('.detail-tab');
+
+  function updateActiveTab() {
+    const docH  = document.querySelector('.doc-header')?.offsetHeight || 44;
+    const tabsH = document.querySelector('.detail-tabs')?.offsetHeight || 44;
+    const offset = docH + tabsH + 8; // sticky 헤더 높이 + 여유
+
+    const sClass = document.getElementById('section-class');
+    const sInst  = document.getElementById('section-inst');
+    if (!sClass || !sInst) return;
+
+    const instTop = sInst.getBoundingClientRect().top;
+
+    // 강사소개 섹션 상단이 offset 아래로 내려가면(= 아직 안 도달) 클래스소개 active
+    // 강사소개 섹션 상단이 offset 위로 올라오면(= 진입) 강사소개 active
+    if (instTop <= offset) {
+      tabs.forEach(t => t.classList.remove('active'));
+      tabs[1]?.classList.add('active');
+    } else {
+      tabs.forEach(t => t.classList.remove('active'));
+      tabs[0]?.classList.add('active');
+    }
+  }
+
+  window.addEventListener('scroll', updateActiveTab, { passive: true });
+  updateActiveTab(); // 초기 실행
+});
+
+// ── 장바구니 토글 ──
+function toggleCart(btn) {
+  const added = btn.classList.toggle('added');
+  btn.innerHTML = added
+    ? '<span>✅</span> 장바구니 담김'
+    : '<span>🛒</span> 장바구니 담기';
+}
+
+// ── 무료 신청 스텝 이동 ──
+function goFreeStep(n) {
+  document.querySelectorAll('.free-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('free-panel-' + n)?.classList.add('active');
+  document.querySelectorAll('#free-steps .pay-step').forEach((s, i) => {
+    s.classList.remove('active','done');
+    if (i + 1 < n) s.classList.add('done');
+    if (i + 1 === n) s.classList.add('active');
+  });
+  const fp = document.getElementById('free-process');
+  if (fp) fp.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ── 무료 전체 동의 토글 ──
+function toggleFreeAll(chk) {
+  document.querySelectorAll('.fchk-item').forEach(c => c.checked = chk.checked);
+}
+
+
+let currentPayStep = 1;
+function goPayStep(n) {
+  document.querySelectorAll('.pay-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('pay-panel-' + n)?.classList.add('active');
+  document.querySelectorAll('.pay-step').forEach((s, i) => {
+    s.classList.remove('active','done');
+    if (i + 1 < n) s.classList.add('done');
+    if (i + 1 === n) s.classList.add('active');
+  });
+  currentPayStep = n;
+  const pp = document.getElementById('payment-process');
+  if (pp) pp.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ── 결제 수단 선택 ──
+function selectMethod(el) {
+  document.querySelectorAll('.pay-method-item').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ── 전체 동의 토글 ──
+function toggleAll(chk) {
+  document.querySelectorAll('.chk-item').forEach(c => c.checked = chk.checked);
+}
+
+// ── ann 양방향 연동 ──
+function activateAnn(id) {
+  const bubble = document.querySelector(`.ann-bubble[data-ann="${id}"]`);
+  const isActive = bubble && bubble.classList.contains('active');
+  document.querySelectorAll('.ann-bubble[data-ann]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-num[data-desc]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+  if (isActive) return;
+  if (bubble) {
+    bubble.classList.add('active');
+    const annHost = bubble.closest('.ann-host');
+    if (annHost) {
+      const rect = annHost.getBoundingClientRect();
+      window.scrollTo({ top: window.scrollY + rect.top - 150, behavior:'smooth' });
+      annHost.style.outline = '2.5px solid #c0392b';
+      annHost.style.outlineOffset = '4px';
+      annHost.style.borderRadius = '4px';
+      setTimeout(() => { annHost.style.outline = ''; annHost.style.outlineOffset = ''; }, 1800);
+    } else {
+      const el = document.getElementById(bubble.dataset.scroll);
+      if (el) window.scrollTo({ top: window.scrollY + el.getBoundingClientRect().top - 70, behavior:'smooth' });
+    }
+  }
+  const descNum = document.querySelector(`.desc-num[data-desc="${id}"]`);
+  if (descNum) {
+    descNum.classList.add('active');
+    const item = descNum.closest('.desc-item');
+    if (item) {
+      item.classList.add('active');
+      const panel = item.closest('.desc-panel');
+      if (panel) panel.scrollTo({ top: item.offsetTop - (panel.querySelector('.desc-panel-head')?.offsetHeight || 0) - 12, behavior:'smooth' });
+    }
+  }
+}
+
+// ── 오픈채팅 최초 클릭 시 읽음(is_read) 처리 ──
+function markOpenchatRead(el) {
+  // 이미 읽음 처리된 경우 API 재호출 안 함
+  if (el.dataset.read === '1') return;
+  el.dataset.read = '1';
+  // 실제 구현 시: fetch('/api/openchat-read', { method:'POST', body: JSON.stringify({ class_idx: CLASS_IDX }) })
+  // lc_openchat_log.is_read = 1 SET (최초 1회만)
+  console.log('[읽음 처리] 오픈채팅 클릭 기록 — is_read = 1');
+}
+</script>
+</body>
+</html>

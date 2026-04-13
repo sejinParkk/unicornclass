@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유니콘클래스 — 고객센터</title>
+<link rel="stylesheet" href="./noto-sans.css" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+/* ══════════════════════════════
+   사이트 화면 공통 스타일
+══════════════════════════════ */
+/* 서브배너 */
+.cs-banner { position:relative; height:140px; background:linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 55%,#3a1a1a 100%); display:flex; align-items:center; overflow:hidden; }
+.cs-banner::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(-45deg,transparent,transparent 28px,rgba(192,57,43,.04) 28px,rgba(192,57,43,.04) 29px); }
+.cs-banner::after { content:''; position:absolute; right:-50px; top:-50px; width:260px; height:260px; border-radius:50%; background:radial-gradient(circle,rgba(192,57,43,.18) 0%,transparent 70%); }
+.cs-banner-inner { position:relative; z-index:1; padding:0 48px; }
+.cs-banner-en { font-size:10px; font-weight:500; letter-spacing:3px; color:#c0392b; margin-bottom:8px; }
+.cs-banner-title { font-size:26px; font-weight:700; color:#fff; letter-spacing:-0.5px; }
+.cs-banner-title span { color:#c0392b; }
+
+/* 서브메뉴탭 */
+.cs-subnav { background:#fff; border-bottom:1px solid #eee; display:flex; padding:0 48px; }
+.cs-subnav-item { position:relative; padding:0 20px; height:48px; line-height:48px; font-size:13.5px; font-weight:500; color:#888; cursor:pointer; border-bottom:2px solid transparent; transition:color .2s, border-color .2s; white-space:nowrap; }
+.cs-subnav-item.active { color:#c0392b; font-weight:700; border-bottom-color:#c0392b; }
+
+/* FAQ */
+.faq-wrap { padding:32px 48px 60px; }
+.page-section-title { font-size:17px; font-weight:700; color:#1a1a1a; margin-bottom:20px; }
+.faq-filters { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; }
+.faq-filter-btn { padding:5px 14px; border-radius:20px; border:1px solid #ccc; background:#fff; font-size:12px; font-weight:500; color:#888; cursor:pointer; font-family:inherit; }
+.faq-filter-btn.active { background:#c0392b; border-color:#c0392b; color:#fff; }
+.faq-list { border-top:2px solid #222; }
+.faq-item { border-bottom:1px solid #eee; overflow:hidden; }
+.faq-q { display:flex; align-items:center; gap:12px; padding:18px 0; cursor:pointer; }
+.faq-q-badge { flex-shrink:0; width:22px; height:22px; border-radius:50%; background:#c0392b; color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.faq-q-text { flex:1; font-size:13.5px; font-weight:500; color:#222; line-height:1.5; }
+.faq-item.open .faq-q-text { color:#c0392b; }
+.faq-toggle { flex-shrink:0; width:22px; height:22px; border:1px solid #ccc; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.faq-toggle svg { transition:transform .3s; }
+.faq-item.open .faq-toggle { background:#c0392b; border-color:#c0392b; }
+.faq-item.open .faq-toggle svg { transform:rotate(45deg); }
+.faq-a-wrap { max-height:0; overflow:hidden; transition:max-height .35s cubic-bezier(.4,0,.2,1); }
+.faq-item.open .faq-a-wrap { max-height:320px; }
+.faq-a { display:flex; gap:12px; padding:0 0 20px; }
+.faq-a-badge { flex-shrink:0; width:22px; height:22px; border-radius:50%; border:1.5px solid #c0392b; color:#c0392b; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.faq-a-text { font-size:13px; color:#555; line-height:1.8; }
+.faq-a-text strong { color:#c0392b; }
+
+/* 공지사항 목록 */
+.notice-wrap { padding:32px 48px 60px; }
+.notice-list { border-top:2px solid #222; }
+.notice-row { display:flex; align-items:center; gap:14px; padding:16px 0; border-bottom:1px solid #eee; cursor:pointer; }
+.notice-row:hover .notice-title-text { color:#c0392b; }
+.notice-badge { flex-shrink:0; padding:2px 8px; background:#c0392b; color:#fff; font-size:10px; font-weight:700; border-radius:3px; letter-spacing:.4px; }
+.notice-badge.gen { background:#f0f0f0; color:#888; }
+.notice-badge.maint { background:#e67e22; color:#fff; }
+.notice-title-text { flex:1; font-size:13.5px; font-weight:500; line-height:1.5; transition:color .2s; }
+.notice-date { flex-shrink:0; font-size:12px; color:#aaa; }
+.notice-pinned { background:#fffaf9; }
+
+/* 공지사항 상세 */
+.notice-detail-wrap { padding:32px 48px 60px; }
+.notice-detail-header { border-bottom:2px solid #222; padding-bottom:20px; margin-bottom:28px; }
+.notice-detail-badge { display:inline-block; padding:3px 10px; background:#c0392b; color:#fff; font-size:11px; font-weight:700; border-radius:3px; margin-bottom:12px; }
+.notice-detail-title { font-size:20px; font-weight:800; color:#1a1a1a; line-height:1.4; margin-bottom:12px; }
+.notice-detail-meta { display:flex; gap:20px; font-size:12px; color:#aaa; }
+.notice-detail-body { font-size:13.5px; color:#444; line-height:2; min-height:260px; padding-bottom:32px; border-bottom:1px solid #eee; }
+.notice-detail-body p { margin-bottom:14px; }
+.notice-detail-body strong { color:#1a1a1a; font-weight:700; }
+.highlight-box { background:#fff8f8; border-left:3px solid #c0392b; padding:12px 16px; margin:16px 0; border-radius:0 6px 6px 0; font-size:13px; color:#555; line-height:1.9; }
+.notice-back-btn { height:42px; padding:0 20px; background:#f5f5f5; border:1px solid #e0e0e0; border-radius:8px; font-size:13px; font-weight:600; color:#555; display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-family:inherit; margin-top:16px; }
+.notice-nav { border:1px solid #eee; border-radius:8px; overflow:hidden; margin-top:24px; }
+.notice-nav-row { display:flex; align-items:center; gap:14px; padding:14px 18px; border-bottom:1px solid #f0f0f0; cursor:pointer; }
+.notice-nav-row:last-child { border-bottom:none; }
+.notice-nav-row:hover { background:#fafafa; }
+.notice-nav-label { font-size:11px; font-weight:700; color:#aaa; width:28px; flex-shrink:0; }
+.notice-nav-title { font-size:13px; color:#555; flex:1; }
+.notice-nav-date { font-size:11px; color:#bbb; }
+
+/* 약관 */
+.policy-wrap { padding:32px 48px 60px; }
+.policy-version-bar { display:flex; align-items:center; justify-content:space-between; padding:12px 18px; background:#f7f7f7; border:1px solid #eee; border-radius:6px 6px 0 0; }
+.policy-ver-label { font-size:12px; color:#888; }
+.policy-ver-sel { font-size:12px; font-family:inherit; border:1px solid #ddd; border-radius:4px; padding:4px 8px; color:#333; background:#fff; }
+.policy-body { border:1px solid #eee; border-top:none; border-radius:0 0 6px 6px; padding:28px; font-size:13px; line-height:2; color:#555; }
+.policy-body h3 { font-size:13.5px; font-weight:700; color:#1a1a1a; margin:24px 0 8px; padding-left:10px; border-left:3px solid #c0392b; }
+.policy-body h3:first-child { margin-top:0; }
+.policy-body p { margin-bottom:10px; }
+.policy-body ol, .policy-body ul { padding-left:18px; margin-bottom:10px; }
+.policy-body li { margin-bottom:4px; }
+</style>
+</head>
+<body>
+
+<!-- ══ 기획서 헤더 ══ -->
+<div class="doc-header">
+  <div>
+    <div class="doc-proj">Project — 유니콘클래스 기획서 v3.0</div>
+    <div class="doc-title">고객센터</div>
+  </div>
+</div>
+
+<!-- ══ 탭 네비게이션 ══ -->
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <div class="tab-btn" onclick="location.href='./'">메인</div>
+    <div class="tab-btn" onclick="location.href='./02_unicorn_login.html'">로그인 / 회원가입</div>
+    <div class="tab-btn" onclick="location.href='./03_unicorn_class_list.html'">클래스 리스트</div>
+    <div class="tab-btn" onclick="location.href='./04_unicorn_class_detail.html'">클래스 상세</div>
+	<div class="tab-btn" onclick="location.href='./05_unicorn_class_vimeo_player.html'">영상 화면</div>
+	<div class="tab-btn" onclick="location.href='./06_unicorn_about.html'">회사소개</div>
+	<div class="tab-btn" onclick="location.href='./07_unicorn_instructor.html'">강사 리스트</div>
+	<div class="tab-btn" onclick="location.href='./08_unicorn_instructor_detail.html'">강사 상세</div>
+	<div class="tab-btn" onclick="location.href='./12_unicorn_instructor_apply.html'">강사 지원</div>
+	<div class="tab-btn active" onclick="location.href='./09_unicorn_support.html'">고객센터</div>
+    <div class="tab-btn" onclick="location.href='./10_unicorn_mypage.html'">마이페이지</div>
+	<div class="tab-btn" onclick="location.href='./11_unicorn_search.html'">검색결과</div>
+  </div>
+</nav>
+
+<!-- ══ 2뎁스 서브탭 ══ -->
+<div class="sub-tab-nav">
+  <div class="sub-tab-btn active"  onclick="showSection('faq')">FAQ</div>
+  <div class="sub-tab-btn"         onclick="showSection('notice')">공지사항 목록</div>
+  <div class="sub-tab-btn"         onclick="showSection('notice-detail')">공지사항 상세</div>
+  <div class="sub-tab-btn"         onclick="showSection('terms')">이용약관</div>
+  <div class="sub-tab-btn"         onclick="showSection('privacy')">개인정보처리방침</div>
+</div>
+
+
+<!-- ════════════════════════════════════
+  SECTION 1 · FAQ
+════════════════════════════════════ -->
+<div id="panel-faq" class="section-panel active">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider">
+    <span class="s-title">FAQ</span>
+    <span class="s-url">/supports/faqs</span>
+    <span class="s-desc">자주 묻는 질문 목록 + 아코디언</span>
+  </div>
+
+  <div class="section-body">
+    <!-- 좌: 화면 -->
+    <div class="screen-col">
+
+      <!-- ① 서브배너 -->
+      <div class="ann-host">
+        <div class="ann" style="left:0;top:0;"><div class="ann-bubble" data-ann="faq-1" onclick="activateAnn('faq-1')">1</div></div>
+        <div class="cs-banner">
+          <div class="cs-banner-inner">
+            <div class="cs-banner-en">Customer Support</div>
+            <div class="cs-banner-title">고객<span>센터</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② 서브메뉴 -->
+      <div class="ann-host">
+        <div class="ann" style="left:0;top:0;"><div class="ann-bubble" data-ann="faq-2" onclick="activateAnn('faq-2')">2</div></div>
+        <div class="cs-subnav">
+          <div class="cs-subnav-item active">자주묻는질문</div>
+          <div class="cs-subnav-item">공지사항</div>
+          <div class="cs-subnav-item">이용약관</div>
+          <div class="cs-subnav-item">개인정보처리방침</div>
+        </div>
+      </div>
+
+      <div class="faq-wrap">
+        <div class="page-section-title">자주 묻는 질문</div>
+
+        <!-- ③ 카테고리 필터 -->
+        <div class="ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="faq-3" onclick="activateAnn('faq-3')">3</div></div>
+          <div class="faq-filters">
+            <button class="faq-filter-btn active">전체</button>
+            <button class="faq-filter-btn">결제/환불</button>
+            <button class="faq-filter-btn">강의 수강</button>
+            <button class="faq-filter-btn">계정/회원</button>
+            <button class="faq-filter-btn">기술 문제</button>
+          </div>
+        </div>
+
+        <!-- ④ FAQ 목록 전체 -->
+        <div class="ann-host faq-list">
+          <div class="ann"><div class="ann-bubble" data-ann="faq-4" onclick="activateAnn('faq-4')">4</div></div>
+
+          <!-- ⑤ 열린 항목 -->
+          <div class="ann-host faq-item open">
+            <div class="ann" style="left:13px;top:5px;"><div class="ann-bubble" data-ann="faq-5" onclick="activateAnn('faq-5')">5</div></div>
+            <div class="faq-q">
+              <span class="faq-q-badge">Q</span>
+              <span class="faq-q-text">결제 내역은 어디서 확인하나요?</span>
+              <span class="faq-toggle"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2"><line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/></svg></span>
+            </div>
+            <div class="faq-a-wrap">
+              <div class="faq-a">
+                <span class="faq-a-badge">A</span>
+                <p class="faq-a-text">로그인 하신 후 <strong>마이페이지 &gt; 결제 내역</strong>에서 확인 가능합니다.<br>결제일, 강의명, 금액 등 상세 내역을 확인하실 수 있으며, 영수증 출력도 지원합니다.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ⑥ 닫힌 항목 -->
+          <div class="ann-host faq-item">
+            <div class="ann" style="left:0;top:0;"><div class="ann-bubble" data-ann="faq-6" onclick="activateAnn('faq-6')">6</div></div>
+            <div class="faq-q">
+              <span class="faq-q-badge">Q</span>
+              <span class="faq-q-text">해외 카드로도 결제가 가능한가요?</span>
+              <span class="faq-toggle"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#aaa" stroke-width="2"><line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/></svg></span>
+            </div>
+            <div class="faq-a-wrap">
+              <div class="faq-a"><span class="faq-a-badge">A</span><p class="faq-a-text">네, Visa / Mastercard / AMEX 등 <strong>해외 발급 카드</strong>로도 결제 가능합니다.<br>일부 카드는 카드사 정책에 따라 제한될 수 있으니 해당 카드사에 문의해 주세요.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-q-badge">Q</span><span class="faq-q-text">PC와 모바일 동시에 수강이 가능한가요?</span><span class="faq-toggle"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#aaa" stroke-width="2"><line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/></svg></span></div>
+            <div class="faq-a-wrap"><div class="faq-a"><span class="faq-a-badge">A</span><p class="faq-a-text">동일 계정으로 <strong>PC, 태블릿, 모바일</strong> 모두 수강 가능합니다.<br>단, 동일 강의를 여러 기기에서 동시에 재생하는 것은 제한될 수 있습니다.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-q-badge">Q</span><span class="faq-q-text">플레이어 영상 재생이 안되고 까맣게 나와요</span><span class="faq-toggle"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#aaa" stroke-width="2"><line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/></svg></span></div>
+            <div class="faq-a-wrap"><div class="faq-a"><span class="faq-a-badge">A</span><p class="faq-a-text">① 브라우저 캐시 삭제 후 재접속 → ② <strong>최신 버전 브라우저</strong>(Chrome/Edge) 사용 → ③ 그래픽 드라이버 업데이트 순으로 시도해 보세요.<br>해결되지 않으면 1:1 문의를 남겨주세요.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-q-badge">Q</span><span class="faq-q-text">환불은 어떻게 신청하나요?</span><span class="faq-toggle"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#aaa" stroke-width="2"><line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/></svg></span></div>
+            <div class="faq-a-wrap"><div class="faq-a"><span class="faq-a-badge">A</span><p class="faq-a-text"><strong>마이페이지 &gt; 결제 내역 &gt; 환불 신청</strong>에서 접수하실 수 있습니다.<br>수강 시작 7일 이내·수강률 33% 미만 시 전액 환불, 이후에는 잔여 기간 비례 환불됩니다.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q"><span class="faq-q-badge">Q</span><span class="faq-q-text">수료증은 어디서 발급받나요?</span><span class="faq-toggle"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#aaa" stroke-width="2"><line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/></svg></span></div>
+            <div class="faq-a-wrap"><div class="faq-a"><span class="faq-a-badge">A</span><p class="faq-a-text">수강률 <strong>80% 이상</strong> 달성 시 수료증이 자동 발급됩니다.<br><strong>마이페이지 &gt; 나의 강의 &gt; 수료증 발급</strong>에서 PDF로 다운로드하실 수 있습니다.</p></div></div>
+          </div>
+        </div><!-- /faq-list -->
+
+        <!-- ⑦ 1:1 문의 유도 배너 -->
+        <div class="ann-host" style="margin-top:40px">
+          <div class="ann"><div class="ann-bubble" data-ann="faq-7" onclick="activateAnn('faq-7')">7</div></div>
+          <div style="background:#1a3a5c;border-radius:10px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;">원하시는 답변을 찾지 못하셨나요?</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.6);">1:1 문의를 남겨주시면 빠르게 답변드리겠습니다.</div>
+            </div>
+            <button style="height:40px;padding:0 20px;background:#c0392b;border-radius:8px;color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;">1:1 문의하기</button>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /screen-col -->
+
+    <!-- 우: Description -->
+    <div class="desc-col ver2">
+      <div class="desc-col-head">DESCRIPTION — FAQ</div>
+      <div class="desc-list">
+        <div class="desc-item" onclick="activateAnn('faq-1')">
+          <div class="desc-num" data-desc="faq-1">1</div>
+          <div class="desc-text"><strong>서브 배너</strong><br>고객센터 공통 상단 배너 (전 페이지 동일)<br>다크 그라디언트 배경 + 빨간 accent<br>height: 140px 고정</div>
+        </div>
+        <div class="desc-item" onclick="activateAnn('faq-2')">
+          <div class="desc-num" data-desc="faq-2">2</div>
+          <div class="desc-text"><strong>서브 메뉴 탭</strong><br>자주묻는질문 / 공지사항 / 이용약관 / 개인정보처리방침<br>클릭 → 해당 URL로 페이지 이동<br>현재 페이지 탭 하단 <strong>2px #c0392b</strong> 라인</div>
+        </div>
+        <div class="desc-item" onclick="activateAnn('faq-3')">
+          <div class="desc-num" data-desc="faq-3">3</div>
+          <div class="desc-text"><strong>카테고리 필터 버튼</strong><br>전체 / 결제·환불 / 강의수강 / 계정·회원 / 기술문제<br>클릭 시 해당 카테고리 항목만 노출<br>비활성 항목 <code>display:none</code> 처리 (전체 로드 후 JS 필터)<br>활성: 빨간 배경 + 흰 글자</div>
+        </div>
+        <div class="desc-item" onclick="activateAnn('faq-4')">
+          <div class="desc-num" data-desc="faq-4">4</div>
+          <div class="desc-text"><strong>FAQ 목록 전체 영역</strong><br>상단 2px #222 border-top으로 시작<br>각 항목 하단 1px #eee 구분선<br>DB: <code>lc_faqs</code> (id, category, question, answer, sort, is_active)<br>API: <code>GET /api/faqs?category=all</code></div>
+        </div>
+        <div class="desc-item" onclick="activateAnn('faq-5')">
+          <div class="desc-num" data-desc="faq-5">5</div>
+          <div class="desc-text"><strong>FAQ 아코디언 — 열린 상태</strong><br>Q 빨간 원형 배지 + 질문 + +/× 토글<br><strong>1개만 열림</strong>: 다른 항목 클릭 시 기존 항목 자동 닫힘<br>max-height 트랜지션으로 펼침<br>A 빈 원형 배지(빨간 테두리) + 답변<br>열린 상태: Q텍스트 color:#c0392b, 토글 빨간 배경</div>
+        </div>
+        <div class="desc-item" onclick="activateAnn('faq-6')">
+          <div class="desc-num" data-desc="faq-6">6</div>
+          <div class="desc-text"><strong>FAQ 아코디언 — 닫힌 상태</strong><br>클릭 시 열리고, 이전 열린 항목은 닫힘<br>hover 시 Q텍스트 color:#c0392b</div>
+        </div>
+        <!--div class="desc-item" onclick="activateAnn('faq-7')">
+          <div class="desc-num" data-desc="faq-7">7</div>
+          <div class="desc-text"><strong>1:1 문의 유도 배너</strong><br>FAQ 목록 하단 고정 노출<br>클릭 → <code>/supports/contact</code> 1:1 문의 페이지<br>배경 #1a3a5c / 버튼 #c0392b</div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" style="background:#e67e22;cursor:default">i</div>
+          <div class="desc-text"><strong>데이터 / API</strong><br><code>GET /api/faqs?category=all</code><br>응답: id, category, question, answer, sort<br>카테고리 필터는 프론트 JS 처리</div>
+        </div-->
+      </div>
+    </div>
+  </div>
+</div><!-- /#panel-faq -->
+
+
+<!-- ════════════════════════════════════
+  SECTION 2 · 공지사항 목록
+════════════════════════════════════ -->
+<div id="panel-notice" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider">
+    <span class="s-title">공지사항 목록</span>
+    <span class="s-url">/supports/notices</span>
+    <span class="s-desc">리스트 + 페이지네이션</span>
+  </div>
+
+  <div class="section-body">
+    <div class="screen-col">
+      <div class="cs-banner"><div class="cs-banner-inner"><div class="cs-banner-en">Customer Support</div><div class="cs-banner-title">고객<span>센터</span></div></div></div>
+      <div class="cs-subnav">
+        <div class="cs-subnav-item">자주묻는질문</div>
+        <div class="cs-subnav-item active">공지사항</div>
+        <div class="cs-subnav-item">이용약관</div>
+        <div class="cs-subnav-item">개인정보처리방침</div>
+      </div>
+
+      <div class="notice-wrap">
+        <div class="page-section-title">공지사항</div>
+
+        <!-- ① 목록 전체 -->
+        <div class="ann-host notice-list">
+          <div class="ann"><div class="ann-bubble" data-ann="nt-1" onclick="activateAnn('nt-1')">1</div></div>
+
+          <!-- ② 고정 공지 -->
+          <div class="ann-host notice-row notice-pinned">
+            <div class="ann" style="top:14px;left:-20px;"><div class="ann-bubble" data-ann="nt-2" onclick="activateAnn('nt-2')">2</div></div>
+            <span class="notice-badge">공지</span>
+            <span class="notice-title-text">2026년 1분기 신규 강의 오픈 안내</span>
+            <span class="notice-date">2026.03.20</span>
+          </div>
+          <div class="notice-row notice-pinned">
+            <span class="notice-badge maint">점검</span>
+            <span class="notice-title-text">정기 서버 점검 안내 (3월 28일 새벽 2시~4시)</span>
+            <span class="notice-date">2026.03.18</span>
+          </div>
+
+          <!-- ③ 일반 공지 -->
+          <div class="ann-host notice-row">
+            <div class="ann"><div class="ann-bubble" data-ann="nt-3" onclick="activateAnn('nt-3')">3</div></div>
+            <span class="notice-badge gen">일반</span>
+            <span class="notice-title-text">이용약관 개정 안내 (2026.04.01 시행)</span>
+            <span class="notice-date">2026.03.10</span>
+          </div>
+          <div class="notice-row"><span class="notice-badge gen">일반</span><span class="notice-title-text">스프링 시즌 특별 할인 이벤트 — 최대 40% 할인</span><span class="notice-date">2026.03.05</span></div>
+          <div class="notice-row"><span class="notice-badge gen">일반</span><span class="notice-title-text">모바일 앱 2.5.0 업데이트 안내</span><span class="notice-date">2026.02.28</span></div>
+          <div class="notice-row"><span class="notice-badge gen">일반</span><span class="notice-title-text">강사 모집 공고 — 2026 상반기</span><span class="notice-date">2026.02.20</span></div>
+          <div class="notice-row"><span class="notice-badge">공지</span><span class="notice-title-text">개인정보처리방침 변경 사전 안내</span><span class="notice-date">2026.02.10</span></div>
+          <div class="notice-row"><span class="notice-badge gen">일반</span><span class="notice-title-text">유니콘클래스 서비스 개시 안내</span><span class="notice-date">2026.01.02</span></div>
+        </div>
+
+        <!-- ④ 페이지네이션 -->
+		<div id="pagination" class="ann-host">
+		  <div class="ann" onclick="activateAnn(nt-4)" style="left:50%;top:0;transform:translateX(-50%);"><div class="ann-bubble" id="nt-4">4</div></div>
+		  <button class="page-arrow">‹</button>
+		  <button class="page-btn active">1</button>
+		  <button class="page-btn">2</button>
+		  <button class="page-arrow">›</button>
+		</div>
+      </div>
+    </div>
+
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 공지사항 목록</div>
+      <div class="desc-list">
+        <div class="desc-item">
+          <div class="desc-num" data-desc="nt-1" onclick="activateAnn('nt-1')">1</div>
+          <div class="desc-text"><strong>공지사항 목록 영역</strong><br>상단 2px #222 border-top<br>행 클릭 → <code>/supports/notices/:id</code> 상세 이동<br>hover 시 제목 color:#c0392b</div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" data-desc="nt-2" onclick="activateAnn('nt-2')">2</div>
+          <div class="desc-text"><strong>고정 공지 행</strong><br><code>is_pinned = 1</code>인 항목 목록 최상단 고정<br>배경 #fffaf9 (연한 핑크)로 일반 행 구분<br>배지: <strong>공지</strong> #c0392b / <strong>점검</strong> #e67e22 / <strong>이벤트</strong> #2980b9</div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" data-desc="nt-3" onclick="activateAnn('nt-3')">3</div>
+          <div class="desc-text"><strong>일반 공지 행</strong><br>배지 + 제목(flex:1) + 날짜(우측 고정) 3열<br>DB: <code>lc_notices</code> (id, category, title, content, is_pinned, created_at, views)</div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" data-desc="nt-4" onclick="activateAnn('nt-4')">4</div>
+          <div class="desc-text"><strong>페이지네이션</strong><br>페이지당 10건 기본<br>현재 페이지: 빨간 배경 + 흰 글자<br>API: <code>GET /api/notices?page=1&amp;limit=10</code><br>응답: data[], total, page, limit</div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" style="background:#e67e22;cursor:default">i</div>
+          <div class="desc-text"><strong>배지 카테고리 정의</strong><br>공지(notice) → #c0392b 빨강<br>점검(maintenance) → #e67e22 주황<br>이벤트(event) → #2980b9 파랑<br>일반(general) → #f0f0f0 회색</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /#panel-notice -->
+
+
+<!-- ════════════════════════════════════
+  SECTION 3 · 공지사항 상세
+════════════════════════════════════ -->
+<div id="panel-notice-detail" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider">
+    <span class="s-title">공지사항 상세</span>
+    <span class="s-url">/supports/notices/:id</span>
+    <span class="s-desc">상세 본문 + 이전/다음글</span>
+  </div>
+
+  <div class="section-body">
+    <div class="screen-col">
+      <div class="cs-banner"><div class="cs-banner-inner"><div class="cs-banner-en">Customer Support</div><div class="cs-banner-title">고객<span>센터</span></div></div></div>
+      <div class="cs-subnav">
+        <div class="cs-subnav-item">자주묻는질문</div>
+        <div class="cs-subnav-item active">공지사항</div>
+        <div class="cs-subnav-item">이용약관</div>
+        <div class="cs-subnav-item">개인정보처리방침</div>
+      </div>
+
+      <div class="notice-detail-wrap">
+
+        <!-- ① 헤더 -->
+        <div class="ann-host notice-detail-header">
+          <div class="ann"><div class="ann-bubble" data-ann="nd-1" onclick="activateAnn('nd-1')">1</div></div>
+          <div class="notice-detail-badge">공지</div>
+          <div class="notice-detail-title">2026년 1분기 신규 강의 오픈 안내</div>
+          <div class="notice-detail-meta">
+            <span>작성일 2026.03.20</span>
+            <span>조회수 1,240</span>
+          </div>
+        </div>
+
+        <!-- ② 본문 -->
+        <div class="ann-host notice-detail-body">
+          <div class="ann"><div class="ann-bubble" data-ann="nd-2" onclick="activateAnn('nd-2')">2</div></div>
+          <p>안녕하세요, 유니콘클래스입니다.</p>
+          <p>2026년 1분기를 맞이하여 다양한 분야의 신규 강의를 새롭게 선보입니다. 각 분야 최고 전문가들이 직접 참여한 프리미엄 강의로, 여러분의 성장을 응원합니다.</p>
+          <div class="highlight-box">✅ 신규 오픈 강의<br>· 데이터 분석 with Python (총 32강)<br>· 사진 편집 마스터 클래스 (총 24강)<br>· 영어 회화 집중 과정 (총 40강)</div>
+          <p>오픈 기념으로 <strong>2026년 4월 7일까지 20% 할인 혜택</strong>을 제공드립니다.</p>
+          <p>감사합니다.</p>
+        </div>
+
+        <!-- ③ 목록으로 -->
+        <div class="ann-host" style="display:inline-block">
+          <div class="ann"><div class="ann-bubble" data-ann="nd-3" onclick="activateAnn('nd-3')">3</div></div>
+          <button class="notice-back-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#555" stroke-width="1.5"><polyline points="9,2 4,7 9,12"/></svg>
+            목록으로
+          </button>
+        </div>
+
+        <!-- ④ 이전/다음글 -->
+        <div class="ann-host notice-nav">
+          <div class="ann"><div class="ann-bubble" data-ann="nd-4" onclick="activateAnn('nd-4')">4</div></div>
+          <div class="notice-nav-row">
+            <span class="notice-nav-label">이전글</span>
+            <span class="notice-nav-title">정기 서버 점검 안내 (3월 28일 새벽 2시~4시)</span>
+            <span class="notice-nav-date">2026.03.18</span>
+          </div>
+          <div class="notice-nav-row">
+            <span class="notice-nav-label">다음글</span>
+            <span class="notice-nav-title" style="color:#bbb;font-size:13px">다음 글이 없습니다.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 공지사항 상세</div>
+      <div class="desc-list">
+        <div class="desc-item">
+          <div class="desc-num" data-desc="nd-1" onclick="activateAnn('nd-1')">1</div>
+          <div class="desc-text"><strong>상세 헤더</strong><br>카테고리 배지 + 제목 + 작성일/조회수<br>하단 2px #222 border-bottom으로 본문과 구분<br>API: <code>GET /api/notices/:id</code></div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" data-desc="nd-2" onclick="activateAnn('nd-2')">2</div>
+          <div class="desc-text"><strong>본문 영역</strong><br>관리자 WYSIWYG 에디터 HTML 출력<br>XSS 방지: 서버 허용 태그 화이트리스트 처리<br>최소 높이 260px<br>highlight-box, strong 등 서식 지원</div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" data-desc="nd-3" onclick="activateAnn('nd-3')">3</div>
+          <div class="desc-text"><strong>목록으로 버튼</strong><br>클릭 → <code>/supports/notices</code> 복귀<br>브라우저 history.back() 처리로 이전 스크롤 위치 유지</div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" data-desc="nd-4" onclick="activateAnn('nd-4')">4</div>
+          <div class="desc-text"><strong>이전글 / 다음글</strong><br>현재 글 기준 인접 공지 2건<br>클릭 → 해당 상세 페이지 이동<br>없는 경우 "이전/다음 글이 없습니다." (링크 비활성)<br>API 상세 응답에 prev, next 객체 포함</div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" style="background:#e67e22;cursor:default">i</div>
+          <div class="desc-text"><strong>조회수 처리</strong><br>상세 진입 시 서버에서 views +1<br>세션/쿠키로 중복 집계 방지<br>(동일 사용자 30분 내 재방문 미집계)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /#panel-notice-detail -->
+
+
+<!-- ════════════════════════════════════
+  SECTION 4 · 이용약관
+════════════════════════════════════ -->
+<div id="panel-terms" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider">
+    <span class="s-title">이용약관</span>
+    <span class="s-url">/supports/terms</span>
+    <span class="s-desc">버전 선택 + 약관 본문</span>
+  </div>
+
+  <div class="section-body">
+    <div class="screen-col">
+      <div class="cs-banner"><div class="cs-banner-inner"><div class="cs-banner-en">Customer Support</div><div class="cs-banner-title">고객<span>센터</span></div></div></div>
+      <div class="cs-subnav">
+        <div class="cs-subnav-item">자주묻는질문</div>
+        <div class="cs-subnav-item">공지사항</div>
+        <div class="cs-subnav-item active">이용약관</div>
+        <div class="cs-subnav-item">개인정보처리방침</div>
+      </div>
+      <div class="policy-wrap">
+        <div class="page-section-title">이용약관</div>
+
+        <!-- ① 버전 선택 바 -->
+        <div class="ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="tm-1" onclick="activateAnn('tm-1')">1</div></div>
+          <div class="policy-version-bar">
+            <span class="policy-ver-label">시행일 : 2026년 4월 1일</span>
+            <select class="policy-ver-sel"><option>현재 버전 (2026.04.01)</option><option>이전 버전 (2025.01.01)</option></select>
+          </div>
+        </div>
+
+        <!-- ② 본문 -->
+        <div class="ann-host policy-body">
+          <div class="ann"><div class="ann-bubble" data-ann="tm-2" onclick="activateAnn('tm-2')">2</div></div>
+          <h3>제1조 (목적)</h3>
+          <p>이 약관은 주식회사 유니콘컴퍼니(이하 "회사")가 운영하는 유니콘클래스(이하 "서비스")의 이용과 관련하여 회사와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+          <h3>제2조 (정의)</h3>
+          <ol><li>"서비스"란 회사가 제공하는 온라인 교육 플랫폼 및 이와 관련된 제반 서비스를 의미합니다.</li><li>"이용자"란 이 약관에 따라 서비스를 받는 회원 및 비회원을 말합니다.</li></ol>
+          <h3>제3조 (약관의 효력 및 변경)</h3>
+          <p>이 약관은 서비스 화면에 게시하거나 기타의 방법으로 이용자에게 공지함으로써 효력이 발생합니다. 변경 시 적용일자 및 변경 사유를 공지사항에 게재합니다.</p>
+          <h3>제4조 (결제 및 환불)</h3>
+          <ul><li>수강 시작 7일 이내, 수강률 33% 미만: 전액 환불</li><li>수강 시작 7일 초과 또는 수강률 33% 이상: 잔여 기간 비례 환불</li><li>수강 종료 후: 환불 불가</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 이용약관</div>
+      <div class="desc-list">
+        <div class="desc-item">
+          <div class="desc-num" data-desc="tm-1" onclick="activateAnn('tm-1')">1</div>
+          <div class="desc-text"><strong>버전 선택 바</strong><br>시행일 텍스트 + 우측 버전 셀렉트박스<br>버전 변경 시 해당 시점 약관 본문으로 교체<br>API: <code>GET /api/terms?version=2026-04-01</code><br>버전 목록: <code>GET /api/terms/versions</code></div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" data-desc="tm-2" onclick="activateAnn('tm-2')">2</div>
+          <div class="desc-text"><strong>약관 본문 영역</strong><br>각 조항 h3: 좌측 <strong>3px #c0392b</strong> 세로 라인<br>font-size:13px, line-height:2<br>DB: <code>lc_terms</code> (version, content, effective_at)<br>관리자에서 버전별 등록·수정</div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" style="background:#e67e22;cursor:default">i</div>
+          <div class="desc-text"><strong>공통 안내</strong><br>개인정보처리방침 페이지도 동일 레이아웃·구조<br>버전관리 방식 동일 적용</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /#panel-terms -->
+
+
+<!-- ════════════════════════════════════
+  SECTION 5 · 개인정보처리방침
+════════════════════════════════════ -->
+<div id="panel-privacy" class="section-panel">
+  <div class="sd-sentinel"></div>
+  <div class="section-divider">
+    <span class="s-title">개인정보처리방침</span>
+    <span class="s-url">/supports/privacy</span>
+    <span class="s-desc">버전 선택 + 방침 본문</span>
+  </div>
+
+  <div class="section-body">
+    <div class="screen-col">
+      <div class="cs-banner"><div class="cs-banner-inner"><div class="cs-banner-en">Customer Support</div><div class="cs-banner-title">고객<span>센터</span></div></div></div>
+      <div class="cs-subnav">
+        <div class="cs-subnav-item">자주묻는질문</div>
+        <div class="cs-subnav-item">공지사항</div>
+        <div class="cs-subnav-item">이용약관</div>
+        <div class="cs-subnav-item active">개인정보처리방침</div>
+      </div>
+      <div class="policy-wrap">
+        <div class="page-section-title">개인정보처리방침</div>
+
+        <!-- ① 버전 선택 바 -->
+        <div class="ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="pv-1" onclick="activateAnn('pv-1')">1</div></div>
+          <div class="policy-version-bar">
+            <span class="policy-ver-label">시행일 : 2026년 4월 1일</span>
+            <select class="policy-ver-sel"><option>현재 버전 (2026.04.01)</option><option>이전 버전 (2025.01.01)</option></select>
+          </div>
+        </div>
+
+        <!-- ② 본문 -->
+        <div class="ann-host policy-body">
+          <div class="ann"><div class="ann-bubble" data-ann="pv-2" onclick="activateAnn('pv-2')">2</div></div>
+          <h3>제1조 (개인정보의 처리 목적)</h3>
+          <p>주식회사 유니콘컴퍼니는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우 별도의 동의를 받습니다.</p>
+          <ol><li>회원 가입 및 관리: 본인 식별·인증, 서비스 부정이용 방지</li><li>서비스 제공: 강의 제공, 콘텐츠 제공, 맞춤서비스 제공</li><li>고충처리: 민원 신원 확인, 처리결과 통보</li></ol>
+          <h3>제2조 (개인정보의 처리 및 보유기간)</h3>
+          <ul><li>회원 정보: 회원 탈퇴 시까지</li><li>결제 정보: 5년 (전자상거래법)</li><li>접속 로그: 3개월 (통신비밀보호법)</li></ul>
+          <h3>제3조 (개인정보의 제3자 제공)</h3>
+          <p>회사는 정보주체의 동의 없이 개인정보를 제3자에게 제공하지 않습니다. 단, 법률의 특별한 규정이 있는 경우는 예외로 합니다.</p>
+          <h3>제4조 (정보주체의 권리·의무 및 행사방법)</h3>
+          <p>정보주체는 언제든지 개인정보 열람·정정·삭제·처리정지 요구 등의 권리를 행사할 수 있습니다.</p>
+          <ul><li>개인정보 보호책임자: 오윤록</li><li>이메일: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="39494b504f585a40794c57505a564b575a55584a4a175a5617524b">[email&#160;protected]</a></li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="desc-col">
+      <div class="desc-col-head">DESCRIPTION — 개인정보처리방침</div>
+      <div class="desc-list">
+        <div class="desc-item">
+          <div class="desc-num" data-desc="pv-1" onclick="activateAnn('pv-1')">1</div>
+          <div class="desc-text"><strong>버전 선택 바</strong><br>이용약관과 동일 구조<br>API: <code>GET /api/privacy?version=2026-04-01</code><br>버전 목록: <code>GET /api/privacy/versions</code></div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" data-desc="pv-2" onclick="activateAnn('pv-2')">2</div>
+          <div class="desc-text"><strong>방침 본문 영역</strong><br>이용약관과 동일 레이아웃 (h3 빨간 세로선)<br>DB: <code>lc_privacy</code> (version, content, effective_at)<br>법령상 변경 시 공지사항 연동 필수</div>
+        </div>
+        <div class="desc-item">
+          <div class="desc-num" style="background:#2980b9;cursor:default">!</div>
+          <div class="desc-text"><strong>법적 고지 사항</strong><br>개인정보보호법 제30조 — 공개 의무<br>변경 시 시행 <strong>7일 전</strong> 공지 필수<br>중요 변경(수집항목·목적·제3자 제공)은 <strong>30일 전</strong> 공지</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /#panel-privacy -->
+
+
+<script>
+// ── 서브탭 전환 ──
+function showSection(key) {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-' + key);
+  if (panel) panel.classList.add('active');
+
+  document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.sub-tab-btn[onclick="showSection('${key}')"]`);
+  if (btn) btn.classList.add('active');
+
+  const divider = panel && panel.querySelector('.section-divider');
+  if (divider) {
+    const top = divider.getBoundingClientRect().top + window.scrollY - 136;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll('.ann-bubble.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-num.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+}
+
+// ── section-divider sticky 전환 ──
+(function() {
+  const STICKY_TOP = 93;
+  document.querySelectorAll('.sd-sentinel').forEach(sentinel => {
+    const divider = sentinel.nextElementSibling;
+    if (!divider || !divider.classList.contains('section-divider')) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { divider.classList.toggle('is-stuck', !entry.isIntersecting); },
+      { rootMargin: `-${STICKY_TOP}px 0px 0px 0px`, threshold: 0 }
+    );
+    observer.observe(sentinel);
+  });
+})();
+
+// ── ann-bubble ↔ desc-item 양방향 연동 ──
+function activateAnn(id) {
+  const bubble = document.querySelector(`.ann-bubble[data-ann="${id}"]`);
+  const isActive = bubble && bubble.classList.contains('active');
+
+  // prefix 추출 (faq-1 → faq, nd-1 → nd, nt-1 → nt 등)
+  const parts = id.split('-');
+  const prefix = parts.slice(0, parts.length - 1).join('-');
+
+  document.querySelectorAll(`.ann-bubble[data-ann^="${prefix}-"]`).forEach(el => el.classList.remove('active'));
+  document.querySelectorAll(`.desc-num[data-desc^="${prefix}-"]`).forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+
+  if (isActive) return;
+
+  if (bubble) {
+    bubble.classList.add('active');
+    const target = bubble.closest('.ann-host');
+    if (target) {
+      const HEADER_H = 160;
+      const rect = target.getBoundingClientRect();
+      const scrollY = window.scrollY + rect.top - HEADER_H - 24;
+      window.scrollTo({ top: scrollY, behavior: 'smooth' });
+      target.style.outline = '2.5px solid #c0392b';
+      target.style.outlineOffset = '4px';
+      target.style.borderRadius = '6px';
+      setTimeout(() => { target.style.outline = ''; target.style.outlineOffset = ''; }, 1800);
+    }
+  }
+
+  const descNum = document.querySelector(`.desc-num[data-desc="${id}"]`);
+  if (descNum) {
+    descNum.classList.add('active');
+    const item = descNum.closest('.desc-item');
+    if (item) {
+      item.classList.add('active');
+      const col = item.closest('.desc-col');
+      if (col) {
+        const headH = col.querySelector('.desc-col-head')?.offsetHeight || 0;
+        col.scrollTo({ top: item.offsetTop - headH - 12, behavior: 'smooth' });
+      }
+    }
+  }
+}
+
+// desc-num 클릭은 각 요소의 inline onclick으로 처리 (이중 등록 방지)
+
+// ── FAQ 아코디언 ──
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.faq-item .faq-q').forEach(q => {
+    q.addEventListener('click', () => {
+      const item = q.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+
+      // 같은 faq-list 안의 모든 항목 닫기
+      item.closest('.faq-list').querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+
+      // 닫혀 있던 항목이면 열기
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+});
+</script>
+</body>
+</html>

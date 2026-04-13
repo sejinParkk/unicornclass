@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유니콘클래스 — 강사 지원</title>
+<link rel="stylesheet" href="./noto-sans.css" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+#sub-banner {
+  position:relative;
+  background:linear-gradient(105deg,#0d0d0d 0%,#1a1a2e 60%,#0f2027 100%);
+  padding:36px 32px 32px; overflow:hidden;
+}
+.sub-banner-bg { position:absolute;inset:0;background:linear-gradient(105deg,rgba(192,57,43,0.15) 0%,transparent 60%);pointer-events:none; }
+.sub-banner-label { font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px; }
+.sub-banner-title { font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.2; }
+.sub-banner-desc { font-size:14px;color:rgba(255,255,255,0.6);margin-top:8px;line-height:1.6; }
+.apply-wrap { padding:40px 32px 64px; }
+.apply-section { background:#fff;border:1px solid #eee;border-radius:12px;padding:24px 28px;margin-bottom:16px; }
+.apply-section-title { font-size:14px;font-weight:800;color:#1a1a1a;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;gap:8px; }
+.apply-section-title::before { content:'';width:4px;height:15px;background:#c0392b;border-radius:2px;flex-shrink:0; }
+.form-field { margin-bottom:16px; }
+.form-label { font-size:12px;font-weight:600;color:#444;margin-bottom:6px;display:block; }
+.form-label .req { color:#c0392b;margin-left:2px; }
+.form-label .opt { font-size:11px;color:#aaa;font-weight:400;margin-left:4px; }
+.form-input { width:100%;height:44px;border:1px solid #e0e0e0;border-radius:8px;padding:0 14px;font-size:13px;color:#333;font-family:inherit;outline:none;box-sizing:border-box;transition:border-color .15s; }
+.form-input:focus { border-color:#c0392b; }
+.form-input::placeholder { color:#bbb; }
+.form-textarea { width:100%;min-height:110px;border:1px solid #e0e0e0;border-radius:8px;padding:11px 14px;font-size:13px;color:#333;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box;transition:border-color .15s;line-height:1.7; }
+.form-textarea:focus { border-color:#c0392b; }
+.form-textarea::placeholder { color:#bbb; }
+.form-select { width:100%;height:44px;border:1px solid #e0e0e0;border-radius:8px;padding:0 14px;font-size:13px;color:#333;font-family:inherit;outline:none;box-sizing:border-box;background:#fff; }
+.form-select:focus { border-color:#c0392b; }
+.form-hint { font-size:11px;color:#aaa;margin-top:5px;padding-left:2px;line-height:1.6; }
+.form-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+.social-row { display:flex;align-items:center;gap:10px;margin-bottom:8px; }
+.social-label { font-size:12px;font-weight:600;color:#888;width:60px;flex-shrink:0; }
+.file-drop { border:2px dashed #ddd;border-radius:8px;padding:22px;text-align:center;background:#fafafa;cursor:pointer;transition:border-color .15s; }
+.file-drop:hover { border-color:#c0392b; }
+.file-drop-icon { font-size:26px;margin-bottom:6px; }
+.file-drop-text { font-size:13px;color:#888; }
+.file-drop-hint { font-size:11px;color:#bbb;margin-top:4px; }
+.agree-box { display:flex;align-items:flex-start;gap:10px;padding:14px 16px;background:#f8f9fa;border-radius:8px;border:1px solid #e8e8e8;cursor:pointer;margin-bottom:18px; }
+.cbox { width:18px;height:18px;border-radius:4px;border:2px solid #ddd;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;margin-top:2px; }
+.cbox.checked { background:#c0392b;border-color:#c0392b; }
+.cbox.checked::after { content:'checkmark';color:#fff;font-size:11px;font-weight:700; }
+.agree-text { font-size:12.5px;color:#444;line-height:1.7; }
+.agree-text a { color:#c0392b;text-decoration:underline; }
+.btn-submit { width:100%;height:54px;background:#c0392b;color:#fff;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s; }
+.btn-submit:hover { background:#a93226; }
+.modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;align-items:center;justify-content:center; }
+.modal-overlay.active { display:flex; }
+.modal-card { background:#fff;border-radius:20px;width:360px;padding:40px 32px 32px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.3); }
+.modal-icon { font-size:52px;margin-bottom:14px; }
+.modal-title { font-size:20px;font-weight:900;color:#1a1a1a;margin-bottom:10px; }
+.modal-desc { font-size:13px;color:#666;line-height:1.8;margin-bottom:28px; }
+.modal-btn-primary { width:100%;height:48px;background:#c0392b;color:#fff;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px; }
+.modal-btn-secondary { width:100%;height:42px;background:#f5f5f5;color:#555;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div>
+    <div class="doc-proj">Project — 유니콘클래스 기획서 v3.0</div>
+    <div class="doc-title">강사 지원</div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <div class="tab-btn" onclick="location.href='/unicornclass'">메인</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/02_unicorn_login.html'">로그인 / 회원가입</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/03_unicorn_class_list.html'">클래스 리스트</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/04_unicorn_class_detail.html'">클래스 상세</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/05_unicorn_class_vimeo_player.html'">영상 화면</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/06_unicorn_about.html'">회사소개</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/07_unicorn_instructor.html'">강사 리스트</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/08_unicorn_instructor_detail.html'">강사 상세</div>
+	<div class="tab-btn active" onclick="location.href='./12_unicorn_instructor_apply.html'">강사 지원</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/09_unicorn_support.html'">고객센터</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/10_unicorn_mypage.html'">마이페이지</div>
+    <div class="tab-btn" onclick="location.href='/unicornclass/11_unicorn_search.html'">검색결과</div>    
+  </div>
+</nav>
+
+<div class="page-wrap">
+<div class="screen-wrap">
+
+  <div id="site-header" class="ann-host">
+    <div class="ann" onclick="activateAnn('ia-1')" style="left:0;top:0;"><div class="ann-bubble" data-ann="ia-1">1</div></div>
+    <div class="header-inner">
+      <div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div>
+      <nav class="gnb">
+        <div class="gnb-item">클래스<div class="gnb-dropdown"><a href="#">무료강의</a><a href="#">프리미엄강의</a></div></div>
+        <div class="gnb-item">회사소개</div>
+        <div class="gnb-item">강사진</div>
+        <div class="gnb-item">고객센터<div class="gnb-dropdown"><a href="#">공지사항</a><a href="#">FAQ</a></div></div>
+      </nav>
+      <div class="header-right">
+	  	<a href="./12_unicorn_instructor_apply.html" class="btn-instructor-gnb">🎓 강사 지원하기</a>
+        <div class="search-box"><input type="text" placeholder="강사 / 과정명을 입력해 주세요."><button>🔍</button></div>
+        <span class="login-btn">로그인</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="sub-banner" class="ann-host">
+    <div class="ann" onclick="activateAnn('ia-2')" style="left:0;"><div class="ann-bubble" data-ann="ia-2">2</div></div>
+    <div class="sub-banner-bg"></div>
+    <div class="sub-banner-label">유니콘클래스와 함께</div>
+    <div class="sub-banner-title">강사 지원하기</div>
+    <div class="sub-banner-desc">당신의 노하우를 수강생들과 나눠보세요.<br>지원 후 담당자 검토를 거쳐 영업일 기준 3~5일 내 안내드립니다.</div>
+  </div>
+
+  <div class="apply-wrap">
+
+    <div class="apply-section ann-host">
+      <div class="ann" onclick="activateAnn('ia-3')" style="left:-11px;top:-11px;"><div class="ann-bubble" data-ann="ia-3">3</div></div>
+      <div class="apply-section-title">기본 정보</div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label">이름 <span class="req">*</span></label>
+          <input class="form-input" type="text" placeholder="홍길동">
+        </div>
+        <div class="form-field">
+          <label class="form-label">연락처 <span class="req">*</span></label>
+          <input class="form-input" type="tel" placeholder="010-0000-0000">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">이메일 <span class="req">*</span></label>
+        <input class="form-input" type="email" placeholder="example@email.com">
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label">강의 분야 <span class="req">*</span></label>
+          <select class="form-select">
+            <option value="">분야를 선택해주세요</option>
+            <option>커머스 / 쇼핑몰</option>
+            <option>AI / 자동화</option>
+            <option>SNS / 마케팅</option>
+            <option>유튜브 / 콘텐츠</option>
+            <option>부동산 / 투자</option>
+            <option>창업 / 비즈니스</option>
+            <option>기타</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">강의 경력 <span class="req">*</span></label>
+          <select class="form-select">
+            <option value="">강의 경력을 선택해주세요</option>
+            <option>없음 (처음 도전)</option>
+            <option>1년 미만</option>
+            <option>1~3년</option>
+            <option>3~5년</option>
+            <option>5년 이상</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="apply-section ann-host">
+      <div class="ann" onclick="activateAnn('ia-4')" style="left:-11px;top:-11px;"><div class="ann-bubble" data-ann="ia-4">4</div></div>
+      <div class="apply-section-title">강사 소개</div>
+      <div class="form-field">
+        <label class="form-label">주요 경력 / 자기소개 <span class="req">*</span></label>
+        <textarea class="form-textarea" placeholder="주요 경력, 성과, 보유 역량 등을 자유롭게 작성해 주세요." style="min-height:130px;"></textarea>
+        <div class="form-hint">최소 100자 이상 작성을 권장합니다.</div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">강의 계획 / 커리큘럼 아이디어 <span class="req">*</span></label>
+        <textarea class="form-textarea" placeholder="어떤 강의를 진행하고 싶으신가요? 대략적인 커리큘럼이나 강의 방향을 작성해 주세요."></textarea>
+      </div>
+      <div class="form-field">
+        <label class="form-label">희망 강의 형태 <span class="req">*</span></label>
+        <select class="form-select">
+          <option value="">선택해주세요</option>
+          <option>무료 웨비나 (카카오 오픈채팅 기반)</option>
+          <option>유료 VOD (Vimeo 영상 기반)</option>
+          <option>무료 + 유료 혼합</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="apply-section ann-host">
+      <div class="ann" onclick="activateAnn('ia-5')" style="left:-11px;top:-11px;"><div class="ann-bubble" data-ann="ia-5">5</div></div>
+      <div class="apply-section-title">SNS / 채널 <span style="font-size:11px;font-weight:400;color:#aaa;margin-left:2px;">(선택)</span></div>
+      <div class="social-row"><span class="social-label">📷 인스타</span><input class="form-input" type="url" placeholder="https://instagram.com/..."></div>
+      <div class="social-row"><span class="social-label">▶ 유튜브</span><input class="form-input" type="url" placeholder="https://youtube.com/..."></div>
+      <div class="social-row"><span class="social-label">✦ 블로그</span><input class="form-input" type="url" placeholder="https://blog.naver.com/..."></div>
+      <div class="social-row"><span class="social-label">@ 기타</span><input class="form-input" type="url" placeholder="기타 채널 URL"></div>
+      <div class="form-hint" style="margin-top:6px;">보유 채널이 없어도 지원 가능합니다.</div>
+    </div>
+
+    <div class="apply-section ann-host">
+      <div class="ann" onclick="activateAnn('ia-6')" style="left:-11px;top:-11px;"><div class="ann-bubble" data-ann="ia-6">6</div></div>
+      <div class="apply-section-title">포트폴리오 / 참고 자료 <span style="font-size:11px;font-weight:400;color:#aaa;margin-left:2px;">(선택)</span></div>
+      <div class="form-field">
+        <label class="form-label">파일 첨부 <span class="opt">(PDF/PPT/이미지 · 최대 20MB · 최대 3개)</span></label>
+        <div class="file-drop">
+          <div class="file-drop-icon">📎</div>
+          <div class="file-drop-text">파일을 드래그하거나 클릭하여 업로드</div>
+          <div class="file-drop-hint">PDF · PPT · JPG · PNG</div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">외부 링크 <span class="opt">(선택)</span></label>
+        <input class="form-input" type="url" placeholder="Notion, Google Drive, 유튜브 강의 링크 등">
+        <div class="form-hint">파일 업로드가 어려운 경우 링크로 대체 가능합니다.</div>
+      </div>
+    </div>
+
+    <div class="apply-section ann-host">
+      <div class="ann" onclick="activateAnn('ia-7')" style="left:-11px;top:-11px;"><div class="ann-bubble" data-ann="ia-7">7</div></div>
+      <div class="apply-section-title">개인정보 수집 및 이용 동의</div>
+      <div class="agree-box" onclick="this.querySelector('.cbox').classList.toggle('checked')">
+        <div class="cbox"></div>
+        <div class="agree-text">
+          <strong>[필수]</strong> 개인정보 수집 및 이용에 동의합니다.<br>
+          <span style="font-size:11px;color:#aaa;">수집 항목: 이름, 연락처, 이메일, 강의 관련 정보 · 보유 기간: 검토 완료 후 1년</span>
+          &nbsp;<a href="#">개인정보처리방침 보기</a>
+        </div>
+      </div>
+      <div class="ann-host" style="display:block;">
+        <div class="ann" onclick="activateAnn('ia-8')" style="left:-11px;top:-11px;"><div class="ann-bubble" data-ann="ia-8">8</div></div>
+        <button class="btn-submit" onclick="document.getElementById('apply-modal').classList.add('active')">
+          🎓 강사 지원서 제출하기
+        </button>
+      </div>
+      <div style="font-size:11.5px;color:#aaa;text-align:center;margin-top:10px;line-height:1.7;">
+        제출 후 영업일 기준 3~5일 내 연락처 또는 이메일로 안내드립니다.
+      </div>
+    </div>
+
+    <!-- 완료 팝업 열린 상태 정적 화면 -->
+    <div style="margin-top:32px;">
+      <div style="display:inline-block;font-size:12px;font-weight:700;color:#c0392b;padding:5px 12px;background:#fdecea;border-radius:5px;margin-bottom:14px;">&#10003; 제출 완료 시 — 완료 팝업 열린 상태</div>
+      <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+        <div>
+          <div style="background:rgba(0,0,0,0.45);border-radius:14px;padding:18px;width:290px;">
+            <div style="background:#fff;border-radius:16px;padding:32px 24px;text-align:center;">
+              <div style="font-size:44px;margin-bottom:12px;">🎉</div>
+              <div style="font-size:17px;font-weight:900;color:#1a1a1a;margin-bottom:8px;">지원서가 접수되었습니다!</div>
+              <div style="font-size:12px;color:#666;line-height:1.8;margin-bottom:20px;">강사 지원해 주셔서 감사합니다.<br>담당자 검토 후 영업일 기준 3~5일 이내<br>기재하신 연락처로 안내드리겠습니다.</div>
+              <div style="height:42px;background:#c0392b;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800;margin-bottom:8px;">강사 소개 페이지로</div>
+              <div style="height:38px;background:#f5f5f5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#555;font-size:13px;font-weight:600;">메인으로 돌아가기</div>
+            </div>
+          </div>
+          <div style="font-size:10.5px;color:#aaa;text-align:center;margin-top:6px;">팝업 미리보기</div>
+        </div>
+        <div style="flex:1;min-width:180px;padding-top:4px;">
+          <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:10px;">동작 방식</div>
+          <div style="font-size:12px;color:#555;line-height:2.2;">
+            · 제출 버튼 클릭 → 서버 저장 후 팝업 표시<br>
+            · 배경 딤 클릭으로 닫기 가능<br>
+            · <strong style="color:#c0392b;">강사 소개 페이지로</strong> → /instructor<br>
+            · <strong>메인으로</strong> → /<br>
+            · 중복 제출 방지: 제출 후 버튼 비활성화
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="footer">
+    <div class="footer-logo">UNICORN CLASS</div>
+    <div class="footer-info">
+      <strong>상호</strong>유니콘클래스&nbsp;&nbsp;<strong>대표</strong>홍길동&nbsp;&nbsp;<strong>사업자등록번호</strong>000-00-00000<br>
+      <strong>주소</strong>서울특별시 OO구 OO로 000
+    </div>
+    <div class="footer-links"><a href="#">이용약관</a><a href="#">개인정보처리방침</a><a href="#">회사소개</a><a href="#">고객센터</a></div>
+    <div class="footer-copy">&#169; 2026 유니콘클래스. All rights reserved.</div>
+  </div>
+
+</div>
+
+<div class="desc-panel">
+  <div class="desc-panel-head">📋 화면 설명</div>
+
+  <div class="desc-item" id="desc-ia-1" onclick="activateAnn('ia-1')">
+    <div class="desc-num">1</div>
+    <div>
+      <div class="desc-label">GNB — 강사 지원하기 버튼</div>
+      <div class="desc-text">헤더 우측 검색창 옆 빨간 버튼. 강사 관련 페이지 공통 노출. 클릭 시 본 페이지로 이동.</div>
+      <span class="desc-tag t-red">.btn-instructor-gnb 공통 CSS 추가 필요</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-ia-2" onclick="activateAnn('ia-2')">
+    <div class="desc-num">2</div>
+    <div>
+      <div class="desc-label">서브 배너</div>
+      <div class="desc-text">강사 리스트와 동일한 다크 그라디언트. "강사 지원하기" 타이틀 + 간략 안내 문구.</div>
+      <span class="desc-tag t-gray">강사 리스트와 동일 구조</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-ia-3" onclick="activateAnn('ia-3')">
+    <div class="desc-num">3</div>
+    <div>
+      <div class="desc-label">기본 정보</div>
+      <div class="desc-text">이름·연락처·이메일·강의분야·강의경력 입력. 전항목 필수. DB: lc_instructor_apply.</div>
+      <span class="desc-tag t-red">필수</span>
+      <span class="desc-tag t-blue">lc_instructor_apply</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-ia-4" onclick="activateAnn('ia-4')">
+    <div class="desc-num">4</div>
+    <div>
+      <div class="desc-label">강사 소개</div>
+      <div class="desc-text">경력/자기소개(필수, 100자↑) + 강의계획(필수) + 희망형태(필수). 희망형태: 무료 웨비나/유료 VOD/혼합.</div>
+      <span class="desc-tag t-red">필수</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-ia-5" onclick="activateAnn('ia-5')">
+    <div class="desc-num">5</div>
+    <div>
+      <div class="desc-label">SNS / 채널</div>
+      <div class="desc-text">인스타·유튜브·블로그·기타 URL 입력. 전체 선택 사항. 미입력 시에도 지원 가능.</div>
+      <span class="desc-tag t-gray">선택</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-ia-6" onclick="activateAnn('ia-6')">
+    <div class="desc-num">6</div>
+    <div>
+      <div class="desc-label">포트폴리오 첨부</div>
+      <div class="desc-text">파일 업로드(PDF/PPT/이미지, 최대 20MB, 3개) + 외부 링크 모두 지원. 둘 다 선택 사항. DB: lc_instructor_apply_file.</div>
+      <span class="desc-tag t-gray">선택</span>
+      <span class="desc-tag t-blue">파일 + 링크 지원</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-ia-7" onclick="activateAnn('ia-7')">
+    <div class="desc-num">7</div>
+    <div>
+      <div class="desc-label">개인정보 동의</div>
+      <div class="desc-text">필수 동의. 미동의 시 제출 버튼 비활성. 수집 항목: 이름/연락처/이메일/강의정보. 보유 기간: 검토 완료 후 1년.</div>
+      <span class="desc-tag t-red">필수 동의</span>
+    </div>
+  </div>
+
+  <div class="desc-item" id="desc-ia-8" onclick="activateAnn('ia-8')">
+    <div class="desc-num">8</div>
+    <div>
+      <div class="desc-label">제출 버튼 + 완료 팝업</div>
+      <div class="desc-text">POST /api/instructor/apply 호출. 성공 시 완료 팝업 표시. 중복 제출 방지(제출 후 비활성). 관리자에서 지원자 목록·상태 관리.</div>
+      <span class="desc-tag t-red">POST /api/instructor/apply</span>
+    </div>
+  </div>
+
+  <div style="padding:12px 14px;background:#fef0ee;border-top:1px solid #e8eef4;">
+    <div style="font-size:10px;font-weight:700;color:#e74c3c;letter-spacing:1px;">📌 lc_instructor_apply</div>
+    <div style="font-size:10px;color:#666;margin-top:5px;line-height:1.9;">
+      apply_idx · name · phone · email<br>
+      field · career_years<br>
+      intro · plan · lecture_type<br>
+      social_insta / youtube / blog / other<br>
+      portfolio_link<br>
+      status (대기/검토중/합격/불합격)<br>
+      created_at · updated_at
+    </div>
+  </div>
+  <div style="padding:12px 14px;background:#f0f4ff;border-top:1px solid #e8eef4;">
+    <div style="font-size:10px;font-weight:700;color:#1a3a8a;letter-spacing:1px;">📌 lc_instructor_apply_file</div>
+    <div style="font-size:10px;color:#666;margin-top:5px;line-height:1.9;">
+      file_idx · apply_idx (FK)<br>
+      file_path · original_name · file_size<br>
+      created_at
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="apply-modal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="modal-card">
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title">지원서가 접수되었습니다!</div>
+    <div class="modal-desc">강사 지원해 주셔서 감사합니다.<br>담당자 검토 후 영업일 기준 3~5일 이내<br>기재하신 연락처로 안내드리겠습니다.</div>
+    <button class="modal-btn-primary" onclick="location.href='./07_unicorn_instructor.html'">강사 소개 페이지로</button>
+    <button class="modal-btn-secondary" onclick="location.href='/unicornclass'">메인으로 돌아가기</button>
+  </div>
+</div>
+
+<script>
+function activateAnn(id) {
+  document.querySelectorAll('.ann-bubble.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.ann-host.active-host').forEach(el => el.classList.remove('active-host'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+  const bubble = document.querySelector('.ann-bubble[data-ann="' + id + '"]');
+  if (!bubble) return;
+  bubble.classList.add('active');
+  const host = bubble.closest('.ann-host');
+  if (host) {
+    host.classList.add('active-host');
+    const rect = host.getBoundingClientRect();
+    window.scrollTo({ top: window.scrollY + rect.top - 120, behavior: 'smooth' });
+    host.style.outline = '2.5px solid #c0392b';
+    host.style.outlineOffset = '4px';
+    host.style.borderRadius = '6px';
+    setTimeout(() => { host.style.outline = ''; host.style.outlineOffset = ''; }, 1800);
+  }
+  const descItem = document.getElementById('desc-' + id);
+  if (descItem) {
+    descItem.classList.add('active');
+    const panel = descItem.closest('.desc-panel');
+    if (panel) {
+      const headH = panel.querySelector('.desc-panel-head')?.offsetHeight || 0;
+      panel.scrollTo({ top: descItem.offsetTop - headH - 8, behavior: 'smooth' });
+    }
+  }
+}
+</script>
+</body>
+</html>

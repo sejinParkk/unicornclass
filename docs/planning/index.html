@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유니콘클래스 — 메인</title>
+<link rel="stylesheet" href="./noto-sans.css" />
+<link rel="stylesheet" href="./styles.css" />
+<style>
+.tab-nav {border-bottom:2px solid var(--red);}
+#hero {
+  position:relative; width:100%; min-height:420px;
+  background:#0d0d0d; display:flex; align-items:flex-end;
+  overflow:hidden;
+}
+.hero-bg-placeholder {
+  position:absolute; inset:0;
+  background:linear-gradient(105deg, #0a0a0a 0%, #1a1a1a 45%, #2a2a2a 100%);
+  display:flex; align-items:center; justify-content:flex-end;
+}
+.hero-person-area {
+  width:45%; height:100%; display:flex; align-items:center; justify-content:center;
+  color:#333; font-size:11px; letter-spacing:1px;
+  border-left:1px dashed #2a2a2a;
+}
+.hero-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(105deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.05) 100%);
+}
+.hero-video-note {
+  position:absolute; top:12px; left:50%; transform:translateX(-50%);
+  background:rgba(255,255,255,0.08); border:1px dashed rgba(255,255,255,0.2);
+  border-radius:4px; padding:4px 14px; font-size:10px; color:rgba(255,255,255,0.4);
+  letter-spacing:1px; z-index:2;
+}
+.hero-content {
+  position:relative; z-index:2; padding:0 32px 52px; width:100%;
+}
+.hero-title { font-size:48px; font-weight:900; color:#fff; letter-spacing:-2px; line-height:1.15; margin-bottom:12px; }
+.hero-sub { font-size:17px; color:rgba(255,255,255,0.7); font-weight:400; }
+.main-section {
+  padding:48px 32px 0; position:relative; overflow:visible;
+}
+.main-section:last-of-type { padding-bottom:52px; }
+.section-header { display:flex; align-items:center; gap:8px; margin-bottom:20px; }
+.section-icon { font-size:20px; }
+.section-title-ko { font-size:21px; font-weight:900; color:#1a1a1a; letter-spacing:-0.5px; }
+.section-title-en { font-size:13px; color:#bbb; font-style:italic; margin-left:6px; padding-left:10px; border-left:1px solid #ddd; }
+.section-more { margin-left:auto; font-size:13px; color:#aaa; display:flex; align-items:center; gap:3px; cursor:pointer; }
+.section-more:hover { color:#c0392b; }
+.arr { display:inline-block; font-size:16px; }
+.slider-wrap { position:relative; padding:0 20px; margin:0 -20px; }
+.slider-track-outer {
+  overflow:hidden;
+  -webkit-mask-image:linear-gradient(to right, black 0%, black 88%, transparent 100%);
+  mask-image:linear-gradient(to right, black 0%, black 88%, transparent 100%);
+}
+.slider-track { display:flex; gap:16px; transition:transform .35s cubic-bezier(.4,0,.2,1); }
+.class-card {
+  flex:0 0 calc((100% - 32px) / 2.8);
+  border-radius:6px; overflow:hidden; cursor:pointer; border:1px solid #eee;
+  transition:box-shadow .15s, transform .15s; background:#fff;
+}
+.class-card:hover { box-shadow:0 5px 18px rgba(0,0,0,0.12); transform:translateY(-2px); }
+.card-thumb { position:relative; aspect-ratio:16/9; overflow:hidden; }
+.card-thumb-inner { width:100%; height:100%; }
+.card-info { padding:9px 12px 12px; }
+.card-tags { display:flex; gap:3px; margin-bottom:5px; flex-wrap:wrap; }
+.ctag { font-size:10px; font-weight:700; padding:2px 5px; border-radius:2px; }
+.ct-hot { background:#fdecea; color:#c0392b; }
+.ct-new { background:#e8f5e9; color:#27ae60; }
+.ct-premium { background:#f3e8ff; color:#8e44ad; }
+.card-title-text {
+  font-size:13px; font-weight:700; color:#1a1a1a; line-height:1.4;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:4px;
+}
+.card-meta { font-size:11.5px; color:#888; }
+.sl-btn {
+  position:absolute; top:calc(50% - 20px); transform:translateY(-50%);
+  width:34px; height:34px; border-radius:50%; background:#fff;
+  border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,.15);
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; color:#555; z-index:10; transition:all .15s;
+}
+.sl-btn:hover { background:#c0392b; color:#fff; border-color:#c0392b; }
+.sl-btn.prev { left:2px; }
+.sl-btn.next { right:2px; }
+.slider-dots { display:flex; justify-content:center; gap:6px; margin-top:12px; }
+.dot { width:6px; height:6px; border-radius:50%; background:#ddd; cursor:pointer; transition:all .2s; }
+.dot.active { background:#c0392b; width:18px; border-radius:3px; }
+.inst-track { display:flex; gap:15px; transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.inst-card { flex:0 0 calc((100% - 0px) / 5.5); cursor:pointer; }
+.inst-card:hover .i-card { transform:translateY(-8px); }
+.i-card { position:relative; transition:transform .28s ease; }
+.i-photo-wrap { position:relative; width:100%; height:180px; overflow:hidden; background:#e8eef4; }
+.i-photo-wrap::after { content:''; position:absolute; bottom:0; left:0; right:0; height:70%; background:linear-gradient(to top, rgba(192,57,43,0.88) 0%, rgba(231,76,60,0.45) 45%, transparent 100%); opacity:0; transition:opacity .28s ease; z-index:1; }
+.inst-card:hover .i-photo-wrap::after { opacity:1; }
+.i-photo-ph { position:absolute; inset:0; background:linear-gradient(160deg,#e8eef4 0%,#c8d8e8 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; }
+.i-photo-ph .person-icon { font-size:44px; line-height:1; color:#b0c4d8; }
+.i-photo-ph small { font-size:10px; color:#aaa; }
+.i-info { padding:8px 2px 4px; }
+.i-name { font-size:13.5px; font-weight:800; color:#111; margin-bottom:4px; }
+.i-desc-list { list-style:none; margin-bottom:6px; }
+.i-desc-list li { font-size:10.5px; color:#666; line-height:1.55; padding-left:10px; position:relative; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-bottom:2px; }
+.i-desc-list li::before { content:'•'; position:absolute; left:0; color:#e74c3c; font-weight:700; }
+.i-social-fixed { display:flex; gap:4px; }
+.i-social-icon { width:20px; height:20px; border-radius:50%; background:#f0f0f0; border:1px solid #e0e0e0; display:flex; align-items:center; justify-content:center; font-size:10px; color:#666; }
+.ann-right { position:absolute; z-index:50; top:-11px; right:-11px; pointer-events:none; }
+.ann-right .ann-bubble { width:22px; height:22px; border-radius:50%; background:#1a3a5c; color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.3); border:2px solid #fff; }
+
+/* ══════════════════════════════
+   ★ 팝업창 (클라이언트 피드백 반영)
+══════════════════════════════ */
+#site-popup-overlay {flex:1;}
+#site-popup {
+  background:#fff; border-radius:10px; overflow:hidden;
+  width:380px; box-shadow:0 16px 48px rgba(0,0,0,0.3);
+  position:relative;
+}
+.popup-img-area {
+  width:100%; height:220px;
+  background:linear-gradient(135deg,#c0392b 0%,#e74c3c 50%,#c0392b 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  color:#fff; gap:8px; cursor:pointer;
+}
+.popup-img-area .pi-icon { font-size:44px; }
+.popup-img-area .pi-text { font-size:18px; font-weight:900; letter-spacing:-0.5px; }
+.popup-img-area .pi-sub { font-size:12px; opacity:0.8; }
+.popup-img-note {
+  position:absolute; top:10px; right:10px;
+  background:rgba(26,58,92,0.85); color:#fff;
+  font-size:10px; padding:3px 8px; border-radius:3px;
+}
+.popup-close-btn {
+  position:absolute; top:10px; left:10px;
+  width:28px; height:28px; border-radius:50%;
+  background:rgba(0,0,0,0.4); color:#fff;
+  border:none; font-size:14px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .15s;
+}
+.popup-close-btn:hover { background:rgba(0,0,0,0.7); }
+.popup-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 16px; border-top:1px solid #eee; background:#fafafa;
+}
+.popup-today-check {
+  display:flex; align-items:center; gap:6px;
+  font-size:12.5px; color:#555; cursor:pointer;
+}
+.popup-today-check input { accent-color:#c0392b; cursor:pointer; }
+.popup-expire-info {
+  font-size:10.5px; color:#bbb;
+}
+
+/* 기획서용 팝업 설명 박스 */
+.popup-spec-box {
+  margin:0 0 32px; padding:16px 20px;
+  border:1px solid #d0dae8; border-radius:6px;
+  background:#fafcff; position:relative;
+}
+.popup-spec-title {
+  font-size:11px; font-weight:700; color:#1a3a5c;
+  margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid #e0eaf5;
+}
+.popup-spec-grid {
+  display:grid; grid-template-columns:80px 1fr; gap:6px 12px; font-size:11.5px;
+}
+.popup-spec-grid .sk { color:#888; font-weight:600; }
+.popup-spec-grid .sv { color:#333; }
+
+/* ══════════════════════════════
+   ★ 카카오 채널 플로팅 버튼 (클라이언트 피드백 반영)
+══════════════════════════════ */
+#kakao-float {
+  position:fixed; bottom:28px; right:320px; z-index:1500;
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+}
+.kakao-float-btn {
+  width:52px; height:52px; border-radius:50%;
+  background:#fee500; box-shadow:0 4px 16px rgba(0,0,0,0.22);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; text-decoration:none;
+  transition:transform .15s, box-shadow .15s;
+  border:none;
+}
+.kakao-float-btn:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.28); }
+.kakao-float-btn svg { width:28px; height:28px; }
+.kakao-float-label {
+  font-size:10px; font-weight:700; color:#3c1e1e;
+  background:#fee500; padding:2px 7px; border-radius:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.15); white-space:nowrap;
+}
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div>
+    <div class="doc-proj">Project — 유니콘클래스 기획서 v3.0</div>
+    <div class="doc-title">메인 (홈)</div>
+  </div>
+</div>
+
+<nav class="tab-nav">
+  <div class="tab-nav-inner">
+    <div class="tab-btn active" onclick="location.href='./'">메인</div>
+    <div class="tab-btn" onclick="location.href='./02_unicorn_login.html'">로그인 / 회원가입</div>
+    <div class="tab-btn" onclick="location.href='./03_unicorn_class_list.html'">클래스 리스트</div>
+    <div class="tab-btn" onclick="location.href='./04_unicorn_class_detail.html'">클래스 상세</div>
+    <div class="tab-btn" onclick="location.href='./05_unicorn_class_vimeo_player.html'">영상 화면</div>
+    <div class="tab-btn" onclick="location.href='./06_unicorn_about.html'">회사소개</div>
+    <div class="tab-btn" onclick="location.href='./07_unicorn_instructor.html'">강사 리스트</div>
+    <div class="tab-btn" onclick="location.href='./08_unicorn_instructor_detail.html'">강사 상세</div>
+    <div class="tab-btn" onclick="location.href='./09_unicorn_support.html'">고객센터</div>
+    <div class="tab-btn" onclick="location.href='./10_unicorn_mypage.html'">마이페이지</div>
+    <div class="tab-btn" onclick="location.href='./11_unicorn_search.html'">검색결과</div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+<div class="screen-wrap">
+
+  <!-- ★ 카카오 채널 플로팅 버튼 -->
+  <div id="kakao-float">
+    <div class="float-ann" style="pointer-events:auto"><div class="ann-bubble" data-ann="main-12" onclick="activateAnn('main-12')">12</div></div>
+    <a href="#" target="_blank" class="kakao-float-btn" title="카카오 채널 문의">
+      <!-- 카카오 말풍선 아이콘 -->
+      <svg viewBox="0 0 24 24" fill="#3c1e1e" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 3C6.477 3 2 6.692 2 11.25c0 2.9 1.696 5.454 4.25 6.98L5.18 21.07a.5.5 0 00.72.555l4.23-2.47c.61.08 1.23.12 1.87.12 5.523 0 10-3.692 10-8.25C22 6.692 17.523 3 12 3z"/>
+      </svg>
+    </a>
+    <div class="kakao-float-label">카카오 채널</div>
+  </div>
+
+  <!-- ① HEADER -->
+  <div id="site-header">
+    <div class="header-inner">
+      <div class="logo"><div class="logo-box"><span>UNICORN<br>CLASS</span></div></div>
+      <nav class="gnb">
+        <div class="gnb-item ann-host">
+          <div class="ann" style="top:5px"><div class="ann-bubble" data-ann="main-1" onclick="activateAnn('main-1')">1</div></div>
+          클래스
+          <div class="gnb-dropdown"><a href="#">무료강의</a><a href="#">프리미엄강의</a></div>
+        </div>
+        <div class="gnb-item">회사소개</div>
+        <div class="gnb-item">강사진</div>
+        <div class="gnb-item">고객센터
+          <div class="gnb-dropdown"><a href="#">공지사항</a><a href="#">FAQ</a></div>
+        </div>
+      </nav>
+      <div class="header-right">
+        <div class="search-box ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="main-2" onclick="activateAnn('main-2')">2</div></div>
+          <input type="text" placeholder="강사 / 과정명을 입력해 주세요.">
+          <button class="ann-host" style="position:relative">
+            <div class="ann"><div class="ann-bubble" data-ann="main-3" onclick="activateAnn('main-3')">3</div></div>
+            🔍
+          </button>
+        </div>
+        <span class="login-btn ann-host">
+          <div class="ann"><div class="ann-bubble" data-ann="main-4" onclick="activateAnn('main-4')">4</div></div>
+          로그인
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ HERO -->
+  <div id="hero" style="position:relative">
+    <div class="hero-bg-placeholder">
+      <div class="hero-person-area">[ 인물 이미지 영역 ]</div>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-video-note">&lt;video&gt; autoplay muted loop</div>
+    <div class="hero-content">
+      <div class="hero-title">유니콘클래스</div>
+      <div class="hero-sub">당신의 인생을 바꾸는 No.1 수익화 플랫폼</div>
+    </div>
+    <div class="ann" style="left:0;top:5px">
+      <div class="ann-bubble" data-ann="main-5" data-scroll="hero" onclick="activateAnn('main-5')">5</div>
+    </div>
+  </div>
+
+  <!-- ⑥ 무료강의 -->
+  <div class="main-section" id="free-section" style="position:relative">
+    <div class="ann" style="left:0;top:5px">
+      <div class="ann-bubble" data-ann="main-6" data-scroll="free-section" onclick="activateAnn('main-6')">6</div>
+    </div>
+    <div class="section-header" style="padding-left:28px">
+      <span class="section-icon">🐦</span>
+      <span class="section-title-ko">꿀팁 대방출, 무료강의</span>
+      <span class="section-title-en">Webinar</span>
+      <div class="section-more">더보기 <span class="arr">→</span></div>
+    </div>
+    <div class="slider-wrap">
+      <button class="sl-btn prev" onclick="slide('free',-1)">‹</button>
+      <div class="slider-track-outer">
+        <div class="slider-track" id="free-track">
+          <div class="class-card"><div class="card-thumb"><div class="card-thumb-inner" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364)"></div></div><div class="card-info"><div class="card-tags"><span class="ctag ct-new">NEW</span></div><div class="card-title-text">[김구링] 생계형으로 완성한 트렌드 커머스 AI자동화로 수익내기</div><div class="card-meta">김구링 · 카머스</div></div></div>
+          <div class="class-card"><div class="card-thumb"><div class="card-thumb-inner" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)"></div></div><div class="card-info"><div class="card-tags"><span class="ctag ct-hot">HOT</span><span class="ctag ct-new">NEW</span></div><div class="card-title-text">[현우] 50대도 월 백 버는 원현우의 AI 제휴마케팅 무료특강</div><div class="card-meta">원현우 · 마케팅</div></div></div>
+          <div class="class-card"><div class="card-thumb"><div class="card-thumb-inner" style="background:linear-gradient(135deg,#0d0d0d,#1a0a0a,#2d1515)"></div></div><div class="card-info"><div class="card-tags"><span class="ctag ct-hot">HOT</span></div><div class="card-title-text">[광희상] 나만의 커스텀 마스터 클래스 완성하기</div><div class="card-meta">광희상 · 카머스</div></div></div>
+          <div class="class-card"><div class="card-thumb"><div class="card-thumb-inner" style="background:linear-gradient(135deg,#1a2a1a,#0d1f0d,#153015)"></div></div><div class="card-info"><div class="card-tags"><span class="ctag ct-new">NEW</span></div><div class="card-title-text">[소업] SNS로 월 300 버는 실전 수익화 전략 무료특강</div><div class="card-meta">소업 · 마케팅</div></div></div>
+        </div>
+      </div>
+      <button class="sl-btn next" onclick="slide('free',1)">›</button>
+    </div>
+    <div class="slider-dots" id="free-dots"></div>
+  </div>
+
+  <!-- ⑦ 프리미엄 -->
+  <div class="main-section" id="premium-section" style="padding-top:44px; position:relative">
+    <div class="ann" style="left:0;top:5px">
+      <div class="ann-bubble" data-ann="main-7" data-scroll="premium-section" onclick="activateAnn('main-7')">7</div>
+    </div>
+    <div class="section-header" style="padding-left:28px">
+      <span class="section-icon">🎁</span>
+      <span class="section-title-ko">프리미엄 강의</span>
+      <span class="section-title-en">Premium Class</span>
+      <div class="section-more">더보기 <span class="arr">→</span></div>
+    </div>
+    <div class="slider-wrap">
+      <button class="sl-btn prev" onclick="slide('premium',-1)">‹</button>
+      <div class="slider-track-outer">
+        <div class="slider-track" id="premium-track">
+          <div class="class-card"><div class="card-thumb"><div class="card-thumb-inner" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364)"></div></div><div class="card-info"><div class="card-tags"><span class="ctag ct-new">NEW</span></div><div class="card-title-text">[김구링] 생계형으로 완성한 트렌드 커머스 AI자동화로 수익내기</div><div class="card-meta">김구링 · 카머스</div></div></div>
+          <div class="class-card"><div class="card-thumb"><div class="card-thumb-inner" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)"></div></div><div class="card-info"><div class="card-tags"><span class="ctag ct-hot">HOT</span><span class="ctag ct-new">NEW</span></div><div class="card-title-text">[현우] 50대도 월 백 버는 원현우의 AI 제휴마케팅 무료특강</div><div class="card-meta">원현우 · 마케팅</div></div></div>
+          <div class="class-card"><div class="card-thumb"><div class="card-thumb-inner" style="background:linear-gradient(135deg,#2d1515,#3d1a1a,#1a0808)"></div></div><div class="card-info"><div class="card-tags"><span class="ctag ct-hot">HOT</span></div><div class="card-title-text">[광희상] 나만의 커스텀 마스터 클래스 완성하기 (프리미엄)</div><div class="card-meta">광희상 · 카머스</div></div></div>
+          <div class="class-card"><div class="card-thumb"><div class="card-thumb-inner" style="background:linear-gradient(135deg,#153015,#1a401a,#0a200a)"></div></div><div class="card-info"><div class="card-tags"><span class="ctag ct-new">NEW</span></div><div class="card-title-text">[단비] 유튜브 수익화 3개월 완성 마스터클래스</div><div class="card-meta">단비 · 유튜브</div></div></div>
+        </div>
+      </div>
+      <button class="sl-btn next" onclick="slide('premium',1)">›</button>
+    </div>
+    <div class="slider-dots" id="premium-dots"></div>
+  </div>
+
+  <!-- ⑧ 배너 -->
+  <div class="main-section" id="banner-section" style="padding:40px 32px; position:relative; background:#f5f6f8;">
+    <div class="ann" style="left:0;top:5px">
+      <div class="ann-bubble" data-ann="main-8" data-scroll="banner-section" onclick="activateAnn('main-8')">8</div>
+    </div>
+    <div class="section-header" style="padding-left:28px">
+      <span class="section-icon">📢</span>
+      <span class="section-title-ko">이벤트 / 공지 배너</span>
+      <span class="section-title-en">Banner</span>
+    </div>
+    <div style="position:relative;border-radius:10px;overflow:hidden;height:120px;background:linear-gradient(105deg,#c0392b,#e74c3c);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+      <div style="color:#fff;text-align:center;">
+        <div style="font-size:18px;font-weight:900;letter-spacing:-0.5px;">🎉 유니콘클래스 런칭 기념 전 강의 30% 할인!</div>
+        <div style="font-size:12px;margin-top:6px;opacity:0.85;">2026.04.01 ~ 2026.04.30 · 관리자에서 배너 이미지/링크 등록</div>
+      </div>
+      <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;">‹</div>
+      <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;">›</div>
+      <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;">
+        <div style="width:18px;height:4px;border-radius:2px;background:#fff;"></div>
+        <div style="width:6px;height:4px;border-radius:2px;background:rgba(255,255,255,0.4);"></div>
+        <div style="width:6px;height:4px;border-radius:2px;background:rgba(255,255,255,0.4);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑨ 강사진 -->
+  <div class="main-section" id="inst-section" style="padding:50px 32px; position:relative">
+    <div class="ann" style="left:0;top:5px">
+      <div class="ann-bubble" data-ann="main-9" data-scroll="inst-section" onclick="activateAnn('main-9')">9</div>
+    </div>
+    <div class="section-header" style="padding-left:28px">
+      <span class="section-icon">🏅</span>
+      <span class="section-title-ko">압도적인 수익화 전문가, 유니콘 강사진</span>
+      <span class="section-title-en">Unicorn Teachers</span>
+      <div class="section-more">더보기 <span class="arr">→</span></div>
+    </div>
+    <div class="slider-wrap">
+      <button class="sl-btn prev" onclick="slide('inst',-1)">‹</button>
+      <div class="slider-track-outer">
+        <div class="inst-track" id="inst-track">
+          <div class="inst-card"><div class="i-card"><div class="i-photo-wrap"><div class="i-photo-ph"><div class="person-icon">👤</div><small>강사 사진</small></div></div><div class="i-info"><div class="i-name">뾴공략</div><ul class="i-desc-list"><li>SBS 8시 뉴스 출연...</li></ul><div class="i-social-fixed"><div class="i-social-icon">I</div><div class="i-social-icon">Y</div></div></div></div></div>
+          <div class="inst-card"><div class="i-card"><div class="i-photo-wrap"><div class="i-photo-ph"><div class="person-icon">👤</div><small>강사 사진</small></div></div><div class="i-info"><div class="i-name">숏대디</div><ul class="i-desc-list"><li>쇼핑 교육 주식회사 대표이...</li></ul><div class="i-social-fixed"><div class="i-social-icon">I</div><div class="i-social-icon">f</div></div></div></div></div>
+          <div class="inst-card"><div class="i-card"><div class="i-photo-wrap"><div class="i-photo-ph"><div class="person-icon">👤</div><small>강사 사진</small></div></div><div class="i-info"><div class="i-name">김구링</div><ul class="i-desc-list"><li>경제대학교 호텔경영학과...</li></ul><div class="i-social-fixed"><div class="i-social-icon">Y</div><div class="i-social-icon">+</div></div></div></div></div>
+          <div class="inst-card"><div class="i-card"><div class="i-photo-wrap"><div class="i-photo-ph"><div class="person-icon">👤</div><small>강사 사진</small></div></div><div class="i-info"><div class="i-name">소업</div><ul class="i-desc-list"><li>경제대학교 호텔경영학과...</li></ul><div class="i-social-fixed"><div class="i-social-icon">I</div><div class="i-social-icon">Y</div></div></div></div></div>
+          <div class="inst-card"><div class="i-card"><div class="i-photo-wrap"><div class="i-photo-ph"><div class="person-icon">👤</div><small>강사 사진</small></div></div><div class="i-info"><div class="i-name">메리</div><ul class="i-desc-list"><li>2021 해외구매대행/브랜드유통...</li></ul><div class="i-social-fixed"><div class="i-social-icon">I</div></div></div></div></div>
+          <div class="inst-card"><div class="i-card"><div class="i-photo-wrap"><div class="i-photo-ph"><div class="person-icon">👤</div><small>강사 사진</small></div></div><div class="i-info"><div class="i-name">단비</div><ul class="i-desc-list"><li>유튜브와 SNS를 활용한 쇼핑유통...</li></ul><div class="i-social-fixed"><div class="i-social-icon">Y</div><div class="i-social-icon">I</div></div></div></div></div>
+          <div class="inst-card"><div class="i-card"><div class="i-photo-wrap"><div class="i-photo-ph"><div class="person-icon">👤</div><small>강사 사진</small></div></div><div class="i-info"><div class="i-name">구티바리</div><ul class="i-desc-list"><li>패션 브랜드 팀장...</li></ul><div class="i-social-fixed"><div class="i-social-icon">I</div></div></div></div></div>
+          <div class="inst-card"><div class="i-card"><div class="i-photo-wrap"><div class="i-photo-ph"><div class="person-icon">👤</div><small>강사 사진</small></div></div><div class="i-info"><div class="i-name">강사명</div><ul class="i-desc-list"><li>경력 및 약력 텍스트...</li></ul><div class="i-social-fixed"><div class="i-social-icon">Y</div></div></div></div></div>
+        </div>
+      </div>
+      <button class="sl-btn next" onclick="slide('inst',1)">›</button>
+    </div>
+    <div class="slider-dots" id="inst-dots"></div>
+  </div>
+
+  <!-- ⑩ 후기 -->
+  <div class="main-section" id="review-section" style="padding:50px 32px; background:#f5f6f8; position:relative">
+    <div class="ann" style="left:0;top:5px">
+      <div class="ann-bubble" data-ann="main-10" data-scroll="review-section" onclick="activateAnn('main-10')">10</div>
+    </div>
+    <div class="section-header" style="padding-left:28px">
+      <span class="section-icon">⭐</span>
+      <span class="section-title-ko">수강생 후기</span>
+      <span class="section-title-en">Reviews</span>
+      <div class="section-more">전체보기 <span class="arr">→</span></div>
+    </div>
+    <div style="display:flex;gap:14px;margin-top:4px;">
+      <div style="flex:1;background:#fff;border-radius:10px;border:1px solid #eee;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.04);cursor:pointer;" onclick="document.getElementById('review-modal').style.display='flex'">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><div style="width:34px;height:34px;border-radius:50%;background:#1a3a5c;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">김*수</div><div><div style="font-size:12px;font-weight:700;color:#111;">김*수</div><div style="color:#f39c12;font-size:12px;">★★★★★</div></div><div style="margin-left:auto;font-size:10px;color:#bbb;">2026.03.15</div></div>
+        <div style="font-size:11.5px;font-weight:700;color:#1a1a1a;margin-bottom:6px;">[뾴공략] 월 5000만원 폰 창업 마스터클래스</div>
+        <div style="font-size:11.5px;color:#555;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">강의 퀄리티가 정말 뛰어납니다. 실질적인 내용 위주로 구성되어 있어서 바로 적용할 수 있었어요.</div>
+        <div style="margin-top:10px;font-size:10.5px;color:#c0392b;font-weight:600;">클릭하여 전체 보기 →</div>
+      </div>
+      <div style="flex:1;background:#fff;border-radius:10px;border:1px solid #eee;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.04);cursor:pointer;" onclick="document.getElementById('review-modal').style.display='flex'">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><div style="width:34px;height:34px;border-radius:50%;background:#27ae60;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">이*진</div><div><div style="font-size:12px;font-weight:700;color:#111;">이*진</div><div style="color:#f39c12;font-size:12px;">★★★★★</div></div><div style="margin-left:auto;font-size:10px;color:#bbb;">2026.03.10</div></div>
+        <div style="font-size:11.5px;font-weight:700;color:#1a1a1a;margin-bottom:6px;">[소업] SNS로 월 300 버는 실전 수익화 전략</div>
+        <div style="font-size:11.5px;color:#555;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">체계적으로 잘 정리된 강의입니다. 꾸준히 따라가다 보니 성과가 나오기 시작했어요.</div>
+        <div style="margin-top:10px;font-size:10.5px;color:#c0392b;font-weight:600;">클릭하여 전체 보기 →</div>
+      </div>
+      <div style="flex:1;background:#fff;border-radius:10px;border:1px solid #eee;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.04);cursor:pointer;" onclick="document.getElementById('review-modal').style.display='flex'">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><div style="width:34px;height:34px;border-radius:50%;background:#8e44ad;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">박*영</div><div><div style="font-size:12px;font-weight:700;color:#111;">박*영</div><div style="color:#f39c12;font-size:12px;">★★★★☆</div></div><div style="margin-left:auto;font-size:10px;color:#bbb;">2026.03.05</div></div>
+        <div style="font-size:11.5px;font-weight:700;color:#1a1a1a;margin-bottom:6px;">[김구링] 트렌드 커머스 AI자동화 수익내기</div>
+        <div style="font-size:11.5px;color:#555;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">AI 툴 활용법을 실전 위주로 가르쳐 주셔서 좋았습니다. 다음 강의도 수강할 예정입니다.</div>
+        <div style="margin-top:10px;font-size:10.5px;color:#c0392b;font-weight:600;">클릭하여 전체 보기 →</div>
+      </div>
+    </div>
+    <div class="slider-dots" style="margin-top:14px;"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+
+  <!-- 후기 팝업 -->
+  
+
+<div style="margin-top:32px;">
+  <div style="display:inline-block;font-size:12px;font-weight:700;color:#c0392b;padding:5px 12px;background:#fdecea;border-radius:5px;margin:0 32px 14px;">&#10003; 메인 팝업</div>
+  <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;padding:0 32px 20px">
+	<div>
+		<!-- ★ 팝업창 (페이지 로드 시 표시) -->
+		  <div id="site-popup-overlay">
+			<div id="site-popup">
+			  <button class="popup-close-btn" onclick="closePopup(false)">✕</button>
+			  <div class="popup-img-note">관리자 설정 이미지</div>
+			  <div class="popup-img-area" onclick="location.href='#'">
+				<div class="pi-icon">🎉</div>
+				<div class="pi-text">런칭 기념 전 강의 30% 할인!</div>
+				<div class="pi-sub">2026.04.01 ~ 2026.04.30 한정</div>
+			  </div>
+			  <div class="popup-footer">
+				<label class="popup-today-check">
+				  <input type="checkbox" id="popup-today-chk"> 오늘 하루 보지 않기
+				</label>
+			  </div>
+			</div>
+		  </div>
+	</div>
+	<div style="flex:1;min-width:180px;padding-top:4px;">
+	   <!-- ★ 팝업 기획서 스펙 섹션 -->
+	  <div class="section-sep" style="margin:0; background:#1a3a5c; color:#fff; padding:12px 16px; border-radius:6px 6px 0 0; font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px;">
+		<span>🎯</span> 팝업창 기능 스펙
+		<span style="background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:10px;font-size:10px;">POPUP</span>
+		<div class="ann" style="position:relative;margin-left:4px;pointer-events:auto;">
+		  <div class="ann-bubble" data-ann="main-11" onclick="activateAnn('main-11')" style="cursor:pointer;">11</div>
+		</div>
+	  </div>
+	  <div class="popup-spec-box">
+		<div class="popup-spec-title">관리자 설정 항목</div>
+		<div class="popup-spec-grid">
+		  <span class="sk">이미지</span><span class="sv">팝업 이미지 업로드 (권장 380×220px) / 슬라이드 방식</span>
+		  <span class="sk">링크 URL</span><span class="sv">클릭 시 이동 URL (선택, 새 탭 or 현재 탭)</span>
+		  <span class="sk">노출기간</span><span class="sv">시작일 ~ 종료일 설정 (기간 외 자동 미노출)</span>
+		  <span class="sk">노출여부</span><span class="sv">ON/OFF 토글 (즉시 반영)</span>
+		  <span class="sk">오늘 하루</span><span class="sv">체크 시 쿠키 저장 → 24시간 미노출</span>
+		</div>
+		<div style="margin-top:10px;padding-top:10px;border-top:1px solid #e0eaf5;font-size:11px;color:#888;">
+		  DB: <code>lc_popup</code> (popup_idx, image_path, link_url, start_date, end_date, is_active)<br>
+		  쿠키명: <code>uc_popup_hide_{popup_idx}</code> · 유효시간: 86400초(24h)
+		</div>
+	  </div>
+	</div>
+  </div>
+</div>
+
+<div style="margin-top:32px;">
+  <div style="display:inline-block;font-size:12px;font-weight:700;color:#c0392b;padding:5px 12px;background:#fdecea;border-radius:5px;margin:0 32px 14px;">&#10003; 후기 팝업</div>
+  <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;padding:0 32px 20px">
+	<div>
+		<div id="review-modal" style="" onclick="if(event.target===this)this.style.display='none'">
+		<div style="background:#fff;border-radius:12px;max-width:500px;width:90%;padding:28px;position:relative;max-height:80vh;overflow-y:auto; box-shadow:0 16px 48px rgba(0,0,0,0.3);">
+		  <button onclick="document.getElementById('review-modal').style.display='none'" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;color:#aaa;cursor:pointer;">✕</button>
+		  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><div style="width:40px;height:40px;border-radius:50%;background:#1a3a5c;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;">김*수</div><div><div style="font-size:13px;font-weight:700;">김*수</div><div style="color:#f39c12;font-size:13px;">★★★★★</div></div><div style="margin-left:auto;font-size:11px;color:#bbb;">2026.03.15</div></div>
+		  <div style="font-size:13px;font-weight:700;color:#c0392b;margin-bottom:10px;">[뾴공략] 월 5000만원 폰 창업 마스터클래스</div>
+		  <div style="font-size:13px;color:#333;line-height:1.8;">강의 퀄리티가 정말 뛰어납니다. 실질적인 내용 위주로 구성되어 있어서 바로 적용할 수 있었어요. 강력 추천합니다.</div>
+		</div>
+	  </div>
+	</div>
+  </div>
+</div>
+
+
+  <div id="footer">
+    <div class="footer-logo">UNICORN CLASS</div>
+    <div class="footer-info">
+      <strong>상호</strong>유니콘클래스&nbsp;&nbsp;<strong>대표</strong>홍길동&nbsp;&nbsp;<strong>사업자등록번호</strong>000-00-00000<br>
+      <strong>주소</strong>서울특별시 OO구 OO로 000, OOO호&nbsp;&nbsp;<strong>대표전화</strong>000-0000-0000&nbsp;&nbsp;<strong>이메일</strong>info@unicornclass.co.kr
+    </div>
+    <div class="footer-links">
+      <a href="#">이용약관</a><a href="#" class="em">개인정보처리방침</a><a href="#">회사소개</a><a href="#">고객센터</a>
+    </div>
+    <div class="footer-copy">© 2026 유니콘클래스. All rights reserved.</div>
+  </div>
+
+</div><!-- /.screen-wrap -->
+
+<div class="desc-panel">
+  <div class="desc-panel-head">Description</div>
+  <div class="desc-list">
+
+    <div class="desc-item" onclick="activateAnn('main-1')">
+      <div class="desc-num" data-desc="main-1">1</div>
+      <div class="desc-text"><strong>GNB 2뎁스</strong>: 클래스 hover → 무료강의·프리미엄강의<br>고객센터 hover → 공지사항·FAQ</div>
+    </div>
+    <div class="desc-item" onclick="activateAnn('main-2')">
+      <div class="desc-num" data-desc="main-2">2</div>
+      <div class="desc-text"><strong>검색창</strong>: 강사/과정명 검색<br>결과 → 클래스·강사 탭 분리 노출</div>
+    </div>
+    <div class="desc-item" onclick="activateAnn('main-3')">
+      <div class="desc-num" data-desc="main-3">3</div>
+      <div class="desc-text"><strong>검색 버튼</strong> (🔍)<br>클릭 또는 Enter 시 검색 실행</div>
+    </div>
+    <div class="desc-item" onclick="activateAnn('main-4')">
+      <div class="desc-num" data-desc="main-4">4</div>
+      <div class="desc-text"><strong>로그인 버튼</strong><br>클릭 → /login 이동<br>로그인 후 → 마이페이지 드롭다운</div>
+    </div>
+    <div class="desc-item" onclick="activateAnn('main-5')">
+      <div class="desc-num" data-desc="main-5">5</div>
+      <div class="desc-text"><strong>히어로 배너</strong>: <code>&lt;video&gt;</code> autoplay / muted / loop<br>좌하단 고정, 오버레이 그라디언트</div>
+    </div>
+    <div class="desc-item" onclick="activateAnn('main-6')">
+      <div class="desc-num" data-desc="main-6">6</div>
+      <div class="desc-text"><strong>무료강의 섹션</strong>: 3열 슬라이더 (좌우 버튼 + dots)<br>카드 썸네일 + NEW·HOT 배지</div>
+    </div>
+    <div class="desc-item" onclick="activateAnn('main-7')">
+      <div class="desc-num" data-desc="main-7">7</div>
+      <div class="desc-text"><strong>프리미엄강의 섹션</strong>: 구조 동일<br>배지: Premium·HOT·NEW</div>
+    </div>
+    <div class="desc-item" onclick="activateAnn('main-8')">
+      <div class="desc-num" data-desc="main-8">8</div>
+      <div class="desc-text"><strong>배너 슬라이딩</strong>: 관리자에서 이미지/링크/노출기간 등록<br>자동 슬라이드 · 좌우 화살표 + dots</div>
+    </div>
+    <div class="desc-item" onclick="activateAnn('main-9')">
+      <div class="desc-num" data-desc="main-9">9</div>
+      <div class="desc-text"><strong>강사진 슬라이더</strong>: 세로 인물사진<br>이름 + 약력 불릿 + SNS 아이콘</div>
+    </div>
+    <div class="desc-item" onclick="activateAnn('main-10')">
+      <div class="desc-num" data-desc="main-10">10</div>
+      <div class="desc-text"><strong>수강생 후기 섹션</strong>: 카드 3열<br>클릭 시 팝업으로 전체 내용 표시</div>
+    </div>
+
+    <div class="desc-divider">▸ 클라이언트 피드백 반영</div>
+
+    <div class="desc-item" onclick="activateAnn('main-11')">
+      <div class="desc-num" data-desc="main-11">11</div>
+      <div class="desc-text">
+        <strong>팝업창</strong> <span style="font-size:10px;background:#e8f4fd;color:#2980b9;padding:1px 6px;border-radius:3px;font-weight:700;">신규</span><br><br>
+        페이지 로드 시 자동 표시<br>
+        <strong>관리자 설정 항목:</strong><br>
+        · 이미지 업로드<br>
+        · 클릭 링크 URL<br>
+        · 노출 기간 (시작일~종료일)<br>
+        · ON/OFF 토글<br><br>
+        <strong>오늘 하루 보지 않기</strong><br>
+        체크 후 닫기 → 쿠키 저장 (24h)<br>
+        재방문 시 쿠키 확인 → 미노출<br><br>
+        DB: <code>lc_popup</code><br>
+        쿠키: <code>uc_popup_hide_{idx}</code>
+      </div>
+    </div>
+
+    <div class="desc-item" onclick="activateAnn('main-12')">
+      <div class="desc-num" data-desc="main-12">12</div>
+      <div class="desc-text">
+        <strong>카카오 채널 플로팅 버튼</strong> <span style="font-size:10px;background:#e8f4fd;color:#2980b9;padding:1px 6px;border-radius:3px;font-weight:700;">신규</span><br><br>
+        위치: 우측 하단 고정 (fixed)<br>
+        bottom: 28px / right: 28px<br>
+        배경색: #fee500 (카카오 공식 컬러)<br>
+        클릭 → 카카오 채널 URL (새 탭)<br>
+        hover 시 위로 살짝 이동 효과<br><br>
+        <strong>전체 공통 적용</strong><br>
+        모든 페이지에 동일하게 삽입<br>
+        URL: 관리자 설정 or 하드코딩
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /.page-wrap -->
+
+<script>
+// ── 팝업 쿠키 처리 ──
+function getCookie(name) {
+  return document.cookie.split(';').some(c => c.trim().startsWith(name + '='));
+}
+function setCookie(name, days) {
+  const d = new Date();
+  d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = name + '=1;expires=' + d.toUTCString() + ';path=/';
+}
+function closePopup(hideToday) {
+  if (hideToday || document.getElementById('popup-today-chk').checked) {
+    setCookie('uc_popup_hide_1', 1);
+  }
+  document.getElementById('site-popup-overlay').style.display = 'none';
+}
+// 쿠키 있으면 팝업 숨김
+if (getCookie('uc_popup_hide_1')) {
+  document.getElementById('site-popup-overlay').style.display = 'none';
+}
+// 팝업 이미지 클릭 시 닫기 + 이동
+document.querySelector('.popup-img-area').addEventListener('click', function() {
+  closePopup(false);
+});
+// 팝업 배경 클릭 닫기
+document.getElementById('site-popup-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closePopup(false);
+});
+
+// ── 슬라이더 ──
+const sliders = {
+  free:    { id:'free-track',    dotsId:'free-dots',    current:0, total:4 },
+  premium: { id:'premium-track', dotsId:'premium-dots', current:0, total:4 },
+  inst:    { id:'inst-track',    dotsId:'inst-dots',    current:0, total:8 },
+};
+function getCardW(trackId) {
+  const track = document.getElementById(trackId);
+  const card = track && track.children[0];
+  return card ? card.offsetWidth + 16 : 0;
+}
+function getMaxSlide(key) {
+  const s = sliders[key];
+  const track = document.getElementById(s.id);
+  if (!track) return 0;
+  const outer = track.parentElement;
+  const cw = getCardW(s.id);
+  if (!cw) return 0;
+  return Math.max(0, s.total - Math.floor(outer.offsetWidth / cw));
+}
+function slide(key, dir) {
+  const s = sliders[key];
+  s.current = Math.max(0, Math.min(s.current + dir, getMaxSlide(key)));
+  applySlide(key);
+}
+function goTo(key, idx) {
+  sliders[key].current = Math.max(0, Math.min(idx, getMaxSlide(key)));
+  applySlide(key);
+}
+function applySlide(key) {
+  const s = sliders[key];
+  const track = document.getElementById(s.id);
+  if (!track) return;
+  track.style.transition = 'transform .35s cubic-bezier(.4,0,.2,1)';
+  track.style.transform = `translateX(-${s.current * getCardW(s.id)}px)`;
+  const dotsEl = document.getElementById(s.dotsId);
+  if (dotsEl) dotsEl.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===s.current));
+}
+function buildDots(key) {
+  const dotsEl = document.getElementById(sliders[key].dotsId);
+  if (!dotsEl) return;
+  dotsEl.innerHTML = '';
+  for (let i = 0; i <= getMaxSlide(key); i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0?' active':'');
+    d.addEventListener('click', () => goTo(key, i));
+    dotsEl.appendChild(d);
+  }
+}
+function initDrag(key) {
+  const s = sliders[key];
+  const track = document.getElementById(s.id);
+  if (!track) return;
+  const outer = track.parentElement;
+  let startX=0, startCurrent=0, isDragging=false;
+  function onStart(e) { isDragging=true; startX=e.type==='mousedown'?e.clientX:e.touches[0].clientX; startCurrent=s.current; track.style.transition='none'; outer.style.cursor='grabbing'; e.preventDefault(); }
+  function onMove(e) { if(!isDragging) return; const x=e.type==='mousemove'?e.clientX:e.touches[0].clientX; track.style.transform=`translateX(-${startCurrent*getCardW(s.id)-(x-startX)}px)`; }
+  function onEnd(e) { if(!isDragging) return; isDragging=false; outer.style.cursor=''; const x=e.type==='mouseup'?e.clientX:(e.changedTouches?e.changedTouches[0].clientX:startX); const diff=x-startX; if(diff<-50) slide(key,1); else if(diff>50) slide(key,-1); else applySlide(key); }
+  outer.addEventListener('mousedown', onStart);
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onEnd);
+  outer.addEventListener('touchstart', onStart, {passive:false});
+  outer.addEventListener('touchmove', onMove, {passive:false});
+  outer.addEventListener('touchend', onEnd);
+  outer.style.userSelect='none'; outer.style.cursor='grab';
+}
+
+// ── ann 양방향 연동 ──
+function activateAnn(id) {
+  const bubble = document.querySelector(`.ann-bubble[data-ann="${id}"]`);
+  const isActive = bubble && bubble.classList.contains('active');
+  document.querySelectorAll('.ann-bubble[data-ann]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-num[data-desc]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.desc-item.active').forEach(el => el.classList.remove('active'));
+  if (isActive) return;
+  if (bubble) {
+    bubble.classList.add('active');
+    const annHost = bubble.closest('.ann-host');
+    if (annHost) {
+      const rect = annHost.getBoundingClientRect();
+      window.scrollTo({ top: window.scrollY + rect.top - 80 - 74, behavior:'smooth' });
+      annHost.style.outline = '2.5px solid #c0392b';
+      annHost.style.outlineOffset = '4px';
+      annHost.style.borderRadius = '4px';
+      setTimeout(() => { annHost.style.outline=''; annHost.style.outlineOffset=''; }, 1800);
+    } else {
+      const el = document.getElementById(bubble.dataset.scroll);
+      if (el) window.scrollTo({ top: window.scrollY + el.getBoundingClientRect().top - 70, behavior:'smooth' });
+    }
+  }
+  const descNum = document.querySelector(`.desc-num[data-desc="${id}"]`);
+  if (descNum) {
+    descNum.classList.add('active');
+    const item = descNum.closest('.desc-item');
+    if (item) {
+      item.classList.add('active');
+      const panel = item.closest('.desc-panel');
+      if (panel) panel.scrollTo({ top: item.offsetTop - (panel.querySelector('.desc-panel-head')?.offsetHeight||0) - 12, behavior:'smooth' });
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  ['free','premium','inst'].forEach(key => { buildDots(key); initDrag(key); });
+});
+</script>
+</body>
+</html>

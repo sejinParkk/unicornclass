@@ -1,0 +1,21 @@
+{
+    "name": "unicornclass/unicornclass",
+    "description": "유니콘클래스 온라인 강의 플랫폼",
+    "type": "project",
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
