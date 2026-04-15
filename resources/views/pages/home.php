@@ -17,8 +17,6 @@ function starRating(int $rating): string
 }
 ?>
 
-<main>
-
 <!-- ====================================================
   ① 히어로 배너
 ===================================================== -->
@@ -346,8 +344,6 @@ function starRating(int $rating): string
     <div class="review-modal-content" id="rm-content"></div>
   </div>
 </div>
-
-</main>
 
 <!-- Swiper JS -->
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>

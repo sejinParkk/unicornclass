@@ -20,7 +20,7 @@
 #hero {
   position: relative;
   width: 100%;
-  min-height: 460px;
+  min-height: 560px;
   background: #0d0d0d;
   display: flex;
   align-items: flex-end;

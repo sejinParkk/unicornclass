@@ -2,45 +2,6 @@
 // $faqs, $categories, $category 가 컨트롤러에서 전달됨
 $currentCat = $category ?: 'all';
 ?>
-<style>
-.cs-banner{position:relative;height:140px;background:linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 55%,#3a1a1a 100%);display:flex;align-items:center;overflow:hidden}
-.cs-banner::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 28px,rgba(192,57,43,.04) 28px,rgba(192,57,43,.04) 29px)}
-.cs-banner::after{content:'';position:absolute;right:-50px;top:-50px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(192,57,43,.18) 0%,transparent 70%)}
-.cs-banner-inner{position:relative;z-index:1;padding:0 48px}
-.cs-banner-en{font-size:10px;font-weight:500;letter-spacing:3px;color:#c0392b;margin-bottom:8px}
-.cs-banner-title{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.5px}
-.cs-banner-title span{color:#c0392b}
-.cs-subnav{background:#fff;border-bottom:1px solid #eee;display:flex;padding:0 48px}
-.cs-subnav-item{position:relative;padding:0 20px;height:48px;line-height:48px;font-size:13.5px;font-weight:500;color:#888;cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap;text-decoration:none;display:block}
-.cs-subnav-item:hover,.cs-subnav-item.active{color:#c0392b;border-bottom-color:#c0392b;font-weight:700}
-.faq-wrap{max-width:900px;margin:0 auto;padding:32px 48px 60px}
-.page-section-title{font-size:17px;font-weight:700;color:#1a1a1a;margin-bottom:20px}
-.faq-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px}
-.faq-filter-btn{padding:5px 14px;border-radius:20px;border:1px solid #ccc;background:#fff;font-size:12px;font-weight:500;color:#888;cursor:pointer;font-family:inherit;transition:all .15s;text-decoration:none}
-.faq-filter-btn.active,.faq-filter-btn:hover{background:#c0392b;border-color:#c0392b;color:#fff}
-.faq-list{border-top:2px solid #222}
-.faq-item{border-bottom:1px solid #eee;overflow:hidden}
-.faq-q{display:flex;align-items:center;gap:12px;padding:18px 0;cursor:pointer}
-.faq-q:hover .faq-q-text{color:#c0392b}
-.faq-q-badge{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#c0392b;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.faq-q-text{flex:1;font-size:13.5px;font-weight:500;color:#222;line-height:1.5}
-.faq-item.open .faq-q-text{color:#c0392b}
-.faq-toggle{flex-shrink:0;width:22px;height:22px;border:1px solid #ccc;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s}
-.faq-item.open .faq-toggle{background:#c0392b;border-color:#c0392b}
-.faq-toggle svg{transition:transform .3s}
-.faq-item.open .faq-toggle svg{transform:rotate(45deg)}
-.faq-a-wrap{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1)}
-.faq-item.open .faq-a-wrap{max-height:400px}
-.faq-a{display:flex;gap:12px;padding:0 0 20px}
-.faq-a-badge{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:1.5px solid #c0392b;color:#c0392b;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.faq-a-text{font-size:13px;color:#555;line-height:1.8}
-.faq-a-text strong{color:#c0392b}
-.faq-empty{padding:48px 0;text-align:center;color:#aaa;font-size:14px}
-.faq-cta{background:#1a3a5c;border-radius:10px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;margin-top:40px;gap:16px}
-.faq-cta-text h4{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
-.faq-cta-text p{font-size:12px;color:rgba(255,255,255,.6)}
-.faq-cta-btn{flex-shrink:0;height:40px;padding:0 20px;background:#c0392b;border-radius:8px;color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
-</style>
 
 <!-- 서브 배너 -->
 <div class="cs-banner">

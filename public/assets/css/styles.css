@@ -23,7 +23,7 @@ img { max-width: 100%; }
 *::-webkit-scrollbar-track { background: #f1f1f1; }
 
 /* ===== 2. Layout Helpers ===== */
-.inner { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.inner { max-width: 1440px; margin: 0 auto; padding-left: 20px; padding-right: 20px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 
 /* ============================================================
@@ -878,7 +878,7 @@ input[type=checkbox]{accent-color:#c0392b;width:14px;height:14px;cursor:pointer;
 .cs-banner-title{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.5px}
 .cs-banner-title span{color:#c0392b}
 .cs-subnav{background:#fff;border-bottom:1px solid #eee;display:flex;padding:0 48px}
-.cs-subnav-item{position:relative;padding:0 20px;height:48px;line-height:48px;font-size:13.5px;font-weight:500;color:#888;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap;text-decoration:none;display:block}
+.cs-subnav-item{position:relative;padding:0 20px;height:48px;line-height:48px;font-size:13.5px;font-weight:500;color:#888;cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap;text-decoration:none;display:block}
 .cs-subnav-item:hover,.cs-subnav-item.active{color:#c0392b;border-bottom-color:#c0392b;font-weight:700}
 .policy-wrap{max-width:900px;margin:0 auto;padding:32px 48px 60px}
 .page-section-title{font-size:17px;font-weight:700;color:#1a1a1a;margin-bottom:20px}
@@ -891,6 +891,64 @@ input[type=checkbox]{accent-color:#c0392b;width:14px;height:14px;cursor:pointer;
 .policy-body li{margin-bottom:4px}
 .policy-empty{padding:48px 0;text-align:center;color:#aaa;font-size:14px}
 .btn-terms-agree:hover{background:#a93226}
+/* FAQ */
+.faq-wrap{max-width:900px;margin:0 auto;padding:32px 48px 60px}
+.faq-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px}
+.faq-filter-btn{padding:5px 14px;border-radius:20px;border:1px solid #ccc;background:#fff;font-size:12px;font-weight:500;color:#888;cursor:pointer;font-family:inherit;transition:all .15s;text-decoration:none}
+.faq-filter-btn.active,.faq-filter-btn:hover{background:#c0392b;border-color:#c0392b;color:#fff}
+.faq-list{border-top:2px solid #222}
+.faq-item{border-bottom:1px solid #eee;overflow:hidden}
+.faq-q{display:flex;align-items:center;gap:12px;padding:18px 0;cursor:pointer}
+.faq-q:hover .faq-q-text{color:#c0392b}
+.faq-q-badge{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#c0392b;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.faq-q-text{flex:1;font-size:13.5px;font-weight:500;color:#222;line-height:1.5}
+.faq-item.open .faq-q-text{color:#c0392b}
+.faq-toggle{flex-shrink:0;width:22px;height:22px;border:1px solid #ccc;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s}
+.faq-item.open .faq-toggle{background:#c0392b;border-color:#c0392b}
+.faq-toggle svg{transition:transform .3s}
+.faq-item.open .faq-toggle svg{transform:rotate(45deg)}
+.faq-a-wrap{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1)}
+.faq-item.open .faq-a-wrap{max-height:400px}
+.faq-a{display:flex;gap:12px;padding:0 0 20px}
+.faq-a-badge{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:1.5px solid #c0392b;color:#c0392b;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.faq-a-text{font-size:13px;color:#555;line-height:1.8}
+.faq-a-text strong{color:#c0392b}
+.faq-empty{padding:48px 0;text-align:center;color:#aaa;font-size:14px}
+.faq-cta{background:#1a3a5c;border-radius:10px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;margin-top:40px;gap:16px}
+.faq-cta-text h4{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
+.faq-cta-text p{font-size:12px;color:rgba(255,255,255,.6)}
+.faq-cta-btn{flex-shrink:0;height:40px;padding:0 20px;background:#c0392b;border-radius:8px;color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
+/* 공지사항 목록 */
+.notice-wrap{max-width:900px;margin:0 auto;padding:32px 48px 60px}
+.notice-list{border-top:2px solid #222}
+.notice-row{display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid #eee;cursor:pointer;text-decoration:none}
+.notice-row:hover .notice-title-text{color:#c0392b}
+.notice-badge{flex-shrink:0;padding:2px 8px;background:#c0392b;color:#fff;font-size:10px;font-weight:700;border-radius:3px;letter-spacing:.4px}
+.notice-badge.gen{background:#f0f0f0;color:#888}
+.notice-pinned{background:#fffaf9}
+.notice-title-text{flex:1;font-size:13.5px;font-weight:500;color:#333;line-height:1.5;transition:color .2s}
+.notice-date{flex-shrink:0;font-size:12px;color:#aaa}
+.notice-empty{padding:48px 0;text-align:center;color:#aaa;font-size:14px}
+/* 공지사항 상세 */
+.notice-detail-wrap{max-width:900px;margin:0 auto;padding:32px 48px 60px}
+.notice-detail-header{border-bottom:2px solid #222;padding-bottom:20px;margin-bottom:28px}
+.notice-detail-badge{display:inline-block;padding:3px 10px;background:#c0392b;color:#fff;font-size:11px;font-weight:700;border-radius:3px;margin-bottom:12px}
+.notice-detail-badge.gen{background:#f0f0f0;color:#888}
+.notice-detail-title{font-size:20px;font-weight:800;color:#1a1a1a;line-height:1.4;margin-bottom:12px}
+.notice-detail-meta{display:flex;gap:20px;font-size:12px;color:#aaa}
+.notice-detail-body{font-size:13.5px;color:#444;line-height:2;min-height:200px;padding-bottom:32px;border-bottom:1px solid #eee;word-break:break-word}
+.notice-detail-body p{margin-bottom:14px}
+.notice-detail-body strong{color:#1a1a1a;font-weight:700}
+.notice-back-btn{height:42px;padding:0 20px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;font-size:13px;font-weight:600;color:#555;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-family:inherit;margin-top:16px;text-decoration:none}
+.notice-back-btn:hover{background:#eee}
+.notice-nav{border:1px solid #eee;border-radius:8px;overflow:hidden;margin-top:24px}
+.notice-nav-row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid #f0f0f0;text-decoration:none}
+.notice-nav-row:last-child{border-bottom:none}
+.notice-nav-row:hover{background:#fafafa}
+.notice-nav-label{font-size:11px;font-weight:700;color:#aaa;width:28px;flex-shrink:0}
+.notice-nav-title{font-size:13px;color:#555;flex:1}
+.notice-nav-date{font-size:11px;color:#bbb}
+.notice-nav-empty{font-size:13px;color:#bbb;flex:1}
 
 /* ── 인라인 폼 에러 ── */
 .field-error{display:none;font-size:12px;color:#c0392b;margin-top:5px;padding-left:2px}
