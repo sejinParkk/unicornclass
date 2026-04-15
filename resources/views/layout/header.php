@@ -100,30 +100,24 @@ $_navActive = function(string $prefix) use ($_uri): string {
 
       <?php if ($_member): ?>
 
-      <!-- 장바구니 -->
-      <a href="/cart" class="cart-icon">
-        🛒
-        <?php if ($_cartCount > 0): ?>
-        <div class="cart-badge"><?= $_cartCount ?></div>
-        <?php endif; ?>
-      </a>
-
       <!-- 마이페이지 드롭다운 -->
       <div class="mypage-wrap">
         <div class="mypage-btn">
-          <!-- <div class="mypage-avatar"><?= htmlspecialchars($_avatarChar) ?></div> -->
+          <div class="mypage-avatar"><?= htmlspecialchars($_avatarChar) ?></div>
           <?= htmlspecialchars($_member['mb_name']) ?> 님 ▾
         </div>
         <div class="mypage-dropdown">
           <div class="mypage-dropdown-inner">
-            <a href="/mypage">마이페이지</a>
-            <a href="/mypage/my-class">내 강의</a>
-            <a href="/cart">장바구니</a>
-            <a href="/mypage/orders">결제 내역</a>
-            <a href="/mypage/inquiries">1:1 문의</a>
-            <form method="POST" action="/logout">
+            <a href="/mypage/my-class"  class="<?= $_navActive('/mypage/my-class')  ?>">📚 나의 강의</a>
+            <a href="/mypage/wishlist"  class="<?= $_navActive('/mypage/wishlist')   ?>">❤️ 찜목록</a>
+            <a href="/mypage/orders"    class="<?= $_navActive('/mypage/orders')     ?>">💳 결제내역</a>
+            <a href="/mypage/qna"       class="<?= $_navActive('/mypage/qna')        ?>">💬 1:1 문의</a>
+            <a href="/mypage/reviews"   class="<?= $_navActive('/mypage/reviews')    ?>">⭐ 내 후기</a>
+            <div class="md-divider"></div>
+            <a href="/mypage/profile"   class="<?= $_navActive('/mypage/profile')    ?>">⚙️ 정보수정</a>
+            <form method="POST" action="/logout" style="margin:0">
               <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_logoutCsrf) ?>">
-              <button type="submit" class="md-logout">로그아웃</button>
+              <button type="submit" class="md-logout">🚪 로그아웃</button>
             </form>
           </div>
         </div>
@@ -158,8 +152,15 @@ $_navActive = function(string $prefix) use ($_uri): string {
         <a href="/search">🔍 검색</a>
         <div class="drawer-auth">
             <?php if ($_member): ?>
-            <a href="/mypage/my-class" class="drawer-btn-mypage">내 강의</a>
-            <a href="/mypage" class="drawer-btn-login">마이페이지</a>
+            <a href="/mypage/my-class">📚 나의 강의</a>
+            <a href="/mypage/wishlist">❤️ 찜목록</a>
+            <a href="/mypage/orders">💳 결제내역</a>
+            <a href="/mypage/qna">💬 1:1 문의</a>
+            <a href="/mypage/profile">⚙️ 정보수정</a>
+            <form method="POST" action="/logout" style="margin:4px 0 0">
+              <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_logoutCsrf) ?>">
+              <button type="submit" class="drawer-btn-login" style="width:100%;cursor:pointer">🚪 로그아웃</button>
+            </form>
             <?php else: ?>
             <a href="/login" class="drawer-btn-login">로그인</a>
             <a href="/register" class="drawer-btn-mypage">회원가입</a>

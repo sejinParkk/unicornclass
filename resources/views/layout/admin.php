@@ -7,6 +7,7 @@ $_favicon = \App\Core\DB::selectOne("SELECT config_value FROM lc_site_config WHE
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?= htmlspecialchars($pageTitle ?? '관리자') ?> — 유니콘클래스 관리자</title>
+	<script src="/assets/js/common.js"></script>
 	<?php if ($_favicon): ?>
 	<link rel="icon" href="/uploads/site/<?= htmlspecialchars($_favicon) ?>">
 	<?php endif; ?>
@@ -32,7 +33,7 @@ $_favicon = \App\Core\DB::selectOne("SELECT config_value FROM lc_site_config WHE
 	$_grpOps      = in_array($_m, ['members', 'orders', 'contacts']);
 	$_grpBoard    = in_array($_m, ['notices', 'faqs']);
 	$_grpStats    = in_array($_m, ['search-logs', 'openchat-logs']);
-	$_grpSettings = in_array($_m, ['settings', 'terms', 'profile']);
+	$_grpSettings = in_array($_m, ['settings', 'terms', 'profile', 'banners', 'popups']);
 	?>
 	<nav class="sidebar-nav">
 		<!-- 대시보드 (단독) -->
@@ -138,6 +139,8 @@ $_favicon = \App\Core\DB::selectOne("SELECT config_value FROM lc_site_config WHE
 			<div class="nav-group-body">
 				<a href="/admin/settings" class="nav-sub-item <?= $_m === 'settings' ? 'active' : '' ?>">사이트 설정</a>
 				<a href="/admin/terms" class="nav-sub-item <?= $_m === 'terms' ? 'active' : '' ?>">약관 관리</a>
+				<a href="/admin/banners" class="nav-sub-item <?= $_m === 'banners' ? 'active' : '' ?>">이벤트 배너</a>
+				<a href="/admin/popups" class="nav-sub-item <?= $_m === 'popups' ? 'active' : '' ?>">팝업 관리</a>
 				<a href="/admin/profile" class="nav-sub-item <?= $_m === 'profile' ? 'active' : '' ?>">관리자 프로필</a>
 			</div>
 		</div>

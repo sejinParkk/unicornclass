@@ -9,6 +9,7 @@ body {
 }
 a { color: inherit; text-decoration: none; }
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
+textarea {resize:none !important;}
 
 /* ===== CSS Variables ===== */
 :root {
@@ -143,17 +144,18 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .nav-sub-item {
   display: block;
   padding: 12px 20px 12px 46px;
-  color: #8898aa;
+  color: #778798;
   font-size: 12.5px;
   font-weight: 400;
   transition: background 0.15s, color 0.15s;
   border-left: 3px solid transparent;
 }
-.nav-sub-item:hover { color: var(--accent); }
+.nav-sub-item:hover { color: var(--accent); background: #e0e7fd; }
 .nav-sub-item.active {
   color: var(--accent);
   font-weight: 600;
   border-left-color: var(--accent);
+  background: #e0e7fd;
 }
 
 /* Sidebar Footer */
@@ -610,6 +612,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   color:#121212;
   border-bottom:1px solid #dfdfdf;
 }
+.data-table tr:last-child td {border-bottom: none;}
 /*.data-table tr:nth-child(even) td {background: #F9FAFC;}
 .data-table tr:hover td { background: #f1f1f1; }*/
 .empty-row td {
@@ -751,7 +754,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .form-control:focus { border-color: var(--accent); }
 .form-control.error { border-color: #e53e3e; }
 .form-control[readonly] { background:#f8fafc; color:#a0aec0; cursor:not-allowed; }
-textarea.form-control { resize: vertical; min-height: 160px; line-height: 1.7; }
+textarea.form-control { resize: vertical; min-height: 160px; line-height: 1.7; padding:12px;}
 .hint      { font-size: 11.5px; color: #a0aec0; margin-top: 4px; }
 .error-msg { font-size: 11.5px; color: #e53e3e; margin-top: 4px; }
 
@@ -917,6 +920,35 @@ textarea.form-control { resize: vertical; min-height: 160px; line-height: 1.7; }
 }
 .info-item .value { font-size: 13.5px; color: #2d3748; }
 .action-bar { display: flex; gap: 10px; align-items: center; }
+
+/* 검토 처리 라디오 UI */
+.review-radio-group { display: flex; gap: 16px; }
+.review-radio { display: flex; align-items: center; gap: 0; cursor: pointer; }
+.review-radio input[type="radio"] { display: none; }
+.review-radio-label {
+  display: inline-block;
+  padding: 10px 36px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #718096;
+  background: #f7fafc;
+  cursor: pointer;
+  transition: all .15s;
+  user-select: none;
+}
+.review-radio input[type="radio"]:checked + .review-radio-label.approve {
+  border-color: #276749;
+  background: #f0fff4;
+  color: #276749;
+}
+.review-radio input[type="radio"]:checked + .review-radio-label.reject {
+  border-color: #c53030;
+  background: #fff5f5;
+  color: #c53030;
+}
+.review-radio-label:hover { border-color: #a0aec0; }
 
 /* --------------------------------------------------------------------------
   13. 링크 스타일
@@ -1133,7 +1165,7 @@ input[type=checkbox].toggle { width:18px; height:18px; cursor:pointer; }
 }
 .meta-info .label { color:#666; font-size:11.5px; font-weight:600; text-transform:uppercase; margin-bottom:3px; }
 
-.terms-tabs { display:flex; gap:4px; margin-bottom:24px; border-bottom:2px solid #e2e8f0; }
+.terms-tabs { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:24px; border-bottom:2px solid #e2e8f0; }
 .terms-tab {
   padding:10px 20px; font-size:13.5px; font-weight:600; color:#666;
   border:none; background:none; cursor:pointer; border-bottom:2px solid transparent;

@@ -350,6 +350,57 @@ class ClassRepository
         );
     }
 
+    /**
+     * 회원의 챕터별 완료 여부 맵 반환
+     * @return array<int, bool>  chapter_idx => true(완료)
+     */
+    public function getProgressMap(int $memberIdx, int $classIdx): array
+    {
+        $rows = DB::select(
+            'SELECT chapter_idx FROM lc_progress
+             WHERE member_idx = ? AND class_idx = ? AND is_complete = 1',
+            [$memberIdx, $classIdx]
+        );
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(int) $row['chapter_idx']] = true;
+        }
+        return $map;
+    }
+
+    /**
+     * 챕터 완료 토글: 완료되어 있으면 취소, 아니면 등록
+     * @return bool  토글 후 완료 상태(true=완료)
+     */
+    public function toggleProgress(int $memberIdx, int $classIdx, int $chapterIdx): bool
+    {
+        $row = DB::selectOne(
+            'SELECT progress_idx, is_complete FROM lc_progress
+             WHERE member_idx = ? AND class_idx = ? AND chapter_idx = ?',
+            [$memberIdx, $classIdx, $chapterIdx]
+        );
+
+        if ($row) {
+            $newState = $row['is_complete'] ? 0 : 1;
+            DB::execute(
+                'UPDATE lc_progress
+                 SET is_complete = ?, completed_at = ?
+                 WHERE progress_idx = ?',
+                [$newState, $newState ? date('Y-m-d H:i:s') : null, $row['progress_idx']]
+            );
+            return (bool) $newState;
+        }
+
+        // 신규 등록 (완료)
+        DB::insert(
+            'INSERT INTO lc_progress (member_idx, class_idx, chapter_idx, is_complete, completed_at)
+             VALUES (?, ?, ?, 1, NOW())',
+            [$memberIdx, $classIdx, $chapterIdx]
+        );
+        return true;
+    }
+
     /** total_episodes 카운트 갱신 */
     public function syncTotalEpisodes(int $classIdx): void
     {

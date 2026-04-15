@@ -29,257 +29,6 @@ $ordererPhone = htmlspecialchars($member['mb_phone'] ?? '');
 // 유효 파일 목록
 $files = $class['files'] ?? [];
 ?>
-<style>
-/* ── 브레드크럼 ── */
-.cd-breadcrumb{padding:10px 32px;font-size:12px;color:#aaa;border-bottom:1px solid #f5f5f5}
-.cd-breadcrumb a{color:#aaa;text-decoration:none}.cd-breadcrumb a:hover{color:#c0392b}
-.cd-breadcrumb span{margin:0 6px;color:#ccc}
-.cd-breadcrumb .cur{color:#555;font-weight:600}
-
-/* ── 2단 레이아웃 ── */
-.cd-wrap{display:flex;gap:28px;padding:28px 32px 0;align-items:flex-start}
-.cd-left{flex:1;min-width:0}
-.cd-right{width:268px;flex-shrink:0;position:sticky;top:80px;align-self:flex-start}
-
-/* ── 썸네일 ── */
-.cd-thumb{width:100%;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:#1a1a2e;margin-bottom:0}
-.cd-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-
-/* ── 내용 탭 ── */
-.cd-tabs{display:flex;border-bottom:2px solid #eee;position:sticky;top:60px;z-index:90;background:#fff}
-.cd-tab{flex:1;text-align:center;height:44px;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;color:#999;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s}
-.cd-tab.active{color:#c0392b;border-bottom-color:#c0392b}
-
-/* ── 클래스 소개 본문 ── */
-.cd-desc-body{padding:20px 0;min-height:200px;line-height:1.8;font-size:14px;color:#333}
-.cd-desc-body img{max-width:100%;height:auto}
-.cd-desc-empty{padding:40px 20px;text-align:center;color:#aaa;font-size:13px;background:#f9f9f9;border-radius:6px}
-
-/* ── 강사 소개 섹션 ── */
-.cd-inst-box{border:1px solid #eee;border-radius:8px;padding:20px;margin-top:4px}
-.cd-inst-head{font-size:14px;font-weight:800;color:#1a1a1a;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #f0f0f0}
-.cd-inst-row{display:flex;align-items:center;justify-content:space-between}
-.cd-inst-profile{display:flex;align-items:center;gap:12px}
-.cd-inst-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#c0392b,#e74c3c);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0;overflow:hidden}
-.cd-inst-avatar img{width:100%;height:100%;object-fit:cover}
-.cd-inst-name{font-size:14px;font-weight:800}
-.cd-inst-field{font-size:11.5px;color:#888;margin-top:2px}
-.cd-inst-toggle{width:28px;height:28px;border-radius:50%;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:16px;color:#888;cursor:pointer;transition:all .15s;flex-shrink:0}
-.cd-inst-toggle:hover{border-color:#c0392b;color:#c0392b}
-.cd-inst-detail{display:none;margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0}
-.cd-inst-detail.open{display:block}
-.bullet-list{list-style:none}
-.bullet-list li{font-size:13px;color:#444;line-height:1.8;padding-left:14px;position:relative}
-.bullet-list li::before{content:'•';position:absolute;left:0;color:#c0392b;font-weight:700}
-.cd-inst-section-title{font-size:12px;font-weight:700;color:#555;margin:14px 0 6px}
-.cd-inst-link{display:inline-flex;align-items:center;gap:6px;margin-top:10px;text-decoration:none;color:#c0392b;font-size:12.5px;font-weight:600;border:1px solid #c0392b;border-radius:20px;padding:4px 12px;transition:all .15s}
-.cd-inst-link:hover{background:#c0392b;color:#fff}
-
-/* ── 마케팅/면책 ── */
-.cd-terms{padding:32px 32px 0}
-.cd-terms-block{margin-bottom:16px}
-.cd-terms-title{font-size:13px;font-weight:800;color:#1a1a1a;margin-bottom:6px}
-.cd-terms-body{font-size:12px;color:#666;line-height:1.8;background:#f9f9f9;padding:12px 14px;border-radius:6px;border:1px solid #eee}
-
-/* ─────────────────────────────────────────────
-   우측 신청/결제 박스
-───────────────────────────────────────────── */
-.cd-box{border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.08)}
-.cd-box-badges{padding:14px 16px 0;display:flex;gap:4px}
-.dbadge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px}
-.db-hot{background:#fdecea;color:#c0392b}
-.db-new{background:#e8f5e9;color:#27ae60}
-.db-free{background:#e8f0ff;color:#3b5bdb}
-.db-premium{background:#f3e8ff;color:#8e44ad}
-.cd-box-title{padding:10px 16px 14px;font-size:14px;font-weight:800;color:#1a1a1a;line-height:1.45;border-bottom:1px solid #f0f0f0}
-.cd-box-actions{display:flex;gap:6px;padding:10px 16px;border-bottom:1px solid #f0f0f0}
-.action-btn{display:flex;align-items:center;gap:4px;height:30px;padding:0 10px;border-radius:15px;border:1px solid #e0e0e0;background:#fff;font-size:12px;font-weight:600;color:#555;cursor:pointer;transition:all .15s}
-.action-btn:hover{border-color:#c0392b;color:#c0392b}
-.action-btn.wished{border-color:#c0392b;color:#c0392b;background:#fff5f5}
-.cd-box-row{padding:10px 16px;display:flex;justify-content:space-between;font-size:12.5px;color:#888;border-bottom:1px solid #f0f0f0}
-.cd-box-row span{color:#333;font-weight:600}
-
-/* 카운트다운 타이머 */
-.cd-timer-wrap{padding:10px 16px;background:#fff9f9;border-bottom:1px solid #f0f0f0;text-align:center;font-size:11.5px;color:#888}
-.cd-timer-val{font-size:17px;font-weight:900;color:#c0392b;letter-spacing:1px;margin-top:2px}
-
-/* 가격 */
-.cd-price-wrap{padding:12px 16px;border-bottom:1px solid #f0f0f0}
-.cd-price-origin{font-size:12px;color:#bbb;text-decoration:line-through;margin-bottom:2px}
-.cd-price-row{display:flex;align-items:baseline;gap:6px}
-.cd-price-rate{font-size:14px;font-weight:900;color:#c0392b}
-.cd-price-val{font-size:20px;font-weight:900;color:#1a1a1a}
-.cd-price-free{font-size:20px;font-weight:900;color:#3b5bdb;padding:12px 16px;border-bottom:1px solid #f0f0f0}
-
-/* 할부 안내 */
-.cd-install-wrap{padding:10px 16px;border-top:1px solid #f5f5f5;background:#fafafa;border-bottom:1px solid #f0f0f0}
-.cd-install-label{font-size:11px;color:#888;margin-bottom:6px}
-.cd-install-chips{display:flex;gap:5px;flex-wrap:wrap}
-.cd-install-chip{font-size:11px;background:#f0f0f0;border-radius:4px;padding:3px 8px;color:#555}
-.cd-install-note{font-size:10.5px;color:#bbb;margin-top:5px}
-
-/* 강의 자료 */
-.cd-files-wrap{padding:10px 16px;border-bottom:1px solid #f0f0f0}
-.cd-files-label{font-size:11px;color:#888;margin-bottom:8px}
-.cd-file-row{display:flex;align-items:center;justify-content:space-between;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;padding:8px 12px;margin-bottom:6px}
-.cd-file-row:last-child{margin-bottom:0}
-.cd-file-name{font-size:12px;font-weight:600;color:#333;margin-bottom:2px}
-.cd-file-meta{font-size:10.5px;color:#aaa}
-.cd-file-row.link{background:#f0f4ff;border-color:#c5d5f5}
-.cd-file-row.link .cd-file-name{color:#1a3a8a}
-.cd-file-row.link .cd-file-meta{color:#7a8ab8}
-.btn-file-dl{height:30px;padding:0 12px;background:#1a3a5c;color:#fff;border-radius:5px;font-size:11px;font-weight:700;border:none;cursor:pointer;white-space:nowrap}
-.btn-file-link{height:30px;padding:0 12px;background:#3b5bdb;color:#fff;border-radius:5px;font-size:11px;font-weight:700;text-decoration:none;display:flex;align-items:center}
-
-/* 신청 버튼 영역 */
-.cd-box-btn{padding:14px 16px 16px}
-.btn-apply{width:100%;height:46px;border-radius:6px;background:#c0392b;color:#fff;font-size:15px;font-weight:800;cursor:pointer;transition:background .15s;border:none;margin-bottom:8px}
-.btn-apply:hover:not(:disabled){background:#a93226}
-.btn-apply.free-color{background:#3b5bdb}
-.btn-apply.free-color:hover:not(:disabled){background:#2f4abf}
-.btn-apply:disabled{background:#ccc;cursor:not-allowed}
-.btn-go-learn{width:100%;height:46px;border-radius:6px;background:#27ae60;color:#fff;font-size:15px;font-weight:800;cursor:pointer;border:none;margin-bottom:8px;text-decoration:none;display:flex;align-items:center;justify-content:center}
-.btn-go-learn:hover{background:#219a52}
-
-/* 상태 메시지 박스 */
-.state-box{margin:0 16px 14px;padding:10px 12px;border-radius:6px;font-size:12px;line-height:1.6;display:flex;gap:8px;align-items:flex-start}
-.state-box a{font-weight:700;text-decoration:underline}
-.state-box.info{background:#e8f0ff;color:#1a3a8a;border:1px solid #c5d5f5}
-.state-box.info a{color:#1a3a8a}
-.state-box.warn{background:#fff8e1;color:#7a5800;border:1px solid #ffe082}
-.state-box.warn a{color:#7a5800}
-.state-box.error{background:#fdecea;color:#922b21;border:1px solid #f5c6c2}
-.state-box.success{background:#e8f5e9;color:#1a6b2e;border:1px solid #c3e6cb}
-.state-icon{font-size:14px;flex-shrink:0;margin-top:1px}
-
-/* 로그인 필요 안내 */
-.cd-login-notice{margin:0 16px 6px;padding:7px 12px;background:#fff8e1;border-bottom:1px solid #ffe082;font-size:11px;font-weight:700;color:#7a5800;border-radius:6px;display:flex;align-items:center;gap:6px}
-
-/* ─────────────────────────────────────────────
-   모달 오버레이 (무료 신청 / 유료 결제 공통)
-───────────────────────────────────────────── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
-.modal-overlay.open{opacity:1;pointer-events:auto}
-.modal-sheet{width:100%;max-width:540px;background:#fff;border-radius:16px 16px 0 0;padding:0 0 env(safe-area-inset-bottom);transform:translateY(100%);transition:transform .3s ease;max-height:90vh;overflow-y:auto}
-.modal-overlay.open .modal-sheet{transform:translateY(0)}
-
-/* 모달 헤더 */
-.modal-head{padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0;padding-bottom:14px}
-.modal-title{font-size:16px;font-weight:800;color:#1a1a1a}
-.modal-close{width:32px;height:32px;border:none;background:none;font-size:22px;color:#888;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .15s}
-.modal-close:hover{background:#f0f0f0}
-.modal-body{padding:20px 24px}
-
-/* ── 스텝 인디케이터 ── */
-.pay-steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
-.pay-step{flex:1;text-align:center;position:relative}
-.pay-step-circle{width:28px;height:28px;border-radius:50%;background:#e0e0e0;color:#999;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 5px;position:relative;z-index:1}
-.pay-step.done .pay-step-circle{background:#27ae60;color:#fff}
-.pay-step.active .pay-step-circle{background:#c0392b;color:#fff;box-shadow:0 0 0 4px rgba(192,57,43,.15)}
-.pay-step.active.free-step .pay-step-circle{background:#3b5bdb;box-shadow:0 0 0 4px rgba(59,91,219,.15)}
-.pay-step-label{font-size:10px;color:#aaa;font-weight:600}
-.pay-step.active .pay-step-label{color:#c0392b;font-weight:700}
-.pay-step.active.free-step .pay-step-label{color:#3b5bdb}
-.pay-step.done .pay-step-label{color:#27ae60}
-.pay-step-line{position:absolute;top:14px;left:calc(50% + 14px);right:calc(-50% + 14px);height:2px;background:#e0e0e0;z-index:0}
-.pay-step.done .pay-step-line{background:#27ae60}
-
-/* ── 패널 ── */
-.step-panel{display:none}
-.step-panel.active{display:block}
-
-/* ── 주문 상품 확인 ── */
-.order-product{display:flex;gap:14px;align-items:center;padding:14px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:12px}
-.order-thumb{width:80px;height:45px;border-radius:4px;flex-shrink:0;background:linear-gradient(135deg,#1a1a2e,#0f2027);overflow:hidden}
-.order-thumb img{width:100%;height:100%;object-fit:cover}
-.order-info-title{font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:3px;line-height:1.4}
-.order-info-meta{font-size:11.5px;color:#888}
-.order-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;margin-bottom:6px;font-size:13px}
-.order-row .lbl{color:#666}
-.order-row .val{font-weight:700;color:#1a1a1a}
-.order-row.total{background:#fff5f5;border-color:#f5c6c2}
-.order-row.total .val{color:#c0392b;font-size:15px}
-.order-row.total-free{background:#eff4ff;border-color:#c5d5f5}
-.order-row.total-free .val{color:#3b5bdb;font-size:15px}
-
-/* ── 결제 수단 ── */
-.pay-method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-.pay-method-item{border:2px solid #e0e0e0;border-radius:6px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .15s;background:#fff}
-.pay-method-item:hover{border-color:#c0392b}
-.pay-method-item.selected{border-color:#c0392b;background:#fff5f5}
-.pay-method-icon{font-size:20px;margin-bottom:4px}
-.pay-method-label{font-size:11.5px;font-weight:600;color:#333}
-.pay-method-note{font-size:10px;color:#999;margin-top:2px}
-.pg-notice{padding:10px 14px;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;font-size:11.5px;color:#7a5800;line-height:1.6;margin-bottom:14px}
-
-/* ── 정보 입력 ── */
-.pay-field{margin-bottom:10px}
-.pay-field label{display:block;font-size:12px;font-weight:700;color:#555;margin-bottom:3px}
-.pay-field input,.pay-field select{width:100%;height:36px;border:1px solid #ddd;border-radius:5px;padding:0 10px;font-size:13px;font-family:inherit;color:#333;outline:none;transition:border-color .15s;background:#fff;box-sizing:border-box}
-.pay-field input:focus,.pay-field select:focus{border-color:#c0392b}
-.pay-field-row{display:flex;gap:8px}
-.pay-field-row .pay-field{flex:1;min-width:0}
-.pay-card-section{font-size:12px;font-weight:700;color:#1a3a5c;margin-bottom:10px}
-.pay-card-section span{font-weight:400;color:#aaa;font-size:11px}
-.pay-autofill-note{font-size:11.5px;color:#aaa;margin-bottom:12px;padding:6px 10px;background:#f9f9f9;border-radius:4px}
-
-/* ── 약관 동의 ── */
-.agree-all{padding:10px 14px;background:#f5f5f5;border-radius:6px;margin-bottom:8px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;cursor:pointer}
-.agree-item{padding:6px 14px;display:flex;align-items:center;gap:8px;font-size:12px;color:#555;cursor:pointer}
-.agree-item a{color:#c0392b;text-decoration:underline;margin-left:4px}
-input[type=checkbox]{accent-color:#c0392b;width:14px;height:14px;cursor:pointer;flex-shrink:0}
-.final-amount-row{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#fff5f5;border:1px solid #f5c6c2;border-radius:6px;margin-bottom:14px}
-.final-amount-row .lbl{font-size:13px;font-weight:700;color:#555}
-.final-amount-row .val{font-size:18px;font-weight:900;color:#c0392b}
-
-/* ── 완료 화면 ── */
-.pay-result{text-align:center;padding:24px 0 8px}
-.pay-result-icon{font-size:48px;margin-bottom:14px}
-.pay-result-title{font-size:18px;font-weight:900;color:#1a1a1a;margin-bottom:8px}
-.pay-result-desc{font-size:13px;color:#888;line-height:1.7;margin-bottom:16px}
-.pay-result-detail{background:#f9f9f9;border:1px solid #eee;border-radius:6px;padding:14px 16px;text-align:left;margin-bottom:16px}
-.pay-result-row{display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;border-bottom:1px solid #f0f0f0}
-.pay-result-row:last-child{border-bottom:none}
-.pay-result-row .rl{color:#888}
-.pay-result-row .rv{font-weight:700;color:#1a1a1a}
-.btn-kakao{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:44px;border-radius:6px;background:#fee500;color:#3c1e1e;font-size:13px;font-weight:800;text-decoration:none;margin-bottom:8px;border:none;cursor:pointer}
-.btn-vimeo{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:44px;border-radius:6px;background:#1ab7ea;color:#fff;font-size:13px;font-weight:800;text-decoration:none;margin-bottom:8px;border:none;cursor:pointer}
-.pay-link-note{font-size:11px;color:#aaa;text-align:center;margin-bottom:16px}
-
-/* ── 결제 에러 상태 ── */
-.pay-error-box{padding:14px;background:#fdecea;border:1px solid #f5c6c2;border-radius:6px;margin-bottom:14px;font-size:13px;color:#922b21;text-align:center;display:none}
-
-/* ── 내비 버튼 ── */
-.pay-nav{display:flex;gap:10px;margin-top:16px}
-.pay-nav-btn{flex:1;height:42px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
-.pay-nav-btn.prev{background:#f0f0f0;color:#555}
-.pay-nav-btn.prev:hover{background:#e0e0e0}
-.pay-nav-btn.next{background:#c0392b;color:#fff}
-.pay-nav-btn.next:hover{background:#a93226}
-.pay-nav-btn.next:disabled{background:#ccc;cursor:not-allowed}
-.pay-nav-btn.free-btn{background:#3b5bdb;color:#fff}
-.pay-nav-btn.free-btn:hover{background:#2f4abf}
-.pay-nav-btn.free-btn:disabled{background:#ccc;cursor:not-allowed}
-.pay-nav-btn.green-btn{background:#27ae60;color:#fff}
-.pay-nav-btn.green-btn:hover{background:#219a52}
-
-/* ── Loading 스피너 ── */
-.pay-loading{text-align:center;padding:40px 0;display:none}
-.pay-loading.show{display:block}
-.spinner{width:36px;height:36px;border:3px solid #f0f0f0;border-top-color:#c0392b;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── 반응형 ── */
-@media(max-width:960px){
-  .cd-wrap{flex-direction:column}
-  .cd-right{width:100%;position:static}
-}
-@media(max-width:600px){
-  .cd-wrap,.cd-terms{padding-left:16px;padding-right:16px}
-  .cd-breadcrumb{padding-left:16px;padding-right:16px}
-}
-</style>
-
 <?php /* ──────────────── 브레드크럼 ──────────────── */ ?>
 <div class="cd-breadcrumb">
   <a href="/">홈</a><span>›</span>
@@ -454,34 +203,43 @@ input[type=checkbox]{accent-color:#c0392b;width:14px;height:14px;cursor:pointer;
       <?php if (!empty($files)): ?>
       <div class="cd-files-wrap">
         <div class="cd-files-label">📎 강의 자료</div>
+        <?php
+        // 프리미엄: 수강 등록 후 열람 가능 / 무료: 로그인 후 열람 가능
+        $canAccessFiles = $isFree ? ($member !== null) : $isEnrolled;
+        $fileBlockMsg   = !$member ? '로그인 후 이용 가능' : ($isPremium && !$isEnrolled ? '구매 후 열람 가능' : '');
+        ?>
         <?php foreach ($files as $f): ?>
         <?php if ($f['file_type'] === 'file'): ?>
         <div class="cd-file-row">
           <div>
             <div class="cd-file-name"><?= htmlspecialchars($f['title']) ?></div>
             <div class="cd-file-meta">
-              <?= $f['file_size'] ? number_format($f['file_size'] / 1048576, 1) . 'MB · ' : '' ?>
-              <?= $member ? '' : '로그인 후 다운로드 가능' ?>
+              <?= $f['file_size'] ? number_format($f['file_size'] / 1048576, 1) . 'MB' : '' ?>
+              <?= $fileBlockMsg ? ' · ' . $fileBlockMsg : '' ?>
             </div>
           </div>
-          <?php if ($member): ?>
+          <?php if ($canAccessFiles): ?>
           <a href="/uploads/materials/<?= htmlspecialchars($f['file_path']) ?>"
              class="btn-file-dl" download>다운로드</a>
-          <?php else: ?>
+          <?php elseif (!$member): ?>
           <button class="btn-file-dl" onclick="requireLogin()">다운로드</button>
+          <?php else: ?>
+          <button class="btn-file-dl" onclick="openPayModal()" style="background:#8e44ad">구매 후 이용</button>
           <?php endif; ?>
         </div>
         <?php else: ?>
         <div class="cd-file-row link">
           <div>
             <div class="cd-file-name"><?= htmlspecialchars($f['title']) ?></div>
-            <div class="cd-file-meta">외부 링크 · <?= $member ? '' : '로그인 후 이동 가능' ?></div>
+            <div class="cd-file-meta">외부 링크<?= $fileBlockMsg ? ' · ' . $fileBlockMsg : '' ?></div>
           </div>
-          <?php if ($member): ?>
+          <?php if ($canAccessFiles): ?>
           <a href="<?= htmlspecialchars($f['external_url']) ?>" target="_blank" rel="noopener"
              class="btn-file-link">열기 →</a>
-          <?php else: ?>
+          <?php elseif (!$member): ?>
           <button class="btn-file-dl" onclick="requireLogin()" style="background:#3b5bdb">열기 →</button>
+          <?php else: ?>
+          <button class="btn-file-dl" onclick="openPayModal()" style="background:#8e44ad">구매 후 이용</button>
           <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -510,7 +268,7 @@ input[type=checkbox]{accent-color:#c0392b;width:14px;height:14px;cursor:pointer;
       </div>
       <div class="state-box success" style="margin-top:-8px">
         <span class="state-icon">✅</span>
-        <div>이미 신청하셨습니다.<br>강의 당일 카카오톡으로 링크가 전송됩니다.</div>
+        <div>이미 신청하셨습니다.</div>
       </div>
       <?php if (!empty($enroll['kakao_url'])): ?>
       <div style="padding:0 16px 14px">
@@ -658,9 +416,9 @@ input[type=checkbox]{accent-color:#c0392b;width:14px;height:14px;cursor:pointer;
           ⚠ 무료강의를 신청하면 아래 항목에 동의하는 것으로 간주합니다.
         </div>
         <label class="agree-all"><input type="checkbox" id="f-chk-all" onchange="toggleFreeAll(this)"> 아래 항목에 모두 동의합니다</label>
-        <label class="agree-item"><input type="checkbox" class="f-chk-item"> [필수] 개인정보 수집 및 이용 동의<a href="/supports/privacy" target="_blank">보기</a></label>
-        <label class="agree-item"><input type="checkbox" class="f-chk-item"> [필수] 마케팅 메시지 수신 동의 (카카오·문자·이메일)<a href="/supports/terms" target="_blank">보기</a></label>
-        <label class="agree-item"><input type="checkbox" class="f-chk-item"> [필수] 면책조항 확인<a href="#" onclick="event.preventDefault();alert('면책조항: 강의 결과는 개인의 노력에 따라 달라집니다.')">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="f-chk-item"> [필수] 개인정보 수집 및 이용 동의<a href="#" onclick="event.preventDefault();openTermsPopup('/supports/privacy','개인정보 수집 및 이용 동의')">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="f-chk-item"> [필수] 마케팅 메시지 수신 동의 (카카오·문자·이메일)<a href="#" onclick="event.preventDefault();openTermsPopup('/supports/policy/marketing','마케팅 메시지 수신 동의')">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="f-chk-item"> [필수] 면책조항 확인<a href="#" onclick="event.preventDefault();openTermsPopup('/supports/policy/disclaimer','면책조항')">보기</a></label>
         <div id="f-agree-error" class="state-box error" style="display:none;margin:10px 0 0">
           <span class="state-icon">⚠</span><div>필수 항목에 모두 동의해 주세요.</div>
         </div>
@@ -860,10 +618,10 @@ input[type=checkbox]{accent-color:#c0392b;width:14px;height:14px;cursor:pointer;
           <span class="val"><?= number_format($class['price']) ?>원</span>
         </div>
         <label class="agree-all"><input type="checkbox" id="p-chk-all" onchange="togglePayAll(this)"> 아래 약관에 모두 동의합니다</label>
-        <label class="agree-item"><input type="checkbox" class="p-chk-item"> [필수] 구매조건 확인 및 결제 진행 동의<a href="/supports/terms" target="_blank">보기</a></label>
-        <label class="agree-item"><input type="checkbox" class="p-chk-item"> [필수] 개인정보 제3자 제공 동의 (PG사)<a href="/supports/privacy" target="_blank">보기</a></label>
-        <label class="agree-item"><input type="checkbox" class="p-chk-item"> [필수] 전자금융거래 이용약관<a href="/supports/terms" target="_blank">보기</a></label>
-        <label class="agree-item"><input type="checkbox" class="p-chk-item optional"> [선택] 마케팅 정보 수신 동의<a href="/supports/privacy" target="_blank">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="p-chk-item"> [필수] 구매조건 확인 및 결제 진행 동의<a href="#" onclick="event.preventDefault();openTermsPopup('/supports/policy/purchase','구매조건 확인 및 결제 진행 동의')">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="p-chk-item"> [필수] 개인정보 제3자 제공 동의 (PG사)<a href="#" onclick="event.preventDefault();openTermsPopup('/supports/policy/privacy_third','개인정보 제3자 제공 동의 (PG사)')">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="p-chk-item"> [필수] 전자금융거래 이용약관<a href="#" onclick="event.preventDefault();openTermsPopup('/supports/policy/ecommerce','전자금융거래 이용약관')">보기</a></label>
+        <label class="agree-item"><input type="checkbox" class="p-chk-item optional"> [선택] 마케팅 정보 수신 동의<a href="#" onclick="event.preventDefault();openTermsPopup('/supports/policy/marketing','마케팅 정보 수신 동의')">보기</a></label>
         <div id="p-agree-error" class="state-box error" style="display:none;margin:10px 0 0">
           <span class="state-icon">⚠</span><div>필수 약관에 모두 동의해 주세요.</div>
         </div>
@@ -906,6 +664,17 @@ input[type=checkbox]{accent-color:#c0392b;width:14px;height:14px;cursor:pointer;
   </div><!-- /modal-sheet -->
 </div><!-- /payModal -->
 <?php endif; ?>
+
+<?php /* ── 약관 팝업 ── */ ?>
+<div class="terms-popup-overlay" id="termsPopup">
+  <div class="terms-popup-sheet">
+    <div class="terms-popup-head">
+      <div class="terms-popup-title" id="termsPopupTitle"></div>
+      <button class="terms-popup-close" onclick="closeTermsPopup()">×</button>
+    </div>
+    <div class="terms-popup-body" id="termsPopupBody"></div>
+  </div>
+</div>
 
 <script>
 /* ───────────────────────────────────────────────────
@@ -1162,7 +931,9 @@ function submitPayment() {
       if (data.kakao_url) {
         links += '<a href="' + escHtml(data.kakao_url) + '" onclick="logOpenchat()" target="_blank" class="btn-kakao">💬 카카오 오픈채팅 입장</a>';
       }
-      if (data.vimeo_url) {
+      if (data.learn_url) {
+        links += '<a href="' + escHtml(data.learn_url) + '" class="btn-vimeo">▶ 강의 수강하기</a>';
+      } else if (data.vimeo_url) {
         links += '<a href="' + escHtml(data.vimeo_url) + '" target="_blank" class="btn-vimeo">▶ 비메오 영상 보기</a>';
       }
       document.getElementById('payResultLinks').innerHTML = links;
@@ -1179,6 +950,25 @@ function submitPayment() {
   });
 }
 <?php endif; ?>
+
+/* ── 약관 팝업 ── */
+function openTermsPopup(url, title) {
+  const body = document.getElementById('termsPopupBody');
+  document.getElementById('termsPopupTitle').textContent = title;
+  body.innerHTML = '<div class="terms-popup-loading">불러오는 중...</div>';
+  document.getElementById('termsPopup').classList.add('open');
+
+  fetch(url + (url.includes('?') ? '&' : '?') + 'ajax=1')
+    .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+    .then(html => { body.innerHTML = html; body.scrollTop = 0; })
+    .catch(() => { body.innerHTML = '<div class="terms-popup-error">내용을 불러오지 못했습니다.</div>'; });
+}
+function closeTermsPopup() {
+  document.getElementById('termsPopup').classList.remove('open');
+}
+document.getElementById('termsPopup').addEventListener('click', function(e) {
+  if (e.target === this) closeTermsPopup();
+});
 
 /* ── XSS 방지 헬퍼 ── */
 function escHtml(str) {

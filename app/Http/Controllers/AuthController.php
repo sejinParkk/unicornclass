@@ -113,12 +113,13 @@ class AuthController
         }
 
         $data = [
-            'mb_id'        => trim($_POST['mb_id'] ?? ''),
-            'mb_password'  => $_POST['mb_password'] ?? '',
-            'mb_password2' => $_POST['mb_password2'] ?? '',
-            'mb_name'      => trim($_POST['mb_name'] ?? ''),
-            'mb_email'     => trim($_POST['mb_email'] ?? ''),
-            'agree_terms'  => ($_POST['agree_terms'] ?? '0') === '1',
+            'mb_id'           => trim($_POST['mb_id'] ?? ''),
+            'mb_password'     => $_POST['mb_password'] ?? '',
+            'mb_password2'    => $_POST['mb_password2'] ?? '',
+            'mb_name'         => trim($_POST['mb_name'] ?? ''),
+            'mb_email'        => trim($_POST['mb_email'] ?? ''),
+            'agree_terms'     => ($_POST['agree_terms']    ?? '0') === '1',
+            'agree_privacy'   => ($_POST['agree_privacy']  ?? '0') === '1',
             'agree_marketing' => ($_POST['agree_marketing'] ?? '0') === '1',
         ];
 
@@ -264,7 +265,11 @@ class AuthController
         }
 
         if (!($data['agree_terms'] ?? false)) {
-            $errors['agree_terms'] = '필수 약관에 동의해주세요.';
+            $errors['agree_terms'] = '이용약관에 동의해주세요.';
+        }
+
+        if (!($data['agree_privacy'] ?? false)) {
+            $errors['agree_privacy'] = '개인정보 처리방침에 동의해주세요.';
         }
 
         return $errors;

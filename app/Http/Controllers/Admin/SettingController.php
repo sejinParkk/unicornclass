@@ -47,6 +47,7 @@ class SettingController
             'site_name', 'company_name', 'ceo_name', 'business_no',
             'phone', 'email', 'address', 'footer_copy',
             'sns_instagram', 'sns_youtube', 'sns_facebook', 'sns_blog',
+            'kakao_channel_url',
         ];
 
         $data = [];
@@ -76,6 +77,42 @@ class SettingController
                 $this->redirectWithError('/admin/settings', $e->getMessage());
                 return;
             }
+        }
+
+        // 히어로 배너 동영상 업로드
+        if (!empty($_FILES['hero_video']['tmp_name'])) {
+            try {
+                $old = $this->repo->get('hero_video');
+                $data['hero_video'] = FileUploader::uploadSiteVideo($_FILES['hero_video']);
+                FileUploader::deleteSiteVideo($old);
+            } catch (\RuntimeException $e) {
+                $this->redirectWithError('/admin/settings', $e->getMessage());
+                return;
+            }
+        }
+
+        // 히어로 배너 동영상 삭제 요청
+        if (!empty($_POST['delete_hero_video'])) {
+            FileUploader::deleteSiteVideo($this->repo->get('hero_video'));
+            $data['hero_video'] = null;
+        }
+
+        // 히어로 포스터 이미지 업로드
+        if (!empty($_FILES['hero_poster']['tmp_name'])) {
+            try {
+                $old = $this->repo->get('hero_poster');
+                $data['hero_poster'] = FileUploader::uploadSiteImage($_FILES['hero_poster']);
+                FileUploader::deleteSiteImage($old);
+            } catch (\RuntimeException $e) {
+                $this->redirectWithError('/admin/settings', $e->getMessage());
+                return;
+            }
+        }
+
+        // 히어로 포스터 이미지 삭제 요청
+        if (!empty($_POST['delete_hero_poster'])) {
+            FileUploader::deleteSiteImage($this->repo->get('hero_poster'));
+            $data['hero_poster'] = null;
         }
 
         $this->repo->saveMany($data);

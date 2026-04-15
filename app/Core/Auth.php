@@ -87,6 +87,7 @@ class Auth
             'mb_id'       => $member['mb_id'],
             'mb_name'     => $member['mb_name'],
             'mb_email'    => $member['mb_email'] ?? '',
+            'mb_phone'    => $member['mb_phone'] ?? '',
             'signup_type' => $member['signup_type'] ?? 'email',
             'is_active'   => (int) ($member['is_active'] ?? 1),
         ];

@@ -390,8 +390,8 @@ class ClassController
         $data['kakao_url']     = trim($post['kakao_url'] ?? '') ?: null;
         $data['vimeo_url']     = trim($post['vimeo_url'] ?? '') ?: null;
         $data['duration_days'] = max(1, (int) ($post['duration_days'] ?? 180));
-        $data['price']         = max(0, (int) ($post['price'] ?? 0));
-        $data['price_origin']  = max(0, (int) ($post['price_origin'] ?? 0));
+        $data['price']         = max(0, (int) str_replace(',', '', ($post['price'] ?? '0')));
+        $data['price_origin']  = max(0, (int) str_replace(',', '', ($post['price_origin'] ?? '0')));
         $data['badge_hot']     = isset($post['badge_hot']) ? 1 : 0;
         $data['badge_new']     = isset($post['badge_new']) ? 1 : 0;
         $data['is_active']     = isset($post['is_active']) ? 1 : 0;

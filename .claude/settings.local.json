@@ -36,7 +36,26 @@
       "Bash(find . -type f -name *.php -path */Controllers/* ! -path */Admin/* ! -path */Api/*)",
       "Bash(xargs ls:*)",
       "Bash(python3:*)",
-      "Bash(node -e ':*)"
+      "Bash(node -e ':*)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(php -l app/Http/Controllers/MypageController.php)",
+      "Bash(php -l app/Repositories/MypageRepository.php)",
+      "Bash(php -l resources/views/pages/mypage/my-class.php)",
+      "Bash(php -l resources/views/pages/mypage/wishlist.php)",
+      "Bash(php -l resources/views/pages/mypage/orders.php)",
+      "Bash(php -l resources/views/pages/mypage/order-show.php)",
+      "Bash(php -l resources/views/pages/mypage/qna-list.php)",
+      "Bash(php -l resources/views/pages/mypage/qna-show.php)",
+      "Bash(php -l resources/views/pages/mypage/qna-write.php)",
+      "Bash(php -l resources/views/pages/mypage/reviews.php)",
+      "Bash(php -l resources/views/pages/mypage/review-form.php)",
+      "Bash(php -l resources/views/pages/mypage/profile.php)",
+      "Bash(php -l resources/views/pages/mypage/withdraw.php)",
+      "Bash(php -l app/Repositories/ClassRepository.php)",
+      "Bash(php -l app/Http/Controllers/ClassController.php)",
+      "Bash(php -l resources/views/pages/classes/learn.php)",
+      "Bash(cat)",
+      "Bash(bash /tmp/find_duplicates.sh)"
     ]
   }
 }

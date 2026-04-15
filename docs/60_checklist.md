@@ -117,8 +117,8 @@
 ### 무료강의 신청
 - [ ] 3단계 플로우 (신청확인→동의→완료)
 - [ ] `lc_enroll` INSERT (expire_at=NULL)
-- [ ] Google Sheets API 연동
-- [ ] API 실패 시 로그만 기록, 신청 유지
+- [ ] Google Sheets API 연동 (.env 키 설정 후 활성화)
+- [x] API 실패 시 로그만 기록, 신청 유지
 
 ### Toss Payments 연동
 - [ ] `TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY` 환경변수 설정

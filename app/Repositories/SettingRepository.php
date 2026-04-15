@@ -37,8 +37,10 @@ class SettingRepository
     {
         foreach ($data as $key => $value) {
             DB::execute(
-                'UPDATE lc_site_config SET config_value = ? WHERE config_key = ?',
-                [$value, $key]
+                'INSERT INTO lc_site_config (config_key, config_value)
+                 VALUES (?, ?)
+                 ON DUPLICATE KEY UPDATE config_value = VALUES(config_value)',
+                [$key, $value]
             );
         }
     }
@@ -56,12 +58,14 @@ class SettingRepository
         );
     }
 
-    /** 약관 내용 저장 */
+    /** 약관 내용 저장 (upsert) */
     public function saveTerm(string $type, string $title, string $content): void
     {
         DB::execute(
-            'UPDATE lc_terms SET title = ?, content = ? WHERE type = ?',
-            [$title, $content, $type]
+            'INSERT INTO lc_terms (type, title, content)
+             VALUES (?, ?, ?)
+             ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content)',
+            [$type, $title, $content]
         );
     }
 }

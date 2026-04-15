@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Core\Auth;
 use App\Core\Csrf;
 use App\Repositories\ClassRepository;
+use App\Support\GoogleSheetsService;
 
 // AJAX JSON 전용 CSRF 검증 헬퍼 (실패 시 JSON 반환 후 exit)
 function verifyCsrfJson(): void
@@ -70,6 +71,15 @@ class ClassController
 
         $member    = Auth::isMember() ? Auth::member() : null;
         $memberIdx = $member ? (int) $member['member_idx'] : 0;
+
+        // 연락처가 세션에 없으면 DB에서 보완
+        if ($member && empty($member['mb_phone'])) {
+            $row = \App\Core\DB::selectOne(
+                'SELECT mb_phone FROM lc_member WHERE member_idx = ? LIMIT 1',
+                [$memberIdx]
+            );
+            $member['mb_phone'] = $row['mb_phone'] ?? '';
+        }
 
         // 수강 여부
         $enroll    = $memberIdx ? $this->repo->findEnroll($memberIdx, (int) $class_idx) : null;
@@ -150,6 +160,22 @@ class ClassController
 
         $this->repo->createFreeEnroll($memberIdx, $classIdx, $class['kakao_url'], $class['vimeo_url']);
 
+        // Google Sheets 기록 (실패해도 수강 신청은 유지)
+        try {
+            $sheets = new GoogleSheetsService();
+            $sheets->appendEnrollRow([
+                'member_idx'  => $memberIdx,
+                'name'        => $member['name']  ?? '',
+                'email'       => $member['email'] ?? '',
+                'phone'       => $member['phone'] ?? '',
+                'class_idx'   => $classIdx,
+                'class_title' => $class['title'],
+                'enrolled_at' => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable $e) {
+            error_log('[GoogleSheets] 수강 신청 기록 실패: ' . $e->getMessage());
+        }
+
         echo json_encode([
             'success'   => true,
             'kakao_url' => $class['kakao_url'],
@@ -216,8 +242,8 @@ class ClassController
         $durationDays = (int) ($class['duration_days'] ?? 180);
         $expireAt     = date('Y-m-d H:i:s', strtotime("+{$durationDays} days"));
 
-        // 수강 등록
-        $this->repo->createPremiumEnroll($memberIdx, $classIdx, $orderIdx, $class['kakao_url'], $class['vimeo_url'], $expireAt);
+        // 수강 등록 (premium은 vimeo_url 대신 learn_url 사용)
+        $this->repo->createPremiumEnroll($memberIdx, $classIdx, $orderIdx, $class['kakao_url'], null, $expireAt);
 
         echo json_encode([
             'success'   => true,
@@ -226,7 +252,7 @@ class ClassController
             'paid_at'   => date('Y.m.d H:i:s'),
             'method'    => $_POST['pay_method'] ?? 'card',
             'kakao_url' => $class['kakao_url'],
-            'vimeo_url' => $class['vimeo_url'],
+            'learn_url' => '/classes/' . $classIdx . '/learn',
             'class_idx' => $classIdx,
         ]);
         exit;
@@ -268,11 +294,7 @@ class ClassController
             exit;
         }
 
-        $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
-        if (!Csrf::verify($token, false)) {
-            echo json_encode(['success' => false, 'error' => '보안 토큰이 유효하지 않습니다.']);
-            exit;
-        }
+        verifyCsrfJson();
 
         $memberIdx = (int) Auth::member()['member_idx'];
         $classIdx  = (int) $class_idx;
@@ -307,17 +329,16 @@ class ClassController
     // =========================================================================
     public function learn(string $class_idx): void
     {
-        $class = $this->repo->findPublicById((int) $class_idx);
-
-        if (!$class) {
-            http_response_code(404);
-            exit('강의를 찾을 수 없습니다.');
-        }
-
-        // 수강 권한 확인
+        // 수강 권한 확인 (비회원 먼저 체크)
         if (!Auth::isMember()) {
             header('Location: /login?returnUrl=' . urlencode("/classes/{$class_idx}/learn"));
             exit;
+        }
+
+        $class = $this->repo->findPublicById((int) $class_idx);
+        if (!$class) {
+            http_response_code(404);
+            exit('강의를 찾을 수 없습니다.');
         }
 
         $memberIdx = (int) Auth::member()['member_idx'];
@@ -328,9 +349,84 @@ class ClassController
             exit;
         }
 
-        $pageTitle = htmlspecialchars($class['title']) . ' - 강의 수강';
+        // 현재 챕터 결정 (URL 파라미터 or 첫 챕터)
+        $chapters       = $class['chapters'] ?? [];
+        $currentChapter = null;
+        $chapterIdxParam = (int) ($_GET['chapter'] ?? 0);
+
+        if ($chapterIdxParam > 0) {
+            foreach ($chapters as $ch) {
+                if ((int) $ch['chapter_idx'] === $chapterIdxParam) {
+                    $currentChapter = $ch;
+                    break;
+                }
+            }
+        }
+        if (!$currentChapter && !empty($chapters)) {
+            $currentChapter = $chapters[0];
+        }
+
+        // 챕터별 완료 여부 맵 { chapter_idx => true }
+        $progressMap = $this->repo->getProgressMap($memberIdx, (int) $class_idx);
+
+        // 결제 정보 (프리미엄 수강이면 order_idx 연결)
+        $order = null;
+        if ($enroll['order_idx']) {
+            $order = \App\Core\DB::selectOne(
+                'SELECT order_idx, amount, paid_at, toss_order_id
+                 FROM lc_order WHERE order_idx = ?',
+                [(int) $enroll['order_idx']]
+            );
+        }
+
+        // 수강 만료 D-day (프리미엄 + expire_at 있을 때)
+        $expireDays = null;
+        if ($enroll['expire_at']) {
+            $diff = (new \DateTimeImmutable($enroll['expire_at']))->diff(new \DateTimeImmutable());
+            $expireDays = $diff->invert ? $diff->days : -$diff->days; // 양수=만료까지 남은 일, 음수=이미 만료
+        }
+
+        $pageTitle = $class['title'] . ' — 강의 수강';
         require VIEW_PATH . '/layout/header.php';
         require VIEW_PATH . '/pages/classes/learn.php';
         require VIEW_PATH . '/layout/footer.php';
+    }
+
+    // =========================================================================
+    // POST /api/classes/{class_idx}/progress  (AJAX JSON — 챕터 완료 토글)
+    // =========================================================================
+    public function markProgress(string $class_idx): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!Auth::isMember()) {
+            echo json_encode(['success' => false, 'error' => 'login_required']);
+            exit;
+        }
+
+        verifyCsrfJson();
+
+        $memberIdx  = (int) Auth::member()['member_idx'];
+        $classIdx   = (int) $class_idx;
+        $chapterIdx = (int) ($_POST['chapter_idx'] ?? 0);
+
+        if ($chapterIdx <= 0) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'invalid_chapter']);
+            exit;
+        }
+
+        // 수강 권한 재확인
+        $enroll = $this->repo->findEnroll($memberIdx, $classIdx);
+        if (!$enroll) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'no_enroll']);
+            exit;
+        }
+
+        $isDone = $this->repo->toggleProgress($memberIdx, $classIdx, $chapterIdx);
+
+        echo json_encode(['success' => true, 'is_complete' => $isDone]);
+        exit;
     }
 }

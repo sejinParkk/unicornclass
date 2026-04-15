@@ -6,8 +6,23 @@
 
 | 페이지명 | URL | 메서드 | 설명 |
 |----------|-----|--------|------|
-| 메인 | `/` | GET | 히어로 배너, 인기강의, 강사 소개 |
+| 메인 | `/` | GET | 히어로 배너, 무료/프리미엄 강의 슬라이더, 이벤트 배너, 강사 슬라이더, 수강생 후기, 팝업 |
 | 회사소개 | `/about` | GET | 회사 비전, 통계, 강사 카테고리 |
+
+### 메인 페이지 관련 파일
+| 역할 | 경로 |
+|------|------|
+| 컨트롤러 | `app/Http/Controllers/HomeController.php` |
+| 레포지토리 | `app/Repositories/HomeRepository.php` |
+| 뷰 | `resources/views/pages/home.php` |
+| 전용 CSS | `public/assets/css/home.css` |
+| 전용 JS | `public/assets/js/home.js` |
+
+### 메인 페이지 파일 서빙 라우트 (추가)
+| URL | 저장 경로 | 설명 |
+|-----|-----------|------|
+| `GET /uploads/banner/{filename}` | `storage/uploads/banner/` | 이벤트 배너 이미지 |
+| `GET /uploads/popup/{filename}` | `storage/uploads/popup/` | 팝업 이미지 |
 
 ---
 
@@ -50,6 +65,21 @@
 | 페이지명 | URL | 메서드 | 설명 |
 |----------|-----|--------|------|
 | 검색 결과 | `/search?q={keyword}` | GET | 강의·강사 통합 검색 결과, 키워드 하이라이트 |
+| (빈 검색) | `/search` (q 없음 or 공백) | GET | `/classes` 리다이렉트 |
+
+### 검색 로직 요약
+- **클래스**: `lc_class.title LIKE '%q%'` ∪ 강사명 일치 강사의 전체 클래스 (UNION, 중복 제거)
+- **강사**: `lc_instructor.name LIKE '%q%'` + 클래스 결과에 등장한 instructor_idx
+- `is_active = 1` 필수, 강사명 완전일치 클래스 우선 정렬
+- 검색어 로그: `lc_search_log` (keyword, result_count, searched_at)
+- 추천 검색어: `lc_search_suggest` (결과 0건 시 표시)
+
+### 관련 파일
+| 역할 | 경로 |
+|------|------|
+| 컨트롤러 | `app/Http/Controllers/SearchController.php` |
+| 레포지토리 | `app/Repositories/SearchRepository.php` |
+| 뷰 | `resources/views/pages/search/index.php` |
 
 ---
 
@@ -82,8 +112,9 @@
 | FAQ | `/supports/faqs` | GET | FAQ 아코디언, 카테고리 필터 |
 | 공지사항 목록 | `/supports/notices` | GET | 공지사항 목록, 페이지네이션 |
 | 공지사항 상세 | `/supports/notices/{notice_idx}` | GET | 공지 상세 내용 |
-| 이용약관 | `/supports/terms` | GET | 이용약관 페이지 |
-| 개인정보처리방침 | `/supports/privacy` | GET | 개인정보처리방침 |
+| 이용약관 | `/supports/terms` | GET | 이용약관 페이지 (`?ajax=1` 지원) |
+| 개인정보처리방침 | `/supports/privacy` | GET | 개인정보처리방침 (`?ajax=1` 지원) |
+| 기타 약관 | `/supports/policy/{type}` | GET | marketing·disclaimer·purchase·ecommerce (`?ajax=1` 지원) |
 | 1:1 문의 목록 | `/supports/contact` | GET | 내 문의 목록 (로그인 필요) |
 | 1:1 문의 상세 | `/supports/contact/{qna_idx}` | GET | 문의 + 관리자 답변 |
 | 1:1 문의 작성 | `/supports/contact/write` | GET | 문의 작성 폼 |
@@ -99,8 +130,12 @@
 | 찜목록 | `/mypage/wishlist` | GET | 찜한 강의 그리드 |
 | 결제내역 | `/mypage/orders` | GET | 결제 이력, 페이지네이션 |
 | 결제내역 상세 | `/mypage/orders/{order_idx}` | GET | 주문 상세 + 환불 신청 |
-| 1:1 문의 목록 | `/mypage/qna` | GET | 내 문의 목록 |
-| 1:1 문의 상세 | `/mypage/qna/{qna_idx}` | GET | 문의 상세 |
+| 환불 신청 처리 | `/mypage/orders/{order_idx}/refund` | POST | 환불 사유 저장, paid → refund_req |
+| 1:1 문의 목록 | `/mypage/qna` | GET | 내 문의 목록 (상태 필터) |
+| 1:1 문의 작성 | `/mypage/qna/write` | GET | 문의 작성 폼 (`?edit={idx}` 수정) |
+| 1:1 문의 저장 | `/mypage/qna/write` | POST | 신규 작성 or 수정 저장 |
+| 1:1 문의 상세 | `/mypage/qna/{qna_idx}` | GET | 문의 상세 + 답변 |
+| 1:1 문의 삭제 | `/mypage/qna/{qna_idx}/delete` | POST | wait 상태만 삭제 가능 |
 | 후기 목록 | `/mypage/reviews` | GET | 작성한 후기 목록 |
 | 후기 작성·수정 | `/mypage/reviews/write` | GET | 후기 폼 |
 | 후기 저장 | `/mypage/reviews/write` | POST | 후기 저장 |
@@ -175,6 +210,18 @@
 | FAQ 삭제 | `/admin/faqs/{faq_idx}/delete` | POST | 삭제 |
 | 검색 로그 | `/admin/search-logs` | GET | 통계 |
 | 오픈채팅 통계 | `/admin/openchat-logs` | GET | 통계 |
+| 배너 목록 | `/admin/banners` | GET | 이벤트 배너 목록 |
+| 배너 등록 폼 | `/admin/banners/create` | GET | 등록 폼 |
+| 배너 등록 처리 | `/admin/banners` | POST | 이미지 업로드 + 저장 |
+| 배너 수정 폼 | `/admin/banners/{banner_idx}/edit` | GET | 수정 폼 |
+| 배너 수정 처리 | `/admin/banners/{banner_idx}` | POST | 업데이트 |
+| 배너 삭제 | `/admin/banners/{banner_idx}/delete` | POST | 삭제 + 이미지 파일 제거 |
+| 팝업 목록 | `/admin/popups` | GET | 팝업 목록 |
+| 팝업 등록 폼 | `/admin/popups/create` | GET | 등록 폼 |
+| 팝업 등록 처리 | `/admin/popups` | POST | 이미지 업로드 + 저장 |
+| 팝업 수정 폼 | `/admin/popups/{popup_idx}/edit` | GET | 수정 폼 |
+| 팝업 수정 처리 | `/admin/popups/{popup_idx}` | POST | 업데이트 |
+| 팝업 삭제 | `/admin/popups/{popup_idx}/delete` | POST | 삭제 + 이미지 파일 제거 |
 
 ### 파일 서빙 라우트
 

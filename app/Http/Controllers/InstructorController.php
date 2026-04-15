@@ -61,7 +61,6 @@ class InstructorController
     public function applyForm(): void
     {
         $csrfToken = Csrf::token();
-        $error     = $_GET['error'] ?? null;
 
         $pageTitle = '강사 지원하기 - 유니콘클래스';
         require VIEW_PATH . '/layout/header.php';

@@ -229,6 +229,155 @@ class FileUploader
     }
 
     // -------------------------------------------------------------------------
+    // 히어로 배너 동영상 (mp4)
+    // -------------------------------------------------------------------------
+
+    /**
+     * 히어로 배너용 mp4 업로드. 최대 200MB.
+     * @throws \RuntimeException
+     */
+    public static function uploadSiteVideo(array $file): ?string
+    {
+        if (empty($file['tmp_name']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            throw new \RuntimeException('파일 업로드 중 오류가 발생했습니다. (code: ' . $file['error'] . ')');
+        }
+        if ($file['size'] > 200 * 1024 * 1024) {
+            throw new \RuntimeException('파일 크기는 200MB 이하여야 합니다.');
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime  = $finfo->file($file['tmp_name']);
+
+        if ($mime !== 'video/mp4') {
+            throw new \RuntimeException('mp4 형식만 업로드할 수 있습니다.');
+        }
+
+        $filename = bin2hex(random_bytes(16)) . '.mp4';
+        $dir      = ROOT_PATH . '/storage/uploads/site/';
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        if (!move_uploaded_file($file['tmp_name'], $dir . $filename)) {
+            throw new \RuntimeException('파일 저장에 실패했습니다.');
+        }
+
+        return $filename;
+    }
+
+    public static function deleteSiteVideo(?string $filename): void
+    {
+        if (!$filename) return;
+        $filename = basename($filename);
+        $path = ROOT_PATH . '/storage/uploads/site/' . $filename;
+        if (file_exists($path)) @unlink($path);
+    }
+
+    // -------------------------------------------------------------------------
+    // 이벤트 배너 이미지
+    // -------------------------------------------------------------------------
+
+    /**
+     * 메인 이벤트 배너 이미지 업로드. jpg·png·webp 허용, 최대 5MB.
+     * @throws \RuntimeException
+     */
+    public static function uploadBannerImage(array $file): ?string
+    {
+        if (empty($file['tmp_name']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            throw new \RuntimeException('파일 업로드 중 오류가 발생했습니다. (code: ' . $file['error'] . ')');
+        }
+        if ($file['size'] > 5 * 1024 * 1024) {
+            throw new \RuntimeException('파일 크기는 5MB 이하여야 합니다.');
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime  = $finfo->file($file['tmp_name']);
+
+        if (!array_key_exists($mime, self::ALLOWED_IMAGE_MIMES)) {
+            throw new \RuntimeException('jpg, png, webp 형식만 업로드할 수 있습니다.');
+        }
+
+        $ext      = self::ALLOWED_IMAGE_MIMES[$mime];
+        $filename = bin2hex(random_bytes(16)) . '.' . $ext;
+        $dir      = ROOT_PATH . '/storage/uploads/banner/';
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        if (!move_uploaded_file($file['tmp_name'], $dir . $filename)) {
+            throw new \RuntimeException('파일 저장에 실패했습니다.');
+        }
+
+        return $filename;
+    }
+
+    public static function deleteBannerImage(?string $filename): void
+    {
+        if (!$filename) return;
+        $filename = basename($filename);
+        $path = ROOT_PATH . '/storage/uploads/banner/' . $filename;
+        if (file_exists($path)) @unlink($path);
+    }
+
+    // -------------------------------------------------------------------------
+    // 팝업 이미지
+    // -------------------------------------------------------------------------
+
+    /**
+     * 메인 팝업 이미지 업로드. jpg·png·webp 허용, 최대 5MB.
+     * @throws \RuntimeException
+     */
+    public static function uploadPopupImage(array $file): ?string
+    {
+        if (empty($file['tmp_name']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            throw new \RuntimeException('파일 업로드 중 오류가 발생했습니다. (code: ' . $file['error'] . ')');
+        }
+        if ($file['size'] > 5 * 1024 * 1024) {
+            throw new \RuntimeException('파일 크기는 5MB 이하여야 합니다.');
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime  = $finfo->file($file['tmp_name']);
+
+        if (!array_key_exists($mime, self::ALLOWED_IMAGE_MIMES)) {
+            throw new \RuntimeException('jpg, png, webp 형식만 업로드할 수 있습니다.');
+        }
+
+        $ext      = self::ALLOWED_IMAGE_MIMES[$mime];
+        $filename = bin2hex(random_bytes(16)) . '.' . $ext;
+        $dir      = ROOT_PATH . '/storage/uploads/popup/';
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        if (!move_uploaded_file($file['tmp_name'], $dir . $filename)) {
+            throw new \RuntimeException('파일 저장에 실패했습니다.');
+        }
+
+        return $filename;
+    }
+
+    public static function deletePopupImage(?string $filename): void
+    {
+        if (!$filename) return;
+        $filename = basename($filename);
+        $path = ROOT_PATH . '/storage/uploads/popup/' . $filename;
+        if (file_exists($path)) @unlink($path);
+    }
+
+    // -------------------------------------------------------------------------
     // 강사 지원 포트폴리오 파일
     // -------------------------------------------------------------------------
 

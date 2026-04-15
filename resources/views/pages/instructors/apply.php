@@ -1,71 +1,7 @@
 <?php
-// $csrfToken, $error 가 컨트롤러에서 전달됨
+// $csrfToken 가 컨트롤러에서 전달됨
 use App\Core\Csrf;
 ?>
-<style>
-#sub-banner{position:relative;background:linear-gradient(105deg,#0d0d0d 0%,#1a1a2e 60%,#0f2027 100%);padding:36px 32px 32px;overflow:hidden}
-.sub-banner-bg{position:absolute;inset:0;background:linear-gradient(105deg,rgba(192,57,43,.15) 0%,transparent 60%);pointer-events:none}
-.sub-banner-label{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.sub-banner-title{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.2}
-.sub-banner-desc{font-size:14px;color:rgba(255,255,255,.6);margin-top:8px;line-height:1.6}
-.apply-wrap{max-width:700px;margin:0 auto;padding:40px 32px 64px}
-.apply-section{background:#fff;border:1px solid #eee;border-radius:12px;padding:24px 28px;margin-bottom:16px}
-.apply-section-title{font-size:14px;font-weight:800;color:#1a1a1a;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;gap:8px}
-.apply-section-title::before{content:'';width:4px;height:15px;background:#c0392b;border-radius:2px;flex-shrink:0}
-.form-field{margin-bottom:16px}
-.form-label{font-size:12px;font-weight:600;color:#444;margin-bottom:6px;display:block}
-.form-label .req{color:#c0392b;margin-left:2px}
-.form-label .opt{font-size:11px;color:#aaa;font-weight:400;margin-left:4px}
-.form-input{width:100%;height:44px;border:1px solid #e0e0e0;border-radius:8px;padding:0 14px;font-size:13px;color:#333;font-family:inherit;outline:none;box-sizing:border-box;transition:border-color .15s}
-.form-input:focus{border-color:#c0392b}
-.form-input::placeholder{color:#bbb}
-.form-textarea{width:100%;min-height:110px;border:1px solid #e0e0e0;border-radius:8px;padding:11px 14px;font-size:13px;color:#333;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box;transition:border-color .15s;line-height:1.7}
-.form-textarea:focus{border-color:#c0392b}
-.form-textarea::placeholder{color:#bbb}
-.form-select{width:100%;height:44px;border:1px solid #e0e0e0;border-radius:8px;padding:0 14px;font-size:13px;color:#333;font-family:inherit;outline:none;box-sizing:border-box;background:#fff;transition:border-color .15s}
-.form-select:focus{border-color:#c0392b}
-.form-hint{font-size:11px;color:#aaa;margin-top:5px;padding-left:2px;line-height:1.6}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.social-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.social-label{font-size:12px;font-weight:600;color:#888;width:60px;flex-shrink:0}
-.file-drop{border:2px dashed #ddd;border-radius:8px;padding:22px;text-align:center;background:#fafafa;cursor:pointer;transition:border-color .15s}
-.file-drop:hover{border-color:#c0392b}
-.file-drop-icon{font-size:26px;margin-bottom:6px}
-.file-drop-text{font-size:13px;color:#888}
-.file-drop-hint{font-size:11px;color:#bbb;margin-top:4px}
-.file-list{margin-top:10px}
-.file-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f8f9fa;border-radius:6px;margin-bottom:4px;font-size:12px;color:#555}
-.file-item-remove{margin-left:auto;cursor:pointer;color:#aaa;font-size:14px;line-height:1}
-.file-item-remove:hover{color:#c0392b}
-.agree-box{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;background:#f8f9fa;border-radius:8px;border:1px solid #e8e8e8;cursor:pointer;margin-bottom:18px;transition:border-color .15s}
-.agree-box:hover{border-color:#c0392b}
-.agree-box input[type="checkbox"]{width:16px;height:16px;margin-top:3px;accent-color:#c0392b;flex-shrink:0}
-.agree-text{font-size:12.5px;color:#444;line-height:1.7}
-.agree-text a{color:#c0392b;text-decoration:underline}
-.btn-submit{width:100%;height:54px;background:#c0392b;color:#fff;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;border:none;font-family:inherit}
-.btn-submit:hover{background:#a93226}
-.btn-submit:disabled{background:#e0a0a0;cursor:not-allowed}
-.apply-note{font-size:11.5px;color:#aaa;text-align:center;margin-top:10px;line-height:1.7}
-.error-banner{background:#fdecea;border:1px solid #f5c6c6;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#c0392b}
-/* 개인정보 팝업 (회원가입 동일 구조) */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:center;justify-content:center}
-.modal-overlay.active,.modal-overlay.show{display:flex}
-.modal-sheet{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:480px;max-height:80vh;display:flex;flex-direction:column;position:fixed;bottom:0;left:50%;transform:translateX(-50%);box-shadow:0 -4px 40px rgba(0,0,0,.18)}
-.modal-close-btn{position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;color:#888;cursor:pointer;line-height:1;padding:4px}
-.modal-close-btn:hover{color:#333}
-.modal-sheet-title{font-size:15px;font-weight:800;color:#1a1a1a;padding:20px 24px 14px;border-bottom:1px solid #f0f0f0;flex-shrink:0}
-.terms-content{flex:1;overflow-y:auto;padding:16px 24px;font-size:12.5px;color:#555;line-height:1.9;white-space:pre-wrap;word-break:break-word}
-.btn-terms-agree{width:calc(100% - 32px);margin:12px 16px 16px;height:46px;background:#c0392b;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
-.btn-terms-agree:hover{background:#a93226}
-/* 완료 모달 */
-.modal-card{background:#fff;border-radius:20px;width:360px;padding:40px 32px 32px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.3)}
-.modal-icon{font-size:52px;margin-bottom:14px}
-.modal-title{font-size:20px;font-weight:900;color:#1a1a1a;margin-bottom:10px}
-.modal-desc{font-size:13px;color:#666;line-height:1.8;margin-bottom:28px}
-.modal-btn-primary{width:100%;height:48px;background:#c0392b;color:#fff;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;border:none;font-family:inherit}
-.modal-btn-secondary{width:100%;height:42px;background:#f5f5f5;color:#555;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit}
-</style>
-
 <!-- 서브 배너 -->
 <div id="sub-banner">
   <div class="sub-banner-bg"></div>
@@ -76,10 +12,6 @@ use App\Core\Csrf;
 
 <div class="apply-wrap">
 
-  <?php if ($error): ?>
-  <div class="error-banner"><?= htmlspecialchars($error) ?></div>
-  <?php endif; ?>
-
   <?php if (isset($_GET['success'])): ?>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -88,7 +20,7 @@ use App\Core\Csrf;
   </script>
   <?php endif; ?>
 
-  <form method="POST" action="/instructors/apply" enctype="multipart/form-data" id="applyForm">
+  <form method="POST" action="/instructors/apply" enctype="multipart/form-data" id="applyForm" novalidate>
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
 
     <!-- 섹션 1: 기본 정보 -->
@@ -98,23 +30,26 @@ use App\Core\Csrf;
       <div class="form-row">
         <div class="form-field">
           <label class="form-label">이름 <span class="req">*</span></label>
-          <input class="form-input" type="text" name="name" placeholder="홍길동" required>
+          <input class="form-input" type="text" name="name" id="inp-name" placeholder="홍길동" autocomplete="name">
+          <div class="field-error" id="err-name"></div>
         </div>
         <div class="form-field">
           <label class="form-label">연락처 <span class="req">*</span></label>
-          <input class="form-input" type="tel" name="phone" placeholder="01000000000" required>
+          <input class="form-input" type="tel" name="phone" id="inp-phone" placeholder="010-0000-0000" maxlength="13" autocomplete="tel">
+          <div class="field-error" id="err-phone"></div>
         </div>
       </div>
 
       <div class="form-field">
         <label class="form-label">이메일 <span class="req">*</span></label>
-        <input class="form-input" type="email" name="email" placeholder="example@email.com" required>
+        <input class="form-input" type="email" name="email" id="inp-email" placeholder="example@email.com" autocomplete="email">
+        <div class="field-error" id="err-email"></div>
       </div>
 
       <div class="form-row">
         <div class="form-field">
           <label class="form-label">강의 분야 <span class="req">*</span></label>
-          <select class="form-select" name="teach_field" required>
+          <select class="form-select" name="teach_field" id="inp-field">
             <option value="">분야를 선택해주세요</option>
             <option value="커머스/쇼핑몰">커머스 / 쇼핑몰</option>
             <option value="AI/자동화">AI / 자동화</option>
@@ -124,10 +59,11 @@ use App\Core\Csrf;
             <option value="창업/비즈니스">창업 / 비즈니스</option>
             <option value="기타">기타</option>
           </select>
+          <div class="field-error" id="err-field"></div>
         </div>
         <div class="form-field">
           <label class="form-label">강의 경력 <span class="req">*</span></label>
-          <select class="form-select" name="teach_exp" required>
+          <select class="form-select" name="teach_exp" id="inp-exp">
             <option value="">강의 경력을 선택해주세요</option>
             <option value="없음">없음 (처음 도전)</option>
             <option value="1년미만">1년 미만</option>
@@ -135,6 +71,7 @@ use App\Core\Csrf;
             <option value="3~5년">3~5년</option>
             <option value="5년이상">5년 이상</option>
           </select>
+          <div class="field-error" id="err-exp"></div>
         </div>
       </div>
     </div>
@@ -145,23 +82,26 @@ use App\Core\Csrf;
 
       <div class="form-field">
         <label class="form-label">주요 경력 / 자기소개 <span class="req">*</span></label>
-        <textarea class="form-textarea" name="bio" placeholder="주요 경력, 성과, 보유 역량 등을 자유롭게 작성해 주세요." style="min-height:130px;" required></textarea>
-        <div class="form-hint">최소 100자 이상 작성을 권장합니다.</div>
+        <textarea class="form-textarea" name="bio" id="inp-bio" placeholder="주요 경력, 성과, 보유 역량 등을 자유롭게 작성해 주세요." style="min-height:130px;"></textarea>
+        <div class="char-count" id="bio-count">0자 / 최소 100자</div>
+        <div class="field-error" id="err-bio"></div>
       </div>
 
       <div class="form-field">
         <label class="form-label">강의 계획 / 커리큘럼 아이디어 <span class="req">*</span></label>
-        <textarea class="form-textarea" name="curriculum" placeholder="어떤 강의를 진행하고 싶으신가요? 대략적인 커리큘럼이나 강의 방향을 작성해 주세요." required></textarea>
+        <textarea class="form-textarea" name="curriculum" id="inp-curriculum" placeholder="어떤 강의를 진행하고 싶으신가요? 대략적인 커리큘럼이나 강의 방향을 작성해 주세요."></textarea>
+        <div class="field-error" id="err-curriculum"></div>
       </div>
 
       <div class="form-field">
         <label class="form-label">희망 강의 형태 <span class="req">*</span></label>
-        <select class="form-select" name="teach_format" required>
+        <select class="form-select" name="teach_format" id="inp-format">
           <option value="">선택해주세요</option>
           <option value="free_webinar">무료 웨비나 (카카오 오픈채팅 기반)</option>
           <option value="paid_vod">유료 VOD (Vimeo 영상 기반)</option>
           <option value="mixed">무료 + 유료 혼합</option>
         </select>
+        <div class="field-error" id="err-format"></div>
       </div>
     </div>
 
@@ -215,15 +155,16 @@ use App\Core\Csrf;
       <div class="apply-section-title">개인정보 수집 및 이용 동의</div>
 
       <label class="agree-box">
-        <input type="checkbox" name="agree" value="1" required>
+        <input type="checkbox" name="agree" id="inp-agree" value="1">
         <div class="agree-text">
           <strong>[필수]</strong> 개인정보 수집 및 이용에 동의합니다.<br>
           <span style="font-size:11px;color:#aaa;">수집 항목: 이름, 연락처, 이메일, 강의 관련 정보 · 보유 기간: 검토 완료 후 1년</span>
           &nbsp;<a href="#" onclick="openPrivacyModal(event)">개인정보처리방침 보기</a>
         </div>
       </label>
+      <div class="field-error" id="err-agree"></div>
 
-      <button type="submit" class="btn-submit" id="submitBtn">
+      <button type="button" class="btn-submit" id="submitBtn" onclick="validateAndSubmit()">
         🎓 강사 지원서 제출하기
       </button>
       <div class="apply-note">제출 후 영업일 기준 3~5일 내 연락처 또는 이메일로 안내드립니다.</div>
@@ -232,7 +173,7 @@ use App\Core\Csrf;
   </form>
 </div>
 
-<!-- 개인정보처리방침 팝업 (회원가입과 동일 구조) -->
+<!-- 개인정보처리방침 팝업 -->
 <div class="modal-overlay" id="privacyModal" onclick="if(event.target===this)closePrivacyModal()">
   <div class="modal-sheet">
     <button class="modal-close-btn" onclick="closePrivacyModal()">×</button>
@@ -254,20 +195,124 @@ use App\Core\Csrf;
 </div>
 
 <script>
-// 파일 업로드 핸들러
+/* ── 인라인 에러 표시 ── */
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('open');
+}
+function clearErr(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = '';
+  el.classList.remove('open');
+}
+
+/* ── 연락처 하이픈 자동 포맷 ── */
+document.getElementById('inp-phone').addEventListener('input', function() {
+  let digits = this.value.replace(/\D/g, '');
+  if (digits.length > 11) digits = digits.slice(0, 11);
+  let fmt = digits;
+  if (digits.startsWith('02')) {
+    if (digits.length > 6) fmt = digits.slice(0, 2) + '-' + digits.slice(2, digits.length - 4) + '-' + digits.slice(-4);
+    else if (digits.length > 2) fmt = digits.slice(0, 2) + '-' + digits.slice(2);
+  } else {
+    if (digits.length > 7) fmt = digits.slice(0, 3) + '-' + digits.slice(3, 7) + '-' + digits.slice(7);
+    else if (digits.length > 3) fmt = digits.slice(0, 3) + '-' + digits.slice(3);
+  }
+  this.value = fmt;
+  if (this.value) clearErr('err-phone');
+});
+
+/* ── bio 글자수 카운터 ── */
+document.getElementById('inp-bio').addEventListener('input', function() {
+  const len = this.value.length;
+  const el  = document.getElementById('bio-count');
+  if (len >= 100) {
+    el.textContent = len + '자 ✓';
+    el.className   = 'char-count ok';
+    clearErr('err-bio');
+  } else {
+    el.textContent = len + '자 / 최소 100자';
+    el.className   = 'char-count';
+  }
+});
+
+/* ── 에러 자동 해제 리스너 ── */
+document.getElementById('inp-name').addEventListener('input',  function() { if (this.value.trim().length >= 2) clearErr('err-name'); });
+document.getElementById('inp-email').addEventListener('input', function() { if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value.trim())) clearErr('err-email'); });
+document.getElementById('inp-field').addEventListener('change', function() { if (this.value) clearErr('err-field'); });
+document.getElementById('inp-exp').addEventListener('change',   function() { if (this.value) clearErr('err-exp'); });
+document.getElementById('inp-curriculum').addEventListener('input', function() { if (this.value.trim()) clearErr('err-curriculum'); });
+document.getElementById('inp-format').addEventListener('change',    function() { if (this.value) clearErr('err-format'); });
+document.getElementById('inp-agree').addEventListener('change',     function() { if (this.checked) clearErr('err-agree'); });
+
+/* ── 폼 검증 + 제출 ── */
+function validateAndSubmit() {
+  let ok = true;
+  let firstErrEl = null;
+
+  function fail(id, msg) {
+    showErr(id, msg);
+    if (!firstErrEl) firstErrEl = document.getElementById(id);
+    ok = false;
+  }
+
+  const name = document.getElementById('inp-name').value.trim();
+  if (name.length < 2) fail('err-name', '이름을 2자 이상 입력해 주세요.');
+  else clearErr('err-name');
+
+  const phone = document.getElementById('inp-phone').value.replace(/\D/g, '');
+  if (!/^\d{10,11}$/.test(phone)) fail('err-phone', '연락처를 올바르게 입력해 주세요. (예: 010-1234-5678)');
+  else clearErr('err-phone');
+
+  const email = document.getElementById('inp-email').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail('err-email', '이메일 형식이 올바르지 않습니다.');
+  else clearErr('err-email');
+
+  if (!document.getElementById('inp-field').value) fail('err-field', '강의 분야를 선택해 주세요.');
+  else clearErr('err-field');
+
+  if (!document.getElementById('inp-exp').value) fail('err-exp', '강의 경력을 선택해 주세요.');
+  else clearErr('err-exp');
+
+  const bio = document.getElementById('inp-bio').value.trim();
+  if (bio.length < 10) fail('err-bio', '자기소개를 입력해 주세요.');
+  else clearErr('err-bio');
+
+  if (!document.getElementById('inp-curriculum').value.trim()) fail('err-curriculum', '강의 계획을 입력해 주세요.');
+  else clearErr('err-curriculum');
+
+  if (!document.getElementById('inp-format').value) fail('err-format', '희망 강의 형태를 선택해 주세요.');
+  else clearErr('err-format');
+
+  if (!document.getElementById('inp-agree').checked) fail('err-agree', '개인정보 수집 및 이용에 동의해 주세요.');
+  else clearErr('err-agree');
+
+  if (!ok) {
+    firstErrEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '제출 중...';
+  document.getElementById('applyForm').submit();
+}
+
+/* ── 파일 업로드 핸들러 ── */
 const dt = new DataTransfer();
 
 function handleFiles(input) {
   const files = Array.from(input.files);
   const current = dt.files.length;
   let added = 0;
-
   files.forEach(file => {
     if (current + added >= 3) return;
     dt.items.add(file);
     added++;
   });
-
   input.files = dt.files;
   renderFileList();
 }
@@ -295,7 +340,7 @@ function removeFile(index) {
   renderFileList();
 }
 
-// 드래그 앤 드롭
+/* ── 드래그 앤 드롭 ── */
 const dropZone = document.querySelector('.file-drop');
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = '#c0392b'; });
 dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = ''; });
@@ -303,19 +348,21 @@ dropZone.addEventListener('drop', e => {
   e.preventDefault();
   dropZone.style.borderColor = '';
   const input = document.getElementById('portfolioFiles');
-  const files = Array.from(e.dataTransfer.files);
-  files.forEach(f => { if (dt.files.length < 3) dt.items.add(f); });
+  Array.from(e.dataTransfer.files).forEach(f => { if (dt.files.length < 3) dt.items.add(f); });
   input.files = dt.files;
   renderFileList();
 });
 
-// 개인정보처리방침 팝업
-const PRIVACY_CONTENT = `제1조 (목적)\n본 방침은 유니콘클래스(이하 "회사")가 강사 지원 검토를 위해 수집하는 개인정보의 처리 방법과 보호 조치를 규정합니다.\n\n제2조 (수집하는 개인정보 항목)\n회사는 강사 지원 검토를 위해 아래 정보를 수집합니다.\n· 필수 항목: 이름, 연락처(전화번호), 이메일 주소, 강의 분야, 강의 경력, 자기소개, 강의 계획\n· 선택 항목: SNS 채널 URL, 포트폴리오 파일, 외부 링크\n\n제3조 (개인정보의 수집 및 이용 목적)\n· 강사 지원서 검토 및 적합성 평가\n· 지원 결과 안내 (전화 또는 이메일)\n\n제4조 (개인정보의 보유 및 이용 기간)\n검토 완료 후 1년간 보유하며, 이후 즉시 파기합니다.\n단, 관련 법령에 의해 보존이 필요한 경우 해당 기간 동안 보유합니다.\n\n제5조 (개인정보의 파기)\n보유 기간이 경과하거나 목적이 달성된 경우 지체 없이 파기합니다.\n전자 파일은 복구 불가능한 방법으로 영구 삭제하며, 출력물은 분쇄 또는 소각합니다.\n\n제6조 (동의 거부 권리)\n개인정보 수집·이용에 동의를 거부할 권리가 있습니다.\n단, 동의 거부 시 강사 지원이 제한될 수 있습니다.`;
-
+/* ── 개인정보처리방침 팝업 (AJAX) ── */
 function openPrivacyModal(e) {
   e.preventDefault();
-  document.getElementById('privacyModalContent').textContent = PRIVACY_CONTENT;
+  const content = document.getElementById('privacyModalContent');
+  content.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;">불러오는 중...</div>';
   document.getElementById('privacyModal').classList.add('show');
+  fetch('/supports/privacy?ajax=1')
+    .then(r => r.text())
+    .then(html => { content.innerHTML = html; })
+    .catch(() => { content.innerHTML = '<div style="padding:20px;color:#c0392b;">내용을 불러오지 못했습니다.</div>'; });
 }
 
 function closePrivacyModal() {
@@ -323,14 +370,8 @@ function closePrivacyModal() {
 }
 
 function agreePrivacyAndClose() {
-  document.querySelector('input[name="agree"]').checked = true;
+  document.getElementById('inp-agree').checked = true;
+  clearErr('err-agree');
   closePrivacyModal();
 }
-
-// 중복 제출 방지
-document.getElementById('applyForm').addEventListener('submit', function() {
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = '제출 중...';
-});
 </script>

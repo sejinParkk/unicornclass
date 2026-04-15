@@ -15,16 +15,7 @@ $pageTitle  = '대시보드';
 $pageDesc   = '오늘의 주요 지표와 최근 활동을 확인하세요.';
 $activeMenu = 'dashboard';
 
-// 더미 데이터 (컨트롤러 연결 전 UI 확인용)
-$stats ??= [
-	'today_members'   => 12,
-	'today_orders'    => 8,
-	'today_revenue'   => 1_584_000,
-	'total_enrolls'   => 347,
-	'pending_contacts'=> 5,
-	'pending_applies' => 2,
-];
-$recentOrders ??= [];
+$recentOrders  ??= [];
 $recentMembers ??= [];
 
 ob_start();

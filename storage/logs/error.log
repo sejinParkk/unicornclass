@@ -34,3 +34,148 @@ Stack trace:
 #1 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
 #2 {main}
   thrown in /var/www/html/app/Core/Router.php on line 132
+[14-Apr-2026 06:25:07 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'description' at row 1 in /var/www/html/app/Core/DB.php:104
+Stack trace:
+#0 /var/www/html/app/Core/DB.php(104): PDOStatement->execute(Array)
+#1 /var/www/html/app/Repositories/ClassRepository.php(93): App\Core\DB::insert('INSERT INTO lc_...', Array)
+#2 /var/www/html/app/Http/Controllers/Admin/ClassController.php(107): App\Repositories\ClassRepository->create(Array)
+#3 [internal function]: App\Http\Controllers\Admin\ClassController->store()
+#4 /var/www/html/app/Core/Router.php(133): call_user_func_array(Array, Array)
+#5 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#6 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#7 {main}
+  thrown in /var/www/html/app/Core/DB.php on line 104
+[14-Apr-2026 06:32:40 UTC] PHP Warning:  require(/var/www/html/resources/views/pages/about.php): Failed to open stream: No such file or directory in /var/www/html/app/Routes/web.php on line 64
+[14-Apr-2026 06:32:40 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/var/www/html/resources/views/pages/about.php' (include_path='.:/usr/local/lib/php') in /var/www/html/app/Routes/web.php:64
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /var/www/html/app/Core/Router.php(126): call_user_func_array(Object(Closure), Array)
+#2 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Object(Closure), Array)
+#3 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#4 {main}
+  thrown in /var/www/html/app/Routes/web.php on line 64
+[15-Apr-2026 01:03:57 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\DateTimeImmutable" not found in /var/www/html/app/Http/Controllers/MypageController.php:255
+Stack trace:
+#0 [internal function]: App\Http\Controllers\MypageController->orderShow(8)
+#1 /var/www/html/app/Core/Router.php(133): call_user_func_array(Array, Array)
+#2 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#3 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#4 {main}
+  thrown in /var/www/html/app/Http/Controllers/MypageController.php on line 255
+[15-Apr-2026 01:04:02 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\DateTimeImmutable" not found in /var/www/html/app/Http/Controllers/MypageController.php:255
+Stack trace:
+#0 [internal function]: App\Http\Controllers\MypageController->orderShow(8)
+#1 /var/www/html/app/Core/Router.php(133): call_user_func_array(Array, Array)
+#2 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#3 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#4 {main}
+  thrown in /var/www/html/app/Http/Controllers/MypageController.php on line 255
+[15-Apr-2026 01:05:35 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\DateTimeImmutable" not found in /var/www/html/app/Http/Controllers/MypageController.php:255
+Stack trace:
+#0 [internal function]: App\Http\Controllers\MypageController->orderShow(8)
+#1 /var/www/html/app/Core/Router.php(133): call_user_func_array(Array, Array)
+#2 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#3 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#4 {main}
+  thrown in /var/www/html/app/Http/Controllers/MypageController.php on line 255
+[15-Apr-2026 01:10:43 UTC] PHP Warning:  Undefined array key "mb_phone" in /var/www/html/app/Repositories/MemberRepository.php on line 111
+[15-Apr-2026 01:10:43 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /var/www/html/app/Repositories/MemberRepository.php:111) in /var/www/html/app/Http/Controllers/MypageController.php on line 100
+[15-Apr-2026 01:11:18 UTC] PHP Warning:  Undefined array key "mb_phone" in /var/www/html/app/Repositories/MemberRepository.php on line 111
+[15-Apr-2026 01:11:18 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /var/www/html/app/Repositories/MemberRepository.php:111) in /var/www/html/app/Http/Controllers/MypageController.php on line 100
+[15-Apr-2026 01:11:21 UTC] PHP Warning:  Undefined array key "mb_phone" in /var/www/html/app/Repositories/MemberRepository.php on line 111
+[15-Apr-2026 01:11:21 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /var/www/html/app/Repositories/MemberRepository.php:111) in /var/www/html/app/Http/Controllers/MypageController.php on line 100
+[15-Apr-2026 01:11:25 UTC] PHP Warning:  Undefined array key "mb_phone" in /var/www/html/app/Repositories/MemberRepository.php on line 111
+[15-Apr-2026 01:11:25 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /var/www/html/app/Repositories/MemberRepository.php:111) in /var/www/html/app/Http/Controllers/MypageController.php on line 100
+[15-Apr-2026 01:11:30 UTC] PHP Warning:  Undefined array key "mb_phone" in /var/www/html/app/Repositories/MemberRepository.php on line 111
+[15-Apr-2026 01:11:30 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /var/www/html/app/Repositories/MemberRepository.php:111) in /var/www/html/app/Http/Controllers/MypageController.php on line 100
+[15-Apr-2026 01:29:15 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\DateTimeImmutable" not found in /var/www/html/app/Http/Controllers/MypageController.php:288
+Stack trace:
+#0 [internal function]: App\Http\Controllers\MypageController->orderShow(8)
+#1 /var/www/html/app/Core/Router.php(133): call_user_func_array(Array, Array)
+#2 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#3 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#4 {main}
+  thrown in /var/www/html/app/Http/Controllers/MypageController.php on line 288
+[15-Apr-2026 01:29:19 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\DateTimeImmutable" not found in /var/www/html/app/Http/Controllers/MypageController.php:288
+Stack trace:
+#0 [internal function]: App\Http\Controllers\MypageController->orderShow(8)
+#1 /var/www/html/app/Core/Router.php(133): call_user_func_array(Array, Array)
+#2 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#3 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#4 {main}
+  thrown in /var/www/html/app/Http/Controllers/MypageController.php on line 288
+[15-Apr-2026 05:34:22 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'unicornclass.lc_banner' doesn't exist in /var/www/html/app/Core/DB.php:68
+Stack trace:
+#0 /var/www/html/app/Core/DB.php(68): PDO->prepare('SELECT banner_i...')
+#1 /var/www/html/app/Repositories/HomeRepository.php(126): App\Core\DB::select('SELECT banner_i...')
+#2 /var/www/html/app/Http/Controllers/HomeController.php(34): App\Repositories\HomeRepository->getActiveBanners()
+#3 [internal function]: App\Http\Controllers\HomeController->index()
+#4 /var/www/html/app/Core/Router.php(133): call_user_func_array(Array, Array)
+#5 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#6 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#7 {main}
+  thrown in /var/www/html/app/Core/DB.php on line 68
+[15-Apr-2026 05:34:59 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'unicornclass.lc_banner' doesn't exist in /var/www/html/app/Core/DB.php:68
+Stack trace:
+#0 /var/www/html/app/Core/DB.php(68): PDO->prepare('SELECT banner_i...')
+#1 /var/www/html/app/Repositories/HomeRepository.php(126): App\Core\DB::select('SELECT banner_i...')
+#2 /var/www/html/app/Http/Controllers/HomeController.php(34): App\Repositories\HomeRepository->getActiveBanners()
+#3 [internal function]: App\Http\Controllers\HomeController->index()
+#4 /var/www/html/app/Core/Router.php(133): call_user_func_array(Array, Array)
+#5 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#6 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#7 {main}
+  thrown in /var/www/html/app/Core/DB.php on line 68
+[15-Apr-2026 05:37:07 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'unicornclass.lc_banner' doesn't exist in /var/www/html/app/Core/DB.php:68
+Stack trace:
+#0 /var/www/html/app/Core/DB.php(68): PDO->prepare('SELECT banner_i...')
+#1 /var/www/html/app/Repositories/HomeRepository.php(126): App\Core\DB::select('SELECT banner_i...')
+#2 /var/www/html/app/Http/Controllers/HomeController.php(34): App\Repositories\HomeRepository->getActiveBanners()
+#3 [internal function]: App\Http\Controllers\HomeController->index()
+#4 /var/www/html/app/Core/Router.php(133): call_user_func_array(Array, Array)
+#5 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#6 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#7 {main}
+  thrown in /var/www/html/app/Core/DB.php on line 68
+[15-Apr-2026 05:41:34 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'unicornclass.lc_banner' doesn't exist in /var/www/html/app/Core/DB.php:68
+Stack trace:
+#0 /var/www/html/app/Core/DB.php(68): PDO->prepare('SELECT banner_i...')
+#1 /var/www/html/app/Repositories/HomeRepository.php(126): App\Core\DB::select('SELECT banner_i...')
+#2 /var/www/html/app/Http/Controllers/HomeController.php(34): App\Repositories\HomeRepository->getActiveBanners()
+#3 [internal function]: App\Http\Controllers\HomeController->index()
+#4 /var/www/html/app/Core/Router.php(133): call_user_func_array(Array, Array)
+#5 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Array, Array)
+#6 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#7 {main}
+  thrown in /var/www/html/app/Core/DB.php on line 68
+[15-Apr-2026 05:47:08 UTC] [Home] 배너 조회 실패: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'unicornclass.lc_banner' doesn't exist
+[15-Apr-2026 05:47:08 UTC] [Home] 팝업 조회 실패: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'unicornclass.lc_popup' doesn't exist
+[15-Apr-2026 05:47:11 UTC] [Home] 배너 조회 실패: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'unicornclass.lc_banner' doesn't exist
+[15-Apr-2026 05:47:11 UTC] [Home] 팝업 조회 실패: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'unicornclass.lc_popup' doesn't exist
+[15-Apr-2026 06:14:36 UTC] PHP Warning:  require(/var/www/html/resources/views/pages/about.php): Failed to open stream: No such file or directory in /var/www/html/app/Routes/web.php on line 88
+[15-Apr-2026 06:14:36 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/var/www/html/resources/views/pages/about.php' (include_path='.:/usr/local/lib/php') in /var/www/html/app/Routes/web.php:88
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /var/www/html/app/Core/Router.php(126): call_user_func_array(Object(Closure), Array)
+#2 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Object(Closure), Array)
+#3 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#4 {main}
+  thrown in /var/www/html/app/Routes/web.php on line 88
+[15-Apr-2026 06:16:41 UTC] PHP Warning:  require(/var/www/html/resources/views/pages/about.php): Failed to open stream: No such file or directory in /var/www/html/app/Routes/web.php on line 88
+[15-Apr-2026 06:16:41 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/var/www/html/resources/views/pages/about.php' (include_path='.:/usr/local/lib/php') in /var/www/html/app/Routes/web.php:88
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /var/www/html/app/Core/Router.php(126): call_user_func_array(Object(Closure), Array)
+#2 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Object(Closure), Array)
+#3 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#4 {main}
+  thrown in /var/www/html/app/Routes/web.php on line 88
+[15-Apr-2026 06:47:40 UTC] PHP Warning:  require(/var/www/html/resources/views/pages/about.php): Failed to open stream: No such file or directory in /var/www/html/app/Routes/web.php on line 88
+[15-Apr-2026 06:47:40 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/var/www/html/resources/views/pages/about.php' (include_path='.:/usr/local/lib/php') in /var/www/html/app/Routes/web.php:88
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /var/www/html/app/Core/Router.php(126): call_user_func_array(Object(Closure), Array)
+#2 /var/www/html/app/Core/Router.php(104): App\Core\Router->call(Object(Closure), Array)
+#3 /var/www/html/public/index.php(14): App\Core\Router->dispatch()
+#4 {main}
+  thrown in /var/www/html/app/Routes/web.php on line 88

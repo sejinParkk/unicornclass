@@ -20,6 +20,11 @@ class TermsController
         'instructor' => '강사 이용약관',
         'copyright'  => '저작권 정책',
         'cookie'     => '쿠키 정책',
+        'marketing'     => '마케팅 수신 동의',
+        'disclaimer'    => '면책조항',
+        'purchase'      => '구매 조건 동의',
+        'ecommerce'     => '전자금융거래 이용약관',
+        'privacy_third' => '개인정보 제3자 제공 동의 (PG사)',
     ];
 
     public function __construct()

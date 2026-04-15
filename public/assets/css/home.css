@@ -1,0 +1,581 @@
+/* ==========================================================================
+   home.css — 메인(홈) 페이지 전용
+   ========================================================================== */
+
+/* ── 공통 변수 ────────────────────────────────────────────── */
+:root {
+  --red:      #c0392b;
+  --red-lite: #fdecea;
+  --dark:     #1a1a1a;
+  --gray-bg:  #f5f6f8;
+
+  /* Swiper 테마 컬러 */
+  --swiper-theme-color:    #c0392b;
+  --swiper-navigation-size: 18px;
+}
+
+/* ==========================================================================
+   ① 히어로 배너
+   ========================================================================== */
+#hero {
+  position: relative;
+  width: 100%;
+  min-height: 460px;
+  background: #0d0d0d;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    rgba(0,0,0,.82) 0%,
+    rgba(0,0,0,.45) 55%,
+    rgba(0,0,0,.08) 100%
+  );
+  z-index: 1;
+}
+/* 포스터 이미지 — 영상 로드 전 표시, canplay 시 스르르 사라짐 */
+.hero-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 1;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+.hero-poster.fade-out { opacity: 0; }
+.hero-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 48px 56px;
+  max-width: 640px;
+}
+.hero-title {
+  font-size: 52px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -2px;
+  line-height: 1.12;
+  margin-bottom: 14px;
+}
+.hero-sub {
+  font-size: 18px;
+  color: rgba(255,255,255,.72);
+  font-weight: 400;
+  margin-bottom: 28px;
+}
+.hero-cta {
+  display: inline-block;
+  background: var(--red);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 13px 28px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: opacity .15s;
+}
+.hero-cta:hover { opacity: .88; }
+
+/* ==========================================================================
+   ② 섹션 공통 헤더
+   ========================================================================== */
+.home-section {
+  padding: 52px 32px 0;
+  background: #fff;
+}
+.home-section--gray { background: var(--gray-bg); }
+
+.home-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-left: 4px;
+}
+.home-section-icon  { font-size: 20px; }
+.home-section-title {
+  font-size: 21px;
+  font-weight: 900;
+  color: var(--dark);
+  letter-spacing: -.5px;
+}
+.home-section-en {
+  font-size: 13px;
+  color: #bbb;
+  font-style: italic;
+  padding-left: 10px;
+  margin-left: 2px;
+  border-left: 1px solid #ddd;
+}
+.home-section-more {
+  margin-left: auto;
+  font-size: 13px;
+  color: #aaa;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: color .15s;
+}
+.home-section-more:hover { color: var(--red); }
+
+/* ==========================================================================
+   ③ Swiper 공통 커스터마이징
+   ========================================================================== */
+
+/* 강의·강사 슬라이더 — pagination 공간 확보 */
+.home-class-swiper,
+.home-inst-swiper {
+  padding-bottom: 40px !important;
+}
+
+/* 섹션 하단 padding (swiper 포함) */
+.home-section-swiper-wrap {
+  padding-bottom: 52px;
+}
+
+/* 네비게이션 버튼 배경 */
+.swiper-button-prev,
+.swiper-button-next {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  border: 1px solid #eee;
+}
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 14px !important;
+  font-weight: 700;
+}
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background: var(--red);
+  border-color: var(--red);
+  --swiper-theme-color: #fff;
+}
+.swiper-button-disabled { opacity: .3 !important; }
+
+/* 강의 카드 */
+.home-cl-card {
+  display: block;
+  text-decoration: none;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #eee;
+  background: #fff;
+  transition: box-shadow .15s, transform .15s;
+}
+.home-cl-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,.1);
+  transform: translateY(-2px);
+}
+
+/* 강사 카드 */
+.home-inst-card {
+  display: block;
+  text-decoration: none;
+  transition: transform .28s ease;
+}
+.home-inst-card:hover { transform: translateY(-8px); }
+.home-inst-card:hover .i-photo-wrap::after { opacity: 1; }
+
+/* ==========================================================================
+   ④ 이벤트/공지 배너 슬라이더
+   ========================================================================== */
+.home-banner-section {
+  background: var(--gray-bg);
+  padding: 32px;
+}
+.home-banner-swiper {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* 슬라이드 컨테이너: 높이 고정 + overflow hidden → 이미지 비율 왜곡 없음 */
+.home-banner-slide {
+  display: block;
+  height: 300px;
+  overflow: hidden;
+  text-decoration: none;
+}
+.home-banner-slide a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.home-banner-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.home-banner-ph {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(105deg, var(--red), #e74c3c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* 배너 위 pagination/navigation 색상 */
+.home-banner-swiper .swiper-pagination-bullet {
+  background: rgba(255,255,255,.6);
+  opacity: 1;
+}
+.home-banner-swiper .swiper-pagination-bullet-active {
+  background: #fff;
+  width: 20px;
+  border-radius: 3px;
+}
+.home-banner-swiper .swiper-button-prev,
+.home-banner-swiper .swiper-button-next {
+  background: rgba(255,255,255,.75);
+  border: none;
+  --swiper-theme-color: #333;
+}
+.home-banner-swiper .swiper-button-prev:hover,
+.home-banner-swiper .swiper-button-next:hover {
+  background: #fff;
+}
+
+/* ==========================================================================
+   ⑤ 수강생 후기
+   ========================================================================== */
+.home-review-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding-bottom: 56px;
+}
+.home-review-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: box-shadow .15s, transform .15s;
+}
+.home-review-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,.1);
+  transform: translateY(-2px);
+}
+.rv-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.rv-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #1a3a5c;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.rv-name  { font-size: 12px; font-weight: 700; color: #111; }
+.rv-stars { color: #f39c12; font-size: 12px; }
+.rv-date  { margin-left: auto; font-size: 10px; color: #bbb; white-space: nowrap; }
+.rv-class-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rv-content {
+  font-size: 11.5px;
+  color: #555;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.rv-more { margin-top: 10px; font-size: 10.5px; color: var(--red); font-weight: 600; }
+
+/* ==========================================================================
+   ⑥ 후기 상세 모달
+   ========================================================================== */
+.review-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+.review-modal-box {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  padding: 28px;
+  position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,.28);
+}
+.review-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #aaa;
+  cursor: pointer;
+  line-height: 1;
+}
+.review-modal-close:hover { color: #333; }
+.review-modal-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.review-modal-head .rv-avatar { width: 40px; height: 40px; font-size: 13px; }
+.review-modal-class { font-size: 13px; font-weight: 700; color: var(--red); margin-bottom: 12px; }
+.review-modal-content { font-size: 13px; color: #333; line-height: 1.8; }
+
+/* ==========================================================================
+   ⑦ 메인 팝업 (팝업 내부 슬라이더는 커스텀 유지)
+   ========================================================================== */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 20px;
+}
+.popup-modal {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 380px;
+  max-width: 100%;
+  box-shadow: 0 16px 48px rgba(0,0,0,.3);
+  position: relative;
+}
+.popup-close {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.4);
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background .15s;
+}
+.popup-close:hover { background: rgba(0,0,0,.7); }
+.popup-slider { position: relative; overflow: hidden; }
+.popup-slider-track {
+  display: flex;
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+  will-change: transform;
+}
+.popup-slide { flex: 0 0 100%; display: block; }
+.popup-slide img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+  height: auto;
+}
+.popup-img-ph {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg, var(--red) 0%, #e74c3c 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #fff;
+}
+.pi-icon { font-size: 44px; }
+.pi-text { font-size: 18px; font-weight: 900; letter-spacing: -.5px; }
+.popup-sl-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.8);
+  border: none;
+  font-size: 15px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: background .15s;
+}
+.popup-sl-btn:hover { background: #fff; }
+.popup-sl-btn.prev  { left: 8px; }
+.popup-sl-btn.next  { right: 8px; }
+.popup-dots {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+}
+.popup-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.5);
+  cursor: pointer;
+  transition: all .2s;
+}
+.popup-dot.active { background: #fff; width: 16px; border-radius: 3px; }
+.popup-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid #eee;
+  background: #fafafa;
+}
+.popup-today {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: #555;
+  cursor: pointer;
+}
+.popup-today input { accent-color: var(--red); cursor: pointer; }
+.popup-close-text {
+  background: none;
+  border: none;
+  font-size: 12.5px;
+  color: #888;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background .15s;
+}
+.popup-close-text:hover { background: #eee; color: #333; }
+
+/* ==========================================================================
+   ⑧ 카카오 플로팅 버튼
+   ========================================================================== */
+#kakao-float {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.kakao-float-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #fee500;
+  box-shadow: 0 4px 16px rgba(0,0,0,.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform .15s, box-shadow .15s;
+  border: none;
+}
+.kakao-float-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.28);
+}
+.kakao-float-btn svg { width: 28px; height: 28px; }
+.kakao-float-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #3c1e1e;
+  background: #fee500;
+  padding: 2px 7px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   반응형
+   ========================================================================== */
+@media (max-width: 900px) {
+  .hero-title { font-size: 38px; }
+  .hero-content { padding: 0 32px 44px; }
+  .home-section { padding: 40px 20px 0; }
+  .home-banner-section { padding: 20px; }
+  .home-banner-slide { height: 220px; }
+  .home-review-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  #hero { min-height: 320px; }
+  .hero-title { font-size: 28px; letter-spacing: -1px; }
+  .hero-sub   { font-size: 14px; }
+  .hero-cta   { font-size: 13px; padding: 10px 20px; }
+  .hero-content { padding: 0 20px 36px; }
+  .home-section { padding: 32px 16px 0; }
+  .home-section-title { font-size: 17px; }
+  .home-section-en { display: none; }
+  .home-banner-section { padding: 16px; }
+  .home-banner-slide { height: 160px; }
+  .home-review-grid { grid-template-columns: 1fr; }
+  .popup-modal { width: 100%; }
+}

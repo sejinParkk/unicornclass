@@ -57,6 +57,9 @@ $step          = $registerDone ? 3 : ($verifiedPhone ? 2 : 1);
         <?php if (!empty($err['agree_terms'])): ?>
         <div class="error-banner"><?= htmlspecialchars($err['agree_terms']) ?></div>
         <?php endif; ?>
+        <?php if (!empty($err['agree_privacy'])): ?>
+        <div class="error-banner"><?= htmlspecialchars($err['agree_privacy']) ?></div>
+        <?php endif; ?>
 
         <form method="POST" action="/register" id="regForm" novalidate>
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken ?? '') ?>">
@@ -129,17 +132,23 @@ $step          = $registerDone ? 3 : ($verifiedPhone ? 2 : 1);
                     <span class="ca-label">모두 동의</span>
                 </div>
                 <div class="term-row">
+                    <div class="cbox" id="cboxTerms" onclick="event.stopPropagation();toggleTerm('terms')"></div>
+                    <span class="term-label" onclick="toggleTerm('terms')">이용약관 동의<span class="term-req"> (필수) *</span></span>
+                    <button type="button" class="btn-terms-view" onclick="openTerms('terms')">보기</button>
+                </div>
+                <div class="term-row">
                     <div class="cbox" id="cboxPrivacy" onclick="event.stopPropagation();toggleTerm('privacy')"></div>
-                    <span class="term-label" onclick="toggleTerm('privacy')">개인정보 처리 약관 동의<span class="term-req"> (필수) *</span></span>
+                    <span class="term-label" onclick="toggleTerm('privacy')">개인정보 처리방침 동의<span class="term-req"> (필수) *</span></span>
                     <button type="button" class="btn-terms-view" onclick="openTerms('privacy')">보기</button>
                 </div>
                 <div class="term-row">
                     <div class="cbox" id="cboxMarketing" onclick="event.stopPropagation();toggleTerm('marketing')"></div>
-                    <span class="term-label" onclick="toggleTerm('marketing')">광고성 정보 수신 동의<span class="term-opt"> (선택)</span></span>
+                    <span class="term-label" onclick="toggleTerm('marketing')">마케팅 수신 동의<span class="term-opt"> (선택)</span></span>
                     <button type="button" class="btn-terms-view" onclick="openTerms('marketing')">보기</button>
                 </div>
             </div>
-            <input type="hidden" name="agree_terms" id="agreeTerms" value="0">
+            <input type="hidden" name="agree_terms"    id="agreeTerms"    value="0">
+            <input type="hidden" name="agree_privacy"  id="agreePrivacy"  value="0">
             <input type="hidden" name="agree_marketing" id="agreeMarketing" value="0">
 
             <button type="submit" class="btn-next" id="btnSubmit">회원가입</button>
@@ -174,7 +183,7 @@ const CSRF = <?= json_encode($csrfToken ?? '') ?>;
 const PW_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*\-_]).{8,}$/;
 let timerInterval = null;
 let idChecked = false;
-let termState = { privacy: false, marketing: false };
+let termState = { terms: false, privacy: false, marketing: false };
 let currentTermsKey = null;
 
 // ── STEP 1 로직 ──
@@ -298,7 +307,8 @@ async function checkDuplicate() {
 document.getElementById('regForm')?.addEventListener('submit', function(e) {
     let ok = true;
     if (!idChecked) { alert('아이디 중복 확인을 해주세요.'); e.preventDefault(); return; }
-    if (!termState.privacy) { alert('개인정보 처리 약관에 동의해주세요.'); e.preventDefault(); return; }
+    if (!termState.terms)   { alert('이용약관에 동의해주세요.');        e.preventDefault(); return; }
+    if (!termState.privacy) { alert('개인정보 처리방침에 동의해주세요.'); e.preventDefault(); return; }
     const pw = document.getElementById('pw1').value;
     const pw2 = document.getElementById('pw2').value;
     if (!PW_REGEX.test(pw)) { showErr('pw1Err','영문 + 숫자 + 특수문자 포함 8자 이상이어야 합니다.'); document.getElementById('pw1').classList.add('err'); ok=false; }
@@ -308,17 +318,19 @@ document.getElementById('regForm')?.addEventListener('submit', function(e) {
 
 // ── 약관 ──
 function toggleAll() {
-    const allChecked = termState.privacy && termState.marketing;
+    const allChecked = termState.terms && termState.privacy && termState.marketing;
     const newState = !allChecked;
-    termState.privacy = termState.marketing = newState;
+    termState.terms = termState.privacy = termState.marketing = newState;
     syncAll();
 }
 function toggleTerm(key) { termState[key] = !termState[key]; syncAll(); }
 function syncAll() {
-    setCbox('cboxPrivacy', termState.privacy);
+    setCbox('cboxTerms',     termState.terms);
+    setCbox('cboxPrivacy',   termState.privacy);
     setCbox('cboxMarketing', termState.marketing);
-    setCbox('cboxAll', termState.privacy && termState.marketing);
-    document.getElementById('agreeTerms').value    = termState.privacy   ? '1' : '0';
+    setCbox('cboxAll', termState.terms && termState.privacy && termState.marketing);
+    document.getElementById('agreeTerms').value    = termState.terms     ? '1' : '0';
+    document.getElementById('agreePrivacy').value  = termState.privacy   ? '1' : '0';
     document.getElementById('agreeMarketing').value = termState.marketing ? '1' : '0';
 }
 function setCbox(id, checked) {
@@ -327,23 +339,23 @@ function setCbox(id, checked) {
     if (checked) el.classList.add('checked'); else el.classList.remove('checked');
 }
 
-const TERMS_DATA = {
-    privacy: {
-        title: '개인정보 처리 약관',
-        content: `제1조 (목적)\n본 약관은 유니콘클래스(이하 "회사")가 제공하는 서비스 이용에 있어 회원의 개인정보 수집, 이용, 보관, 파기에 관한 사항을 규정합니다.\n\n제2조 (수집하는 개인정보)\n회사는 서비스 제공을 위해 아래 정보를 수집합니다.\n· 필수: 아이디, 이메일, 비밀번호, 이름, 휴대전화번호\n· 선택: 광고성 정보 수신 동의\n\n제3조 (개인정보의 이용 목적)\n수집한 개인정보는 회원 관리, 서비스 제공, 공지사항 전달 목적으로만 활용됩니다.\n\n제4조 (보유 및 이용 기간)\n회원 탈퇴 시 즉시 파기하며, 법령에 의해 보존이 필요한 경우 해당 기간 동안 보관합니다.\n\n[ 이하 생략 ]`
-    },
-    marketing: {
-        title: '광고성 정보 수신 동의',
-        content: `광고성 정보 수신 동의 (선택)\n\n유니콘클래스에서 발송하는 이벤트, 할인 혜택, 신규 강의 소식 등 광고성 정보 수신에 동의합니다.\n\n· 수신 채널: SMS, 이메일\n· 거부 권리: 동의하지 않아도 서비스 이용에 불이익이 없습니다.\n· 철회: 마이페이지 > 설정에서 언제든지 수신 거부 가능합니다.`
-    }
+const TERMS_URL = {
+    terms:     { url: '/supports/terms?ajax=1',             title: '이용약관' },
+    privacy:   { url: '/supports/privacy?ajax=1',           title: '개인정보 처리방침' },
+    marketing: { url: '/supports/policy/marketing?ajax=1',  title: '마케팅 수신 동의' },
 };
 
 function openTerms(key) {
     currentTermsKey = key;
-    const data = TERMS_DATA[key];
-    document.getElementById('termsModalTitle').textContent = data.title;
-    document.getElementById('termsModalContent').textContent = data.content;
+    const info = TERMS_URL[key];
+    document.getElementById('termsModalTitle').textContent = info.title;
+    const content = document.getElementById('termsModalContent');
+    content.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;">불러오는 중...</div>';
     document.getElementById('termsModal').classList.add('show');
+    fetch(info.url)
+        .then(r => r.text())
+        .then(html => { content.innerHTML = html; })
+        .catch(() => { content.innerHTML = '<div style="padding:20px;color:#c0392b;">내용을 불러오지 못했습니다.</div>'; });
 }
 function closeTerms() {
     document.getElementById('termsModal').classList.remove('show');

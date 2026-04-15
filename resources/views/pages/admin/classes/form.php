@@ -1,3 +1,7 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/lang/summernote-ko-KR.min.js"></script>
 <?php
 /**
  * 강의 등록/수정 폼 (공용)
@@ -13,8 +17,9 @@ $isEdit   = !is_null($class);
 $classIdx = $isEdit ? (int)$class['class_idx'] : 0;
 
 // 폼 값: 수정 시 $class, 에러 시 $_POST, 신규는 기본값
+$classData = $class ?? [];
 $v = fn(string $key, $default = '') => htmlspecialchars(
-	(string)($_POST[$key] ?? ($class[$key] ?? $default))
+	(string)($_POST[$key] ?? ($classData[$key] ?? $default))
 );
 
 // 챕터 초기 데이터 (JS 로 전달)
@@ -73,7 +78,7 @@ if ($isEdit) {
 
 							<div class="form-group">
 									<label class="form-label">강의 소개</label>
-									<textarea name="description" class="form-control" rows="8"
+									<textarea id="classDescription" name="description" class="form-control" rows="8"
 														placeholder="강의 상세 소개 (HTML 입력 가능)"><?= $v('description') ?></textarea>
 							</div>
 
@@ -83,11 +88,12 @@ if ($isEdit) {
 													value="<?= $v('kakao_url') ?>" placeholder="https://open.kakao.com/...">
 							</div>
 
-							<div class="form-group">
+							<div class="form-group" id="vimeoGroup"
+										style="<?= ($class['type'] ?? '') === 'premium' ? 'display:none' : '' ?>">
 									<label class="form-label">Vimeo URL (대표 영상)</label>
 									<input type="url" name="vimeo_url" class="form-control"
 													value="<?= $v('vimeo_url') ?>" placeholder="https://vimeo.com/...">
-									<p class="form-hint">챕터별 Vimeo URL은 아래 챕터 관리에서 입력하세요.</p>
+									<p class="form-hint">무료 강의의 대표 영상 URL을 입력하세요.</p>
 							</div>
 					</div>
 
@@ -99,7 +105,7 @@ if ($isEdit) {
 													id="thumbInput">
 									<p class="form-hint">jpg, png, webp / 최대 5MB / 권장 1280×720px</p>
 									<?php if (isset($errors['thumbnail'])): ?>
-											<p class="field-error"><?= htmlspecialchars($errors['thumbnail']) ?></p>
+											<p class="field-error" id="thumbError"><?= htmlspecialchars($errors['thumbnail']) ?></p>
 									<?php endif; ?>
 									<div class="thumb-preview">
 											<?php if ($isEdit && !empty($class['thumbnail'])): ?>
@@ -173,15 +179,19 @@ if ($isEdit) {
 							<div class="form-group" id="priceGroup"
 										style="<?= ($class['type'] ?? 'premium') === 'free' ? 'display:none' : '' ?>">
 									<label class="form-label">정가 (원)</label>
-									<input type="number" name="price_origin" class="form-control"
-													value="<?= $v('price_origin', '0') ?>" min="0" step="1000">
+									<input type="text" name="price_origin" class="form-control"
+													value="<?= number_format($v('price_origin', '0')) ?>"
+													onkeyup="inputNumberFormat(this)"
+													>
 							</div>
 
 							<div class="form-group" id="discountGroup"
 										style="<?= ($class['type'] ?? 'premium') === 'free' ? 'display:none' : '' ?>">
 									<label class="form-label">할인가 (원)</label>
-									<input type="number" name="price" class="form-control"
-													value="<?= $v('price', '0') ?>" min="0" step="1000">
+									<input type="text" name="price" class="form-control"
+													value="<?= number_format($v('price', '0')) ?>"
+													onkeyup="inputNumberFormat(this)"
+													>
 									<p class="form-hint">0이면 정가로 판매됩니다.</p>
 							</div>
 
@@ -511,7 +521,17 @@ function deleteChapterLocal(key) {
 })();
 
 // ── 폼 제출 시 chapters_json 직렬화 ──────────
-document.getElementById('classForm').addEventListener('submit', function () {
+document.getElementById('classForm').addEventListener('submit', function (e) {
+	const typeEl = document.getElementById('typeSelect');
+	const type   = typeEl ? typeEl.value : '<?= htmlspecialchars($class['type'] ?? '') ?>';
+
+	if (type === 'premium' && chapters.length === 0) {
+		e.preventDefault();
+		alert('프리미엄 강의는 챕터를 1개 이상 등록해야 합니다.');
+		document.getElementById('chapterList').scrollIntoView({behavior: 'smooth', block: 'center'});
+		return;
+	}
+
 	const json = JSON.stringify(chapters.map((ch, i) => ({
 			chapter_idx: ch.chapter_idx ?? null,
 			title:       ch.title,
@@ -525,6 +545,16 @@ document.getElementById('classForm').addEventListener('submit', function () {
 
 // ── 초기 렌더링 ───────────────────────────────
 renderChapterList();
+
+// ── 에러 위치로 스크롤 ─────────────────────────
+(function() {
+	const thumbErr = document.getElementById('thumbError');
+	if (thumbErr) { thumbErr.scrollIntoView({behavior:'smooth', block:'center'}); }
+	else {
+		const firstErr = document.querySelector('.field-error, .has-error');
+		if (firstErr) firstErr.scrollIntoView({behavior:'smooth', block:'center'});
+	}
+})();
 
 // ============================================================
 // 강의 자료 관리
@@ -575,6 +605,7 @@ document.getElementById('typeSelect')?.addEventListener('change', function () {
 	const show = this.value === 'premium';
 	document.getElementById('priceGroup').style.display    = show ? '' : 'none';
 	document.getElementById('discountGroup').style.display = show ? '' : 'none';
+	document.getElementById('vimeoGroup').style.display    = show ? 'none' : '';
 });
 
 // ============================================================
@@ -587,4 +618,25 @@ function escHtml(str) {
 	var u = sessionStorage.getItem('back_classes');
 	if (u) { var el = document.querySelector('.btn-cancel'); if (el) el.href = u; }
 })();
+
+// ── 폼 submit 시 써머노트 → textarea 동기화 ──
+document.getElementById('classForm').addEventListener('submit', function () {
+	$('#classDescription').val($('#classDescription').summernote('code'));
+}, true);
+</script>
+<script>
+$(document).ready(function () {
+	$('#classDescription').summernote({
+		height: 400,
+		lang: 'ko-KR',
+		toolbar: [
+			['style',  ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+			['color',  ['forecolor', 'color']],
+			['para',   ['ul', 'ol', 'paragraph']],
+			['table',  ['table']],
+			['insert', ['link', 'video']],
+			['view',   ['codeview']]
+		]
+	});
+});
 </script>

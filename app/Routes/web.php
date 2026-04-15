@@ -44,6 +44,30 @@ $router->get('/uploads/site/{filename}', function (string $filename) {
     readfile($path);
 });
 
+// 이벤트 배너 이미지 서빙
+$router->get('/uploads/banner/{filename}', function (string $filename) {
+    if (str_contains($filename, '..') || str_contains($filename, '/')) {
+        http_response_code(404); exit;
+    }
+    $path = ROOT_PATH . '/storage/uploads/banner/' . $filename;
+    if (!file_exists($path)) { http_response_code(404); exit; }
+    header('Content-Type: ' . mime_content_type($path));
+    header('Content-Length: ' . filesize($path));
+    readfile($path);
+});
+
+// 팝업 이미지 서빙
+$router->get('/uploads/popup/{filename}', function (string $filename) {
+    if (str_contains($filename, '..') || str_contains($filename, '/')) {
+        http_response_code(404); exit;
+    }
+    $path = ROOT_PATH . '/storage/uploads/popup/' . $filename;
+    if (!file_exists($path)) { http_response_code(404); exit; }
+    header('Content-Type: ' . mime_content_type($path));
+    header('Content-Length: ' . filesize($path));
+    readfile($path);
+});
+
 // 강의 자료 파일 서빙
 $router->get('/uploads/materials/{filename}', function (string $filename) {
     if (str_contains($filename, '..') || str_contains($filename, '/')) {
@@ -60,8 +84,8 @@ $router->get('/uploads/materials/{filename}', function (string $filename) {
 // -------------------------------------------------------------------------
 // 공개 페이지
 // -------------------------------------------------------------------------
-$router->get('/', fn() => require VIEW_PATH . '/pages/home.php');
-$router->get('/about', fn() => require VIEW_PATH . '/pages/about.php');
+$router->get('/', [\App\Http\Controllers\HomeController::class, 'index']);
+$router->get('/about', [\App\Http\Controllers\AboutController::class, 'index']);
 
 // -------------------------------------------------------------------------
 // 인증
@@ -90,8 +114,9 @@ $router->get('/auth/naver/callback', [\App\Http\Controllers\AuthController::clas
 // -------------------------------------------------------------------------
 $router->get('/classes',                          [\App\Http\Controllers\ClassController::class, 'index']);
 $router->get('/classes/{class_idx}',              [\App\Http\Controllers\ClassController::class, 'show']);
-$router->get('/classes/{class_idx}/learn',        [\App\Http\Controllers\ClassController::class, 'learn']);
-$router->post('/classes/{class_idx}/enroll',      [\App\Http\Controllers\ClassController::class, 'enroll']);
+$router->get('/classes/{class_idx}/learn',             [\App\Http\Controllers\ClassController::class, 'learn']);
+$router->post('/classes/{class_idx}/enroll',           [\App\Http\Controllers\ClassController::class, 'enroll']);
+$router->post('/api/classes/{class_idx}/progress',     [\App\Http\Controllers\ClassController::class, 'markProgress']);
 $router->post('/classes/{class_idx}/checkout',    [\App\Http\Controllers\ClassController::class, 'checkout']);
 $router->post('/api/wish/{class_idx}',            [\App\Http\Controllers\ClassController::class, 'wishToggle']);
 $router->post('/api/openchat-log/{class_idx}',    [\App\Http\Controllers\ClassController::class, 'openchatLog']);
@@ -125,6 +150,7 @@ $router->get('/supports/notices',                  [\App\Http\Controllers\Suppor
 $router->get('/supports/notices/{notice_idx}',     [\App\Http\Controllers\SupportController::class, 'noticeShow']);
 $router->get('/supports/terms',                    [\App\Http\Controllers\SupportController::class, 'terms']);
 $router->get('/supports/privacy',                  [\App\Http\Controllers\SupportController::class, 'privacy']);
+$router->get('/supports/policy/{type}',            [\App\Http\Controllers\SupportController::class, 'policy']);
 $router->get('/supports/contact',                  [\App\Http\Controllers\SupportController::class, 'contactList']);
 $router->get('/supports/contact/write',            [\App\Http\Controllers\SupportController::class, 'contactForm']);
 $router->post('/supports/contact/write',           [\App\Http\Controllers\SupportController::class, 'contactStore']);
@@ -136,9 +162,13 @@ $router->get('/supports/contact/{qna_idx}',        [\App\Http\Controllers\Suppor
 $router->get('/mypage/my-class',               [\App\Http\Controllers\MypageController::class, 'myClass']);
 $router->get('/mypage/wishlist',               [\App\Http\Controllers\MypageController::class, 'wishlist']);
 $router->get('/mypage/orders',                 [\App\Http\Controllers\MypageController::class, 'orders']);
-$router->get('/mypage/orders/{order_idx}',     [\App\Http\Controllers\MypageController::class, 'orderShow']);
-$router->get('/mypage/qna',                    [\App\Http\Controllers\MypageController::class, 'qnaList']);
-$router->get('/mypage/qna/{qna_idx}',          [\App\Http\Controllers\MypageController::class, 'qnaShow']);
+$router->get('/mypage/orders/{order_idx}',          [\App\Http\Controllers\MypageController::class, 'orderShow']);
+$router->post('/mypage/orders/{order_idx}/refund',  [\App\Http\Controllers\MypageController::class, 'orderRefund']);
+$router->get('/mypage/qna',                        [\App\Http\Controllers\MypageController::class, 'qnaList']);
+$router->get('/mypage/qna/write',                  [\App\Http\Controllers\MypageController::class, 'qnaForm']);
+$router->post('/mypage/qna/write',                 [\App\Http\Controllers\MypageController::class, 'qnaStore']);
+$router->get('/mypage/qna/{qna_idx}',              [\App\Http\Controllers\MypageController::class, 'qnaShow']);
+$router->post('/mypage/qna/{qna_idx}/delete',      [\App\Http\Controllers\MypageController::class, 'qnaDelete']);
 $router->get('/mypage/reviews',                [\App\Http\Controllers\MypageController::class, 'reviews']);
 $router->get('/mypage/reviews/write',          [\App\Http\Controllers\MypageController::class, 'reviewForm']);
 $router->post('/mypage/reviews/write',         [\App\Http\Controllers\MypageController::class, 'reviewStore']);
@@ -210,6 +240,22 @@ $router->post('/admin/faqs/{faq_idx}/delete',                    [\App\Http\Cont
 
 $router->get('/admin/search-logs',                               [\App\Http\Controllers\Admin\StatsController::class, 'searchLogs']);
 $router->get('/admin/openchat-logs',                             [\App\Http\Controllers\Admin\StatsController::class, 'openchatLogs']);
+
+// 이벤트 배너
+$router->get('/admin/banners',                                   [\App\Http\Controllers\Admin\BannerController::class, 'index']);
+$router->get('/admin/banners/create',                            [\App\Http\Controllers\Admin\BannerController::class, 'create']);
+$router->post('/admin/banners',                                  [\App\Http\Controllers\Admin\BannerController::class, 'store']);
+$router->get('/admin/banners/{banner_idx}/edit',                 [\App\Http\Controllers\Admin\BannerController::class, 'edit']);
+$router->post('/admin/banners/{banner_idx}',                     [\App\Http\Controllers\Admin\BannerController::class, 'update']);
+$router->post('/admin/banners/{banner_idx}/delete',              [\App\Http\Controllers\Admin\BannerController::class, 'destroy']);
+
+// 팝업
+$router->get('/admin/popups',                                    [\App\Http\Controllers\Admin\PopupController::class, 'index']);
+$router->get('/admin/popups/create',                             [\App\Http\Controllers\Admin\PopupController::class, 'create']);
+$router->post('/admin/popups',                                   [\App\Http\Controllers\Admin\PopupController::class, 'store']);
+$router->get('/admin/popups/{popup_idx}/edit',                   [\App\Http\Controllers\Admin\PopupController::class, 'edit']);
+$router->post('/admin/popups/{popup_idx}',                       [\App\Http\Controllers\Admin\PopupController::class, 'update']);
+$router->post('/admin/popups/{popup_idx}/delete',                [\App\Http\Controllers\Admin\PopupController::class, 'destroy']);
 
 // 설정
 $router->get('/admin/settings',                                  [\App\Http\Controllers\Admin\SettingController::class, 'index']);

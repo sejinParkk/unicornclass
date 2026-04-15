@@ -100,6 +100,41 @@ $s = fn(string $key) => htmlspecialchars($settings[$key] ?? '');
 					</div>
 			</div>
 
+			<!-- 히어로 배너 동영상 -->
+			<div class="form-card">
+					<h3>히어로 배너 동영상</h3>
+					<?php if (!empty($settings['hero_video'])): ?>
+					<div style="margin-bottom:12px">
+						<video src="/uploads/site/<?= htmlspecialchars($settings['hero_video']) ?>"
+							   controls muted style="max-width:100%;max-height:180px;border-radius:6px;display:block"></video>
+						<label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;cursor:pointer">
+							<input type="checkbox" name="delete_hero_video" value="1"> 현재 영상 삭제
+						</label>
+					</div>
+					<?php endif; ?>
+					<input type="file" name="hero_video" id="heroVideoInput" accept="video/mp4">
+					<div class="hint">mp4 / 최대 200MB / 자동재생·음소거로 재생됩니다</div>
+
+					<hr style="border:none;border-top:1px solid #eee;margin:20px 0">
+
+					<h4 style="font-size:13px;font-weight:700;color:#333;margin-bottom:4px;">
+						포스터 이미지
+						<span style="font-size:11px;font-weight:400;color:#888;margin-left:6px;">영상 로드 전 표시되는 배경 이미지 (검은 화면 방지)</span>
+					</h4>
+					<?php if (!empty($settings['hero_poster'])): ?>
+					<div style="margin-bottom:10px">
+						<img src="/uploads/site/<?= htmlspecialchars($settings['hero_poster']) ?>"
+							 alt="현재 포스터" style="max-width:100%;max-height:120px;object-fit:cover;border-radius:6px;display:block;border:1px solid #eee;">
+						<label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;cursor:pointer">
+							<input type="checkbox" name="delete_hero_poster" value="1"> 현재 포스터 삭제
+						</label>
+					</div>
+					<?php endif; ?>
+					<input type="file" name="hero_poster" id="heroPosterInput"
+						   accept="image/jpeg,image/png,image/webp">
+					<div class="hint">jpg·png·webp / 최대 2MB / 히어로 배너와 동일한 비율 권장</div>
+			</div>
+
 			<!-- SNS 링크 -->
 			<div class="form-card">
 					<h3>SNS 링크</h3>
@@ -124,6 +159,21 @@ $s = fn(string $key) => htmlspecialchars($settings[$key] ?? '');
 									<input type="url" name="sns_blog" class="form-control"
 													value="<?= $s('sns_blog') ?>" placeholder="https://blog.naver.com/...">
 							</div>
+					</div>
+			</div>
+
+			<!-- 카카오 채널 -->
+			<div class="form-card">
+					<h3>카카오 채널</h3>
+					<div class="form-group">
+							<label>카카오 채널 URL
+								<span style="font-size:11px;font-weight:400;color:#888;margin-left:6px;">
+									입력 시 메인 우측 하단에 플로팅 버튼이 표시됩니다
+								</span>
+							</label>
+							<input type="url" name="kakao_channel_url" class="form-control"
+									value="<?= $s('kakao_channel_url') ?>"
+									placeholder="https://pf.kakao.com/_xxxxx">
 					</div>
 			</div>
 		</div>

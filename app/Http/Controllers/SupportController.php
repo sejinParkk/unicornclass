@@ -88,7 +88,13 @@ class SupportController
     public function terms(): void
     {
         $term      = $this->settingRepo->getTerm('terms');
+        $ajaxMode  = !empty($_GET['ajax']);
         $pageTitle = '이용약관 - 고객센터';
+
+        if ($ajaxMode) {
+            require VIEW_PATH . '/pages/supports/terms.php';
+            exit;
+        }
 
         require VIEW_PATH . '/layout/header.php';
         require VIEW_PATH . '/pages/supports/terms.php';
@@ -101,10 +107,49 @@ class SupportController
     public function privacy(): void
     {
         $term      = $this->settingRepo->getTerm('privacy');
+        $ajaxMode  = !empty($_GET['ajax']);
         $pageTitle = '개인정보처리방침 - 고객센터';
+
+        if ($ajaxMode) {
+            require VIEW_PATH . '/pages/supports/privacy.php';
+            exit;
+        }
 
         require VIEW_PATH . '/layout/header.php';
         require VIEW_PATH . '/pages/supports/privacy.php';
+        require VIEW_PATH . '/layout/footer.php';
+    }
+
+    // =========================================================================
+    // GET /supports/policy/{type}   (generic — ajax=1 지원)
+    // =========================================================================
+    private const POLICY_TYPES = [
+        'marketing'     => '마케팅 수신 동의',
+        'disclaimer'    => '면책조항',
+        'purchase'      => '구매 조건 동의',
+        'ecommerce'     => '전자금융거래 이용약관',
+        'privacy_third' => '개인정보 제3자 제공 동의 (PG사)',
+    ];
+
+    public function policy(string $type): void
+    {
+        if (!array_key_exists($type, self::POLICY_TYPES)) {
+            http_response_code(404);
+            exit;
+        }
+
+        $term      = $this->settingRepo->getTerm($type);
+        $policyTitle = self::POLICY_TYPES[$type];
+        $ajaxMode  = !empty($_GET['ajax']);
+        $pageTitle = $policyTitle . ' - 고객센터';
+
+        if ($ajaxMode) {
+            require VIEW_PATH . '/pages/supports/policy.php';
+            exit;
+        }
+
+        require VIEW_PATH . '/layout/header.php';
+        require VIEW_PATH . '/pages/supports/policy.php';
         require VIEW_PATH . '/layout/footer.php';
     }
 

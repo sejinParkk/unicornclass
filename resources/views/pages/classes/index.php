@@ -6,61 +6,6 @@ $typeLabel = match($type) {
     default   => '전체 클래스',
 };
 ?>
-<style>
-/* ── 서브 배너 ── */
-.cl-banner{position:relative;background:linear-gradient(105deg,#0d0d0d 0%,#1a1a2e 60%,#0f2027 100%);padding:36px 32px 32px;overflow:hidden}
-.cl-banner-bg{position:absolute;inset:0;background:linear-gradient(105deg,rgba(192,57,43,.15) 0%,transparent 60%);pointer-events:none}
-.cl-banner-label{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.cl-banner-title{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.2}
-
-/* ── 탭 ── */
-.cl-tabs{background:#fff;border-bottom:2px solid #eee;padding:0 32px;display:flex;gap:0}
-.cl-tab{padding:0 4px;height:50px;margin-right:24px;display:flex;align-items:center;font-size:14px;font-weight:600;color:#999;border-bottom:3px solid transparent;margin-bottom:-2px;text-decoration:none;transition:all .15s}
-.cl-tab:hover{color:#333}
-.cl-tab.active{color:#c0392b;border-bottom-color:#c0392b}
-
-/* ── 카테고리 필터 ── */
-.cat-bar{padding:16px 32px 14px;border-bottom:1px solid #f0f0f0;display:flex;gap:6px;flex-wrap:wrap}
-.cat-btn{height:30px;padding:0 14px;border-radius:15px;border:1px solid #e0e0e0;font-size:12.5px;font-weight:600;color:#555;background:#fff;text-decoration:none;display:inline-flex;align-items:center;transition:all .15s}
-.cat-btn:hover{border-color:#c0392b;color:#c0392b}
-.cat-btn.active{background:#c0392b;border-color:#c0392b;color:#fff}
-
-/* ── 카드 그리드 ── */
-.cl-grid-wrap{padding:28px 32px 0}
-.cl-count{font-size:13px;color:#888;margin-bottom:16px}
-.cl-count strong{color:#c0392b}
-.cl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.cl-card{border-radius:8px;overflow:hidden;cursor:pointer;border:1px solid #eee;background:#fff;text-decoration:none;transition:box-shadow .15s,transform .15s;display:block}
-.cl-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px)}
-.card-thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:#1a1a2e}
-.card-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.card-thumb-ph{width:100%;height:100%;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%)}
-.card-info{padding:10px 12px 14px}
-.card-tags{display:flex;gap:3px;margin-bottom:6px;flex-wrap:wrap}
-.ctag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:2px}
-.ct-hot{background:#fdecea;color:#c0392b}
-.ct-new{background:#e8f5e9;color:#27ae60}
-.ct-free{background:#e8f5e9;color:#27ae60;border:1px solid #27ae60}
-.ct-premium{background:#f3e8ff;color:#8e44ad}
-.card-title{font-size:13px;font-weight:700;color:#1a1a1a;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:4px}
-.card-meta{font-size:11.5px;color:#999}
-
-/* ── 빈 상태 ── */
-.cl-empty{padding:80px 32px;text-align:center;color:#aaa;font-size:14px}
-
-/* ── 페이지네이션 ── */
-.pagination{display:flex;justify-content:center;align-items:center;gap:4px;margin:32px 0 60px}
-.page-btn{width:34px;height:34px;border-radius:6px;border:1px solid #ddd;background:#fff;font-size:13px;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all .15s}
-.page-btn:hover{border-color:#c0392b;color:#c0392b}
-.page-btn.active{background:#c0392b;border-color:#c0392b;color:#fff;font-weight:700}
-.page-arrow{width:34px;height:34px;border-radius:6px;border:1px solid #ddd;background:#fff;font-size:14px;color:#888;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all .15s}
-.page-arrow:hover{border-color:#c0392b;color:#c0392b}
-.page-arrow.disabled{opacity:.35;pointer-events:none}
-
-@media(max-width:900px){.cl-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.cl-grid{grid-template-columns:1fr}.cl-grid-wrap,.cat-bar,.cl-tabs{padding-left:16px;padding-right:16px}}
-</style>
-
 <!-- 서브 배너 -->
 <div class="cl-banner">
   <div class="cl-banner-bg"></div>
