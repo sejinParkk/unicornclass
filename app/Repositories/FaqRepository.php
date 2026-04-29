@@ -12,16 +12,16 @@ class FaqRepository
     {
         if ($category !== '') {
             return DB::select(
-                'SELECT * FROM lc_faq WHERE category = ? ORDER BY sort_order ASC, faq_idx ASC',
+                'SELECT * FROM lc_faq WHERE category = ? AND deleted_at IS NULL ORDER BY sort_order ASC, faq_idx ASC',
                 [$category]
             );
         }
-        return DB::select('SELECT * FROM lc_faq ORDER BY sort_order ASC, faq_idx ASC');
+        return DB::select('SELECT * FROM lc_faq WHERE deleted_at IS NULL ORDER BY sort_order ASC, faq_idx ASC');
     }
 
     public function findByIdx(int $faqIdx): ?array
     {
-        return DB::selectOne('SELECT * FROM lc_faq WHERE faq_idx = ?', [$faqIdx]);
+        return DB::selectOne('SELECT * FROM lc_faq WHERE faq_idx = ? AND deleted_at IS NULL', [$faqIdx]);
     }
 
     public function create(array $data): int
@@ -44,7 +44,7 @@ class FaqRepository
 
     public function delete(int $faqIdx): void
     {
-        DB::execute('DELETE FROM lc_faq WHERE faq_idx = ?', [$faqIdx]);
+        DB::execute('UPDATE lc_faq SET deleted_at = NOW() WHERE faq_idx = ? AND deleted_at IS NULL', [$faqIdx]);
     }
 
     public function getCategories(): array

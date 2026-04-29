@@ -29,7 +29,7 @@ class ContactController
             'category' => $_GET['category'] ?? '',
         ];
         $page  = max(1, (int) ($_GET['page'] ?? 1));
-        $limit = 20;
+        $limit = 10;
 
         $result     = $this->repo->getAdminList($filters, $page, $limit);
         $contacts   = $result['list'];

@@ -37,7 +37,7 @@ class MemberApiController
             echo json_encode(['ok' => false, 'message' => '올바른 휴대폰 번호를 입력해주세요.']);
             return;
         }
-        if (!in_array($purpose, ['find_id', 'find_password', 'register'], true)) {
+        if (!in_array($purpose, ['find_id', 'find_password', 'register', 'change_phone'], true)) {
             echo json_encode(['ok' => false, 'message' => '잘못된 요청입니다.']);
             return;
         }
@@ -49,6 +49,24 @@ class MemberApiController
         }
 
         $phoneFormatted = $this->formatPhone($phone);
+
+        // 연락처 변경: 로그인 확인 + 현재 번호 동일 차단 + 타 계정 번호 차단
+        if ($purpose === 'change_phone') {
+            $session = \App\Core\Auth::member();
+            if (!$session) {
+                echo json_encode(['ok' => false, 'message' => '로그인이 필요합니다.']);
+                return;
+            }
+            $currentPhone = $session['mb_phone'] ?? '';
+            if ($phoneFormatted === $currentPhone) {
+                echo json_encode(['ok' => false, 'message' => '현재 사용 중인 번호와 동일합니다.']);
+                return;
+            }
+            if ($this->memberRepo->existsByPhoneExcept($phoneFormatted, (int)$session['member_idx'])) {
+                echo json_encode(['ok' => false, 'message' => '이미 다른 계정에서 사용 중인 번호입니다.']);
+                return;
+            }
+        }
 
         // 비밀번호 찾기: 아이디+번호 선검증
         if ($purpose === 'find_password') {
@@ -155,6 +173,10 @@ class MemberApiController
                 'phone' => $phone,
                 'mb_id' => $mbId,
             ];
+        }
+
+        if ($purpose === 'change_phone') {
+            $_SESSION['sms_verified_change_phone'] = $phone;
         }
 
         echo json_encode(['ok' => true]);

@@ -57,7 +57,7 @@ class DashboardController
 
         try {
             $stats['pending_contacts'] = (int) (DB::selectOne(
-                "SELECT COUNT(*) AS cnt FROM lc_qna WHERE status = 'wait'"
+                "SELECT COUNT(*) AS cnt FROM lc_qna WHERE status = 'wait' AND deleted_at IS NULL"
             )['cnt'] ?? 0);
         } catch (\Throwable) {}
 

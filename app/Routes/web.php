@@ -68,11 +68,48 @@ $router->get('/uploads/popup/{filename}', function (string $filename) {
     readfile($path);
 });
 
-// 강의 자료 파일 서빙
+// 후기 이미지 서빙
+$router->get('/uploads/review/{filename}', function (string $filename) {
+    if (str_contains($filename, '..') || str_contains($filename, '/')) {
+        http_response_code(404); exit;
+    }
+    $path = ROOT_PATH . '/storage/uploads/review/' . $filename;
+    if (!file_exists($path)) { http_response_code(404); exit; }
+    header('Content-Type: ' . mime_content_type($path));
+    header('Content-Length: ' . filesize($path));
+    readfile($path);
+});
+
+// 강의 자료 파일 서빙 (로그인 + 수강 여부 검증)
 $router->get('/uploads/materials/{filename}', function (string $filename) {
     if (str_contains($filename, '..') || str_contains($filename, '/')) {
         http_response_code(404); exit;
     }
+
+    // 로그인 필수
+    if (!\App\Core\Auth::isMember()) {
+        http_response_code(403);
+        exit('로그인 후 이용 가능합니다.');
+    }
+
+    // 파일이 속한 강의 조회
+    $file = \App\Core\DB::selectOne(
+        'SELECT f.class_idx FROM lc_class_file f WHERE f.file_path = ? AND f.is_active = 1 LIMIT 1',
+        [$filename]
+    );
+    if (!$file) { http_response_code(404); exit; }
+
+    // 수강(신청) 여부 확인
+    $memberIdx = (int) \App\Core\Auth::member()['member_idx'];
+    $enroll = \App\Core\DB::selectOne(
+        'SELECT 1 FROM lc_enroll WHERE member_idx = ? AND class_idx = ? LIMIT 1',
+        [$memberIdx, (int) $file['class_idx']]
+    );
+    if (!$enroll) {
+        http_response_code(403);
+        exit('수강 신청 후 이용 가능합니다.');
+    }
+
     $path = ROOT_PATH . '/storage/uploads/materials/' . $filename;
     if (!file_exists($path)) { http_response_code(404); exit; }
     header('Content-Type: ' . mime_content_type($path));
@@ -110,6 +147,13 @@ $router->get('/auth/naver',          [\App\Http\Controllers\AuthController::clas
 $router->get('/auth/naver/callback', [\App\Http\Controllers\AuthController::class, 'naverCallback']);
 
 // -------------------------------------------------------------------------
+// 회원 API (SMS 인증, 아이디 중복 확인)
+// -------------------------------------------------------------------------
+$router->post('/api/member/send-sms',    [\App\Http\Controllers\Api\MemberApiController::class, 'sendSms']);
+$router->post('/api/member/verify-sms',  [\App\Http\Controllers\Api\MemberApiController::class, 'verifySms']);
+$router->post('/api/member/check-id',    [\App\Http\Controllers\Api\MemberApiController::class, 'checkId']);
+
+// -------------------------------------------------------------------------
 // 강의
 // -------------------------------------------------------------------------
 $router->get('/classes',                          [\App\Http\Controllers\ClassController::class, 'index']);
@@ -117,6 +161,7 @@ $router->get('/classes/{class_idx}',              [\App\Http\Controllers\ClassCo
 $router->get('/classes/{class_idx}/learn',             [\App\Http\Controllers\ClassController::class, 'learn']);
 $router->post('/classes/{class_idx}/enroll',           [\App\Http\Controllers\ClassController::class, 'enroll']);
 $router->post('/api/classes/{class_idx}/progress',     [\App\Http\Controllers\ClassController::class, 'markProgress']);
+$router->post('/api/classes/{class_idx}/complete',     [\App\Http\Controllers\ClassController::class, 'completeChapter']);
 $router->post('/classes/{class_idx}/checkout',    [\App\Http\Controllers\ClassController::class, 'checkout']);
 $router->post('/api/wish/{class_idx}',            [\App\Http\Controllers\ClassController::class, 'wishToggle']);
 $router->post('/api/openchat-log/{class_idx}',    [\App\Http\Controllers\ClassController::class, 'openchatLog']);
@@ -174,6 +219,7 @@ $router->get('/mypage/reviews/write',          [\App\Http\Controllers\MypageCont
 $router->post('/mypage/reviews/write',         [\App\Http\Controllers\MypageController::class, 'reviewStore']);
 $router->get('/mypage/profile',                [\App\Http\Controllers\MypageController::class, 'profileForm']);
 $router->post('/mypage/profile',               [\App\Http\Controllers\MypageController::class, 'profileUpdate']);
+$router->get('/mypage/withdraw/check',         [\App\Http\Controllers\MypageController::class, 'withdrawCheck']);
 $router->get('/mypage/withdraw',               [\App\Http\Controllers\MypageController::class, 'withdrawForm']);
 $router->post('/mypage/withdraw',              [\App\Http\Controllers\MypageController::class, 'withdraw']);
 
@@ -184,6 +230,15 @@ $router->get('/admin',                                           [\App\Http\Cont
 $router->get('/admin/login',                                     [\App\Http\Controllers\Admin\AuthController::class, 'loginForm']);
 $router->post('/admin/login',                                    [\App\Http\Controllers\Admin\AuthController::class, 'login']);
 $router->get('/admin/logout',                                    [\App\Http\Controllers\Admin\AuthController::class, 'logout']);
+
+$router->get('/admin/categories',                                [\App\Http\Controllers\Admin\CategoryController::class, 'index']);
+$router->get('/admin/categories/create',                         [\App\Http\Controllers\Admin\CategoryController::class, 'create']);
+$router->post('/admin/categories',                               [\App\Http\Controllers\Admin\CategoryController::class, 'storeForm']);
+$router->post('/admin/categories/store',                         [\App\Http\Controllers\Admin\CategoryController::class, 'store']);
+$router->get('/admin/categories/{idx}/edit',                     [\App\Http\Controllers\Admin\CategoryController::class, 'edit']);
+$router->post('/admin/categories/{idx}',                         [\App\Http\Controllers\Admin\CategoryController::class, 'updateForm']);
+$router->post('/admin/categories/{idx}/update',                  [\App\Http\Controllers\Admin\CategoryController::class, 'update']);
+$router->post('/admin/categories/{idx}/delete',                  [\App\Http\Controllers\Admin\CategoryController::class, 'destroy']);
 
 $router->get('/admin/classes',                                   [\App\Http\Controllers\Admin\ClassController::class, 'index']);
 $router->get('/admin/classes/create',                            [\App\Http\Controllers\Admin\ClassController::class, 'create']);
@@ -224,6 +279,11 @@ $router->get('/admin/contacts',                                  [\App\Http\Cont
 $router->get('/admin/contacts/{contact_idx}',                    [\App\Http\Controllers\Admin\ContactController::class, 'show']);
 $router->post('/admin/contacts/{contact_idx}/answer',            [\App\Http\Controllers\Admin\ContactController::class, 'answer']);
 
+$router->get('/admin/reviews',                                   [\App\Http\Controllers\Admin\ReviewController::class, 'index']);
+$router->get('/admin/reviews/{review_idx}',                      [\App\Http\Controllers\Admin\ReviewController::class, 'show']);
+$router->post('/admin/reviews/{review_idx}/active',              [\App\Http\Controllers\Admin\ReviewController::class, 'toggleActive']);
+$router->post('/admin/reviews/{review_idx}/delete',              [\App\Http\Controllers\Admin\ReviewController::class, 'destroy']);
+
 $router->get('/admin/notices',                                   [\App\Http\Controllers\Admin\NoticeController::class, 'index']);
 $router->get('/admin/notices/create',                            [\App\Http\Controllers\Admin\NoticeController::class, 'create']);
 $router->post('/admin/notices',                                  [\App\Http\Controllers\Admin\NoticeController::class, 'store']);
@@ -262,8 +322,14 @@ $router->get('/admin/settings',                                  [\App\Http\Cont
 $router->post('/admin/settings',                                 [\App\Http\Controllers\Admin\SettingController::class, 'update']);
 
 // 약관 관리
-$router->get('/admin/terms',                                     [\App\Http\Controllers\Admin\TermsController::class, 'index']);
-$router->post('/admin/terms/{type}',                             [\App\Http\Controllers\Admin\TermsController::class, 'update']);
+$router->get( '/admin/terms',                       [\App\Http\Controllers\Admin\TermsController::class, 'index']);
+$router->get( '/admin/terms/{type}/versions',       [\App\Http\Controllers\Admin\TermsController::class, 'versions']);
+$router->get( '/admin/terms/{type}/create',         [\App\Http\Controllers\Admin\TermsController::class, 'createForm']);
+$router->post('/admin/terms/{type}',                [\App\Http\Controllers\Admin\TermsController::class, 'store']);
+$router->get( '/admin/terms/v/{idx}/edit',          [\App\Http\Controllers\Admin\TermsController::class, 'editForm']);
+$router->post('/admin/terms/v/{idx}',               [\App\Http\Controllers\Admin\TermsController::class, 'update']);
+$router->post('/admin/terms/v/{idx}/current',       [\App\Http\Controllers\Admin\TermsController::class, 'setCurrent']);
+$router->post('/admin/terms/v/{idx}/delete',        [\App\Http\Controllers\Admin\TermsController::class, 'destroy']);
 
 // 관리자 프로필
 $router->get('/admin/profile',                                   [\App\Http\Controllers\Admin\ProfileController::class, 'index']);

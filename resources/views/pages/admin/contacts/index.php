@@ -46,7 +46,7 @@ $catLabel = ['class' => '강의', 'payment' => '결제', 'account' => '계정', 
 			<tr>
 				<th>NO</th>
 				<th>분류</th>
-				<th>제목</th>
+				<th class="text_left">제목</th>
 				<th>회원</th>
 				<th>상태</th>
 				<th>접수일</th>
@@ -61,7 +61,7 @@ $catLabel = ['class' => '강의', 'payment' => '결제', 'account' => '계정', 
 			<tr>
 				<td><?= $total - ($page-1)*$limit - $_i ?></td>
 				<td><?= $catLabel[$c['category']] ?? $c['category'] ?></td>
-				<td class="title-cell"><?= htmlspecialchars($c['title']) ?></td>
+				<td class="title-cell text_left"><?= htmlspecialchars($c['title']) ?></td>
 				<td>
 					<span style="font-weight:600;"><?= htmlspecialchars($c['mb_name']) ?></span>
 					<div style="font-size:11.5px;color:#a0aec0;"><?= htmlspecialchars($c['mb_id']) ?></div>

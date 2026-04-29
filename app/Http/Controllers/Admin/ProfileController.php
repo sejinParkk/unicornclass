@@ -54,13 +54,15 @@ class ProfileController
         $name     = trim($_POST['name'] ?? '');
         $email    = trim($_POST['email'] ?? '') ?: null;
 
+        header('Content-Type: application/json; charset=utf-8');
+
         if ($name === '') {
-            header('Location: /admin/profile?error=' . urlencode('이름을 입력해주세요.'));
+            echo json_encode(['ok' => false, 'errors' => ['name' => '이름을 입력해주세요.']]);
             exit;
         }
 
         $this->repo->updateProfile($adminIdx, $name, $email);
-        header('Location: /admin/profile?saved=1');
+        echo json_encode(['ok' => true, 'redirect' => '/admin/profile?saved=1']);
         exit;
     }
 
@@ -77,22 +79,24 @@ class ProfileController
         $newPw       = $_POST['new_password'] ?? '';
         $confirmPw   = $_POST['confirm_password'] ?? '';
 
+        header('Content-Type: application/json; charset=utf-8');
+
         if (!password_verify($currentPw, $admin['password'])) {
-            header('Location: /admin/profile?pw_error=' . urlencode('현재 비밀번호가 올바르지 않습니다.'));
+            echo json_encode(['ok' => false, 'errors' => ['current_password' => '현재 비밀번호가 올바르지 않습니다.']]);
             exit;
         }
         if (strlen($newPw) < 8) {
-            header('Location: /admin/profile?pw_error=' . urlencode('새 비밀번호는 8자 이상이어야 합니다.'));
+            echo json_encode(['ok' => false, 'errors' => ['new_password' => '새 비밀번호는 8자 이상이어야 합니다.']]);
             exit;
         }
         if ($newPw !== $confirmPw) {
-            header('Location: /admin/profile?pw_error=' . urlencode('새 비밀번호가 일치하지 않습니다.'));
+            echo json_encode(['ok' => false, 'errors' => ['confirm_password' => '새 비밀번호가 일치하지 않습니다.']]);
             exit;
         }
 
         $hashed = password_hash($newPw, PASSWORD_BCRYPT, ['cost' => 12]);
         $this->repo->updatePassword($adminIdx, $hashed);
-        header('Location: /admin/profile?pw_changed=1');
+        echo json_encode(['ok' => true, 'redirect' => '/admin/profile?pw_changed=1']);
         exit;
     }
 }

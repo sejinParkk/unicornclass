@@ -32,7 +32,7 @@ if ($currentChapter && !empty($currentChapter['vimeo_url'])) {
     $vid = extractVimeoId($currentChapter['vimeo_url']);
     if ($vid) {
         $embedUrl = 'https://player.vimeo.com/video/' . $vid
-                  . '?autoplay=1&title=0&byline=0&portrait=0&dnt=1';
+                  . '?title=0&byline=0&portrait=0&dnt=1&share=0&like=0&watchlater=0';
     }
 }
 
@@ -60,12 +60,12 @@ function shortUrl(string $url): string {
 <?php endif; ?>
 
 <!-- ── 브레드크럼 ────────────────────────────────── -->
-<div id="learn-breadcrumb">
+<!-- <div id="learn-breadcrumb">
   <span><a href="/" style="color:inherit;text-decoration:none">홈</a></span>
   <span><a href="/mypage/my-class" style="color:inherit;text-decoration:none">나의 강의</a></span>
   <span><?= htmlspecialchars(mb_substr($class['title'] ?? '', 0, 30)) ?></span>
   <span class="cur">영상 수강</span>
-</div>
+</div> -->
 
 <!-- ── Vimeo 플레이어 ────────────────────────────── -->
 <div id="learn-player-wrap">
@@ -82,7 +82,7 @@ function shortUrl(string $url): string {
           <?php if (empty($chapters)): ?>
             등록된 챕터가 없습니다.
           <?php else: ?>
-            좌측 챕터 목록에서 강의를 선택해주세요.
+            목록에서 강의를 선택해주세요.
           <?php endif; ?>
         </div>
       </div>
@@ -91,7 +91,7 @@ function shortUrl(string $url): string {
 </div>
 
 <!-- ── 강의 정보 바 ──────────────────────────────── -->
-<div id="learn-info-bar">
+<!-- <div id="learn-info-bar">
   <div class="learn-info-title"><?= htmlspecialchars($class['title']) ?></div>
   <?php if (!empty($class['category_name'])): ?>
     <span class="learn-info-badge"><?= htmlspecialchars($class['category_name']) ?></span>
@@ -102,18 +102,20 @@ function shortUrl(string $url): string {
       &nbsp;·&nbsp; <?= htmlspecialchars($currentChapter['title']) ?>
     <?php endif; ?>
   </div>
-</div>
+</div> -->
 
 <!-- ── 2단 레이아웃 ─────────────────────────────── -->
 <div id="learn-content-wrap">
 
   <!-- ════ 좌측: 챕터 + 강의소개 + 자료 ════ -->
   <div class="learn-content-left">
+    <p class="learn-content-cate">Premium</p>
+    <p class="learn-content-title"><?= htmlspecialchars($class['title']) ?></p>
 
     <!-- 챕터 목록 -->
     <?php if (!empty($chapters)): ?>
     <div class="learn-chapter-list">
-      <div class="learn-section-label">강의 목록</div>
+      <div class="learn-content-title learn-section-label">강의 목록</div>
       <?php foreach ($chapters as $i => $ch):
         $chIdx   = (int) $ch['chapter_idx'];
         $isDone  = !empty($progressMap[$chIdx]);
@@ -127,15 +129,17 @@ function shortUrl(string $url): string {
       ?>
       <a href="/classes/<?= (int)$class['class_idx'] ?>/learn?chapter=<?= $chIdx ?>"
          class="<?= $classes ?>">
-        <div class="ch-num">
-          <?php if ($isDone): ?>✓<?php else: ?><?= $i + 1 ?><?php endif; ?>
+        <p class="ch-play">
+          <?= $isDone ? '<img src="/assets/img/icon_player_on.svg" alt="">' : '<img src="/assets/img/icon_player.svg" alt="">' ?>          
+        </p>        
+        <div class="ch-title">
+          <?= $i + 1 ?>. <?= htmlspecialchars($ch['title']) ?>
         </div>
-        <div class="ch-title"><?= htmlspecialchars($ch['title']) ?></div>
         <?php if ($dur): ?>
           <div class="ch-duration"><?= $dur ?></div>
         <?php endif; ?>
         <!-- 완료 체크 버튼 -->
-        <button class="progress-toggle"
+        <!-- <button class="progress-toggle"
                 data-chapter="<?= $chIdx ?>"
                 data-done="<?= $isDone ? '1' : '0' ?>"
                 onclick="event.preventDefault(); toggleProgress(this)"
@@ -143,9 +147,8 @@ function shortUrl(string $url): string {
                 style="background:none;border:1px solid <?= $isDone ? '#27ae60' : '#ddd' ?>;
                        border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer;
                        color:<?= $isDone ? '#27ae60' : '#bbb' ?>;flex-shrink:0;
-                       transition:all .15s">
-          <?= $isDone ? '✓완료' : '완료' ?>
-        </button>
+                       transition:all .15s">          
+        </button> -->
       </a>
       <?php endforeach; ?>
     </div>
@@ -153,41 +156,45 @@ function shortUrl(string $url): string {
 
     <!-- 강의 소개 -->
     <?php if (!empty($class['description'])): ?>
-    <div style="margin-bottom:28px">
-      <div class="learn-section-label">강의 소개</div>
+    <div class="learn-chapter-list">
+      <div class="learn-content-title learn-section-label">강의 소개</div>
       <div class="learn-desc"><?= $class['description'] ?></div>
     </div>
     <?php endif; ?>
 
     <!-- 강의 자료 -->
     <?php if (!empty($materials)): ?>
-    <div>
-      <div class="learn-section-label">📎 강의 자료</div>
+    <div class="learn-chapter-list">
+      <div class="learn-content-title learn-section-label">강의 자료</div>
       <div class="learn-material-list">
         <?php foreach ($materials as $mat): ?>
           <?php if ($mat['file_type'] === 'file'): ?>
           <div class="learn-material-item file-type">
-            <div class="learn-material-icon file-icon">📄</div>
+            <div class="learn-material-icon file-icon"><img src="/assets/img/icon_class_mater_file.svg" alt=""></div>
             <div class="learn-material-info">
               <div class="learn-material-name"><?= htmlspecialchars($mat['title']) ?></div>
               <div class="learn-material-meta">
                 첨부 파일<?= $mat['file_size'] > 0 ? ' · ' . fmtFileSize((int)$mat['file_size']) : '' ?>
               </div>
             </div>
-            <a href="/uploads/materials/<?= htmlspecialchars($mat['file_path']) ?>"
-               class="btn-material-dl" download>다운로드</a>
+            <a href="/uploads/materials/<?= htmlspecialchars($mat['file_path']) ?>" class="btn-material-dl" download>
+              <img src="/assets/img/icon_class_download.svg" alt="">
+              <span>다운로드</span>  
+            </a>
           </div>
           <?php else: ?>
           <div class="learn-material-item link-type">
-            <div class="learn-material-icon link-icon">🔗</div>
+            <div class="learn-material-icon link-icon"><img src="/assets/img/icon_class_mater_link.svg" alt=""></div>
             <div class="learn-material-info">
               <div class="learn-material-name"><?= htmlspecialchars($mat['title']) ?></div>
               <div class="learn-material-meta link-meta">
                 외부 링크 · <?= htmlspecialchars(shortUrl($mat['external_url'] ?? '')) ?>
               </div>
             </div>
-            <a href="<?= htmlspecialchars($mat['external_url'] ?? '#') ?>"
-               target="_blank" rel="noopener" class="btn-material-link">새 탭 열기</a>
+            <a href="<?= htmlspecialchars($mat['external_url'] ?? '#') ?>" target="_blank" rel="noopener" class="btn-material-dl">
+              <img src="/assets/img/icon_class_target.svg" alt="">
+              <span>이동하기</span>
+            </a>
           </div>
           <?php endif; ?>
         <?php endforeach; ?>
@@ -201,55 +208,36 @@ function shortUrl(string $url): string {
   <div class="learn-content-right">
 
     <!-- 강사 카드 -->
-    <div class="learn-side-card">
-      <div class="learn-side-head">강사</div>
+    <div class="">      
       <div class="learn-inst-body">
         <div class="learn-inst-avatar">
           <?php if (!empty($class['instructor_photo'])): ?>
-            <img src="/uploads/instructor/<?= htmlspecialchars($class['instructor_photo']) ?>"
-                 alt="<?= htmlspecialchars($class['instructor_name']) ?>">
+            <!-- <img src="/uploads/instructor/<?= htmlspecialchars($class['instructor_photo']) ?>" alt="<?= htmlspecialchars($class['instructor_name']) ?>"> -->
+             <?= htmlspecialchars(mb_substr($class['instructor_name'] ?? '?', 0, 1)) ?>
           <?php else: ?>
             <?= htmlspecialchars(mb_substr($class['instructor_name'] ?? '?', 0, 1)) ?>
           <?php endif; ?>
         </div>
         <div>
           <div class="learn-inst-name"><?= htmlspecialchars($class['instructor_name'] ?? '') ?></div>
-          <?php if (!empty($class['instructor_field'])): ?>
-            <div class="learn-inst-sub"><?= htmlspecialchars($class['instructor_field']) ?></div>
+          <?php if (!empty($class['instructor_category_name'])): ?>
+            <div class="learn-inst-sub"><?= htmlspecialchars($class['instructor_category_name']) ?></div>
           <?php endif; ?>
         </div>
       </div>
-    </div>
-
-    <!-- 카카오 오픈채팅 카드 -->
-    <?php $kakaoUrl = $enroll['kakao_url'] ?? $class['kakao_url'] ?? ''; ?>
-    <?php if ($kakaoUrl): ?>
-    <div class="learn-kakao-card">
-      <div class="learn-kakao-head">💬 카카오 오픈채팅</div>
-      <div class="learn-kakao-body">
-        <div class="learn-kakao-desc">
-          수강생 전용 오픈채팅방입니다.<br>질문·피드백은 채팅방을 이용해 주세요.
-        </div>
-        <button class="btn-kakao-enter"
-                onclick="openKakao('<?= htmlspecialchars($kakaoUrl) ?>', <?= (int)$class['class_idx'] ?>)">
-          💬 오픈채팅 입장하기
-        </button>
-      </div>
-    </div>
-    <?php endif; ?>
+    </div>    
 
     <!-- 결제 정보 카드 -->
     <div class="learn-side-card">
-      <div class="learn-side-head">수강 정보</div>
+      <div class="learn-side-head">결제 정보</div>
+      <div class="learn-side-box">
       <?php if ($order): ?>
-        <?php if ($order['toss_order_id']): ?>
         <div class="learn-order-row">
           <span class="learn-order-label">주문번호</span>
-          <span class="learn-order-value" style="font-size:11px">
-            <?= htmlspecialchars($order['toss_order_id']) ?>
+          <span class="learn-order-value">
+            <?= $order['toss_order_id'] ? htmlspecialchars($order['toss_order_id']) : 'UC-' . str_pad((string)$order['order_idx'], 6, '0', STR_PAD_LEFT) ?>
           </span>
         </div>
-        <?php endif; ?>
         <div class="learn-order-row">
           <span class="learn-order-label">결제금액</span>
           <span class="learn-order-value" style="color:#c0392b">
@@ -295,26 +283,100 @@ function shortUrl(string $url): string {
           <span class="learn-order-label">수강률</span>
           <span class="learn-order-value" id="progress-label"><?= $doneCount ?>/<?= $total ?>강 (<?= $rate ?>%)</span>
         </div>
-        <div style="height:4px;background:#f0f0f0;border-radius:2px;overflow:hidden">
-          <div style="height:100%;width:<?= $rate ?>%;background:<?= $rate >= 100 ? '#27ae60' : '#c0392b' ?>;border-radius:2px;transition:width .3s"></div>
+        <div class="learn-prog">
+          <div class="learn-bar" style="width:<?= $rate ?>%;"></div>
         </div>
       </div>
       <?php endif; ?>
+      </div>
     </div>
 
+    <!-- 카카오 오픈채팅 카드 -->
+    <?php $kakaoUrl = $enroll['kakao_url'] ?? $class['kakao_url'] ?? ''; ?>
+    <?php if ($kakaoUrl): ?>
+    <div class="learn-side-card ver2">
+      <div class="learn-kakao-desc">
+        수강생 전용 오픈채팅방입니다.<br>질문·피드백은 채팅방을 이용해 주세요.
+      </div>
+      <button class="btn-kakao-enter" onclick="openKakao('<?= htmlspecialchars($kakaoUrl) ?>', <?= (int)$class['class_idx'] ?>)">
+        <img src="/assets/img/icon_class_kakao2.svg" alt="">
+        <span>오픈채팅 입장하기</span>
+      </button>
+    </div>
+    <?php endif; ?>
+
     <!-- 강의 상세 링크 -->
-    <a href="/classes/<?= (int)$class['class_idx'] ?>"
+    <!-- <a href="/classes/<?= (int)$class['class_idx'] ?>"
        style="display:block;text-align:center;padding:10px;font-size:12px;color:#aaa;text-decoration:none;margin-top:4px">
       ← 강의 상세 페이지로
-    </a>
+    </a> -->
 
   </div><!-- /.learn-content-right -->
 
 </div><!-- /#learn-content-wrap -->
 
+<script src="https://player.vimeo.com/api/player.js"></script>
 <script>
-const CSRF_TOKEN  = '<?= htmlspecialchars($csrfToken) ?>';
-const CLASS_IDX   = <?= (int)$class['class_idx'] ?>;
+const CSRF_TOKEN      = '<?= htmlspecialchars($csrfToken) ?>';
+const CLASS_IDX       = <?= (int)$class['class_idx'] ?>;
+const CURRENT_CHAPTER = <?= $currentChapter ? (int)$currentChapter['chapter_idx'] : 'null' ?>;
+
+// 챕터 순서 목록 (다음 챕터 URL 계산용)
+const CHAPTER_LIST = <?php
+    echo json_encode(array_map(fn($ch) => [
+        'chapter_idx' => (int)$ch['chapter_idx'],
+        'url'         => '/classes/' . (int)$class['class_idx'] . '/learn?chapter=' . (int)$ch['chapter_idx'],
+    ], $chapters));
+?>;
+
+// ── Vimeo Player SDK 연결 ────────────────────────────
+(function () {
+  const iframe = document.querySelector('#learn-player-wrap iframe');
+  if (!iframe || CURRENT_CHAPTER === null) return;
+
+  const player = new Vimeo.Player(iframe);
+
+  player.on('ended', async () => {
+    // 1. 챕터 완료 DB 업데이트
+    try {
+      const res = await fetch('/api/classes/' + CLASS_IDX + '/complete', {
+        method : 'POST',
+        headers: {
+          'Content-Type'    : 'application/x-www-form-urlencoded',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: 'csrf_token=' + encodeURIComponent(CSRF_TOKEN)
+            + '&chapter_idx=' + encodeURIComponent(CURRENT_CHAPTER),
+      });
+      const data = await res.json();
+      if (data.success) {
+        // UI 완료 표시 업데이트
+        const activeItem = document.querySelector('.learn-chapter-item.active');
+        if (activeItem) {
+          const btn   = activeItem.querySelector('.progress-toggle');
+          const numEl = activeItem.querySelector('.ch-num');
+          activeItem.classList.add('done');
+          if (numEl) numEl.textContent = '✓';
+          if (btn) {
+            btn.dataset.done      = '1';
+            btn.textContent       = '✓완료';
+            btn.style.borderColor = '#27ae60';
+            btn.style.color       = '#27ae60';
+            btn.title             = '완료 취소';
+          }
+          updateProgressBar();
+        }
+      }
+    } catch (e) {}
+
+    // 2. 다음 챕터로 이동
+    const curIdx  = CHAPTER_LIST.findIndex(c => c.chapter_idx === CURRENT_CHAPTER);
+    const next    = CHAPTER_LIST[curIdx + 1];
+    if (next) {
+      setTimeout(() => { location.href = next.url; }, 1500);
+    }
+  });
+}());
 
 // ── 챕터 완료 토글 ───────────────────────────────────
 function toggleProgress(btn) {

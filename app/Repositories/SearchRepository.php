@@ -73,7 +73,7 @@ class SearchRepository
         if (!empty($classInstructorIds)) {
             $placeholders = implode(',', array_fill(0, count($classInstructorIds), '?'));
             $instructors  = DB::select(
-                "SELECT i.instructor_idx, i.name, i.field, i.photo,
+                "SELECT i.instructor_idx, i.name, i.photo,
                         i.sns_youtube, i.sns_instagram, i.sns_facebook,
                         (SELECT COUNT(*) FROM lc_class c
                          WHERE c.instructor_idx = i.instructor_idx
@@ -88,7 +88,7 @@ class SearchRepository
             );
         } else {
             $instructors = DB::select(
-                "SELECT i.instructor_idx, i.name, i.field, i.photo,
+                "SELECT i.instructor_idx, i.name, i.photo,
                         i.sns_youtube, i.sns_instagram, i.sns_facebook,
                         (SELECT COUNT(*) FROM lc_class c
                          WHERE c.instructor_idx = i.instructor_idx
@@ -98,6 +98,27 @@ class SearchRepository
                  ORDER BY i.sort_order ASC",
                 [$like]
             );
+        }
+
+        // 강사 소개 첫 항목 일괄 매핑
+        if (!empty($instructors)) {
+            $ids          = array_column($instructors, 'instructor_idx');
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $intros       = DB::select(
+                "SELECT instructor_idx, content FROM lc_instructor_intro
+                 WHERE instructor_idx IN ({$placeholders})
+                 ORDER BY instructor_idx ASC, sort_order ASC",
+                $ids
+            );
+            $introMap = [];
+            foreach ($intros as $row) {
+                $idx = $row['instructor_idx'];
+                if (!isset($introMap[$idx])) $introMap[$idx] = $row['content'];
+            }
+            foreach ($instructors as &$ins) {
+                $ins['intro'] = $introMap[$ins['instructor_idx']] ?? '';
+            }
+            unset($ins);
         }
 
         $total = count($classes) + count($instructors);

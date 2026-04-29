@@ -66,14 +66,12 @@ $s = fn(string $key) => htmlspecialchars($settings[$key] ?? '');
 							</div>
 					</div>
 			</div>
-		</div>
 
-		<div>
 			<!-- 로고 / 파비콘 -->
 			<div class="form-card">
-					<h3>로고 / 파비콘</h3>
+					<h3>파비콘</h3>
 					<div class="form-grid">
-							<div class="form-group">
+							<!-- <div class="form-group">
 									<label>로고 이미지</label>
 									<?php if (!empty($settings['logo'])): ?>
 											<img src="/uploads/site/<?= htmlspecialchars($settings['logo']) ?>"
@@ -84,7 +82,7 @@ $s = fn(string $key) => htmlspecialchars($settings[$key] ?? '');
 									<input type="file" name="logo" id="logoInput"
 													accept="image/jpeg,image/png,image/webp,image/svg+xml">
 									<div class="hint">jpg, png, webp, svg / 최대 2MB</div>
-							</div>
+							</div> -->
 							<div class="form-group">
 									<label>파비콘</label>
 									<?php if (!empty($settings['favicon'])): ?>
@@ -99,7 +97,9 @@ $s = fn(string $key) => htmlspecialchars($settings[$key] ?? '');
 							</div>
 					</div>
 			</div>
+		</div>
 
+		<div>			
 			<!-- 히어로 배너 동영상 -->
 			<div class="form-card">
 					<h3>히어로 배너 동영상</h3>
@@ -115,24 +115,6 @@ $s = fn(string $key) => htmlspecialchars($settings[$key] ?? '');
 					<input type="file" name="hero_video" id="heroVideoInput" accept="video/mp4">
 					<div class="hint">mp4 / 최대 200MB / 자동재생·음소거로 재생됩니다</div>
 
-					<hr style="border:none;border-top:1px solid #eee;margin:20px 0">
-
-					<h4 style="font-size:13px;font-weight:700;color:#333;margin-bottom:4px;">
-						포스터 이미지
-						<span style="font-size:11px;font-weight:400;color:#888;margin-left:6px;">영상 로드 전 표시되는 배경 이미지 (검은 화면 방지)</span>
-					</h4>
-					<?php if (!empty($settings['hero_poster'])): ?>
-					<div style="margin-bottom:10px">
-						<img src="/uploads/site/<?= htmlspecialchars($settings['hero_poster']) ?>"
-							 alt="현재 포스터" style="max-width:100%;max-height:120px;object-fit:cover;border-radius:6px;display:block;border:1px solid #eee;">
-						<label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;cursor:pointer">
-							<input type="checkbox" name="delete_hero_poster" value="1"> 현재 포스터 삭제
-						</label>
-					</div>
-					<?php endif; ?>
-					<input type="file" name="hero_poster" id="heroPosterInput"
-						   accept="image/jpeg,image/png,image/webp">
-					<div class="hint">jpg·png·webp / 최대 2MB / 히어로 배너와 동일한 비율 권장</div>
 			</div>
 
 			<!-- SNS 링크 -->

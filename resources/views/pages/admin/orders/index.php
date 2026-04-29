@@ -52,7 +52,7 @@ $statusLabel = fn(string $s) => match($s) {
 	  <tr>
 		<th>NO</th>
 		<th>회원</th>
-		<th>강의</th>
+		<th class="text_left">강의</th>
 		<th>결제금액</th>
 		<th>상태</th>
 		<th>결제일시</th>
@@ -70,7 +70,7 @@ $statusLabel = fn(string $s) => match($s) {
 			<a href="/admin/members/<?= $o['member_idx'] ?>" style="color:#5E81F4;font-weight:600;"><?= htmlspecialchars($o['mb_name']) ?></a>
 			<div style="font-size:12px;color:#AEB9E1;"><?= htmlspecialchars($o['mb_id']) ?></div>
 		  </td>
-		  <td style="max-width:220px;">
+		  <td style="max-width:220px;" class="text_left">
 			<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($o['class_title']) ?></div>
 		  </td>
 		  <td style="font-weight:600;"><?= number_format($o['amount']) ?>원</td>

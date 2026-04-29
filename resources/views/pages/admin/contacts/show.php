@@ -15,7 +15,7 @@ $catLabel = ['class' => '강의', 'payment' => '결제', 'account' => '계정', 
 <?php endif; ?>
 
 <div class="form-card">
-		<h3>
+		<h3 class="form-card-title">
 			문의 상세
 			<span class="badge badge-<?= $contact['status'] ?>"><?= $contact['status'] === 'wait' ? '미답변' : '답변완료' ?></span>
 		</h3>

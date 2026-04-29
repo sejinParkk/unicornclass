@@ -24,11 +24,13 @@ class NoticeController
     public function index(): void
     {
         $filters = [
-            'q'         => trim($_GET['q'] ?? ''),
-            'is_active' => $_GET['is_active'] ?? '',
+            'q'              => trim($_GET['q'] ?? ''),
+            'is_active'      => $_GET['is_active'] ?? '',
+            'is_pinned'      => $_GET['is_pinned'] ?? '',
+            'is_maintenance' => $_GET['is_maintenance'] ?? '',
         ];
         $page  = max(1, (int) ($_GET['page'] ?? 1));
-        $limit = 20;
+        $limit = 10;
 
         $result     = $this->repo->getAdminList($filters, $page, $limit);
         $notices    = $result['list'];
@@ -65,21 +67,24 @@ class NoticeController
     public function store(): void
     {
         Csrf::verify();
+        header('Content-Type: application/json; charset=utf-8');
 
         $title = trim($_POST['title'] ?? '');
         if ($title === '') {
-            header('Location: /admin/notices/create?error=' . urlencode('제목을 입력해주세요.'));
+            echo json_encode(['ok' => false, 'message' => '제목을 입력해주세요.']);
             exit;
         }
 
+        $noticeType = $_POST['notice_type'] ?? 'none';
         $idx = $this->repo->create([
-            'title'     => $title,
-            'content'   => $_POST['content'] ?? '',
-            'is_pinned' => isset($_POST['is_pinned']) ? 1 : 0,
-            'is_active' => (int) ($_POST['is_active'] ?? 1),
+            'title'          => $title,
+            'content'        => $_POST['content'] ?? '',
+            'is_pinned'      => $noticeType === 'pinned' ? 1 : 0,
+            'is_maintenance' => $noticeType === 'maintenance' ? 1 : 0,
+            'is_active'      => (int) ($_POST['is_active'] ?? 1),
         ]);
 
-        header("Location: /admin/notices/{$idx}/edit?saved=1");
+        echo json_encode(['ok' => true, 'redirect' => "/admin/notices/{$idx}/edit?saved=1"]);
         exit;
     }
 
@@ -115,20 +120,24 @@ class NoticeController
             http_response_code(404); exit;
         }
 
+        header('Content-Type: application/json; charset=utf-8');
+
         $title = trim($_POST['title'] ?? '');
         if ($title === '') {
-            header("Location: /admin/notices/{$idx}/edit?error=" . urlencode('제목을 입력해주세요.'));
+            echo json_encode(['ok' => false, 'message' => '제목을 입력해주세요.']);
             exit;
         }
 
+        $noticeType = $_POST['notice_type'] ?? 'none';
         $this->repo->update($idx, [
-            'title'     => $title,
-            'content'   => $_POST['content'] ?? '',
-            'is_pinned' => isset($_POST['is_pinned']) ? 1 : 0,
-            'is_active' => (int) ($_POST['is_active'] ?? 1),
+            'title'          => $title,
+            'content'        => $_POST['content'] ?? '',
+            'is_pinned'      => $noticeType === 'pinned' ? 1 : 0,
+            'is_maintenance' => $noticeType === 'maintenance' ? 1 : 0,
+            'is_active'      => (int) ($_POST['is_active'] ?? 1),
         ]);
 
-        header("Location: /admin/notices/{$idx}/edit?saved=1");
+        echo json_encode(['ok' => true, 'redirect' => "/admin/notices/{$idx}/edit?saved=1"]);
         exit;
     }
 

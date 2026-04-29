@@ -30,7 +30,7 @@ class InstructorController
             'is_active' => $_GET['is_active'] ?? '',
         ];
         $page  = max(1, (int) ($_GET['page'] ?? 1));
-        $limit = 15;
+        $limit = 10;
 
         $result     = $this->instructorRepo->getAdminList($filters, $page, $limit);
         $instructors = $result['list'];
@@ -71,18 +71,12 @@ class InstructorController
     {
         Csrf::verify();
 
+        header('Content-Type: application/json; charset=utf-8');
+
         $errors = $this->validate($_POST);
         if ($errors) {
-            $instructor = null;
-            $categories = DB::select('SELECT * FROM lc_instructor_category WHERE is_active=1 ORDER BY sort_order');
-            $csrfToken  = Csrf::token();
-            $pageTitle  = '강사 등록';
-            $activeMenu = 'instructors';
-            ob_start();
-            require VIEW_PATH . '/pages/admin/instructors/form.php';
-            $content = ob_get_clean();
-            require VIEW_PATH . '/layout/admin.php';
-            return;
+            echo json_encode(['ok' => false, 'errors' => $errors]);
+            exit;
         }
 
         $data = $this->buildData($_POST);
@@ -91,17 +85,8 @@ class InstructorController
             try {
                 $data['photo'] = FileUploader::uploadInstructorPhoto($_FILES['photo']);
             } catch (\RuntimeException $e) {
-                $errors = ['photo' => $e->getMessage()];
-                $instructor = null;
-                $categories = DB::select('SELECT * FROM lc_instructor_category WHERE is_active=1 ORDER BY sort_order');
-                $csrfToken  = Csrf::token();
-                $pageTitle  = '강사 등록';
-                $activeMenu = 'instructors';
-                ob_start();
-                require VIEW_PATH . '/pages/admin/instructors/form.php';
-                $content = ob_get_clean();
-                require VIEW_PATH . '/layout/admin.php';
-                return;
+                echo json_encode(['ok' => false, 'errors' => ['photo' => $e->getMessage()]]);
+                exit;
             }
         }
 
@@ -112,7 +97,7 @@ class InstructorController
         $this->instructorRepo->saveIntros($instructorIdx, $intros);
         $this->instructorRepo->saveCareers($instructorIdx, $careers);
 
-        header('Location: /admin/instructors?created=1');
+        echo json_encode(['ok' => true, 'redirect' => '/admin/instructors?created=1']);
         exit;
     }
 
@@ -147,17 +132,12 @@ class InstructorController
         $instructor = $this->instructorRepo->findById($idx);
         if (!$instructor) { http_response_code(404); exit; }
 
+        header('Content-Type: application/json; charset=utf-8');
+
         $errors = $this->validate($_POST);
         if ($errors) {
-            $categories = DB::select('SELECT * FROM lc_instructor_category WHERE is_active=1 ORDER BY sort_order');
-            $csrfToken  = Csrf::token();
-            $pageTitle  = '강사 수정';
-            $activeMenu = 'instructors';
-            ob_start();
-            require VIEW_PATH . '/pages/admin/instructors/form.php';
-            $content = ob_get_clean();
-            require VIEW_PATH . '/layout/admin.php';
-            return;
+            echo json_encode(['ok' => false, 'errors' => $errors]);
+            exit;
         }
 
         $data = $this->buildData($_POST);
@@ -168,16 +148,8 @@ class InstructorController
                 FileUploader::deleteInstructorPhoto($instructor['photo']);
                 $data['photo'] = $newPhoto;
             } catch (\RuntimeException $e) {
-                $errors = ['photo' => $e->getMessage()];
-                $categories = DB::select('SELECT * FROM lc_instructor_category WHERE is_active=1 ORDER BY sort_order');
-                $csrfToken  = Csrf::token();
-                $pageTitle  = '강사 수정';
-                $activeMenu = 'instructors';
-                ob_start();
-                require VIEW_PATH . '/pages/admin/instructors/form.php';
-                $content = ob_get_clean();
-                require VIEW_PATH . '/layout/admin.php';
-                return;
+                echo json_encode(['ok' => false, 'errors' => ['photo' => $e->getMessage()]]);
+                exit;
             }
         }
 
@@ -188,7 +160,7 @@ class InstructorController
         $this->instructorRepo->saveIntros($idx, $intros);
         $this->instructorRepo->saveCareers($idx, $careers);
 
-        header('Location: /admin/instructors?updated=1');
+        echo json_encode(['ok' => true, 'redirect' => '/admin/instructors?updated=1']);
         exit;
     }
 
@@ -232,7 +204,6 @@ class InstructorController
         return [
             'category_idx'  => !empty($post['category_idx']) ? (int) $post['category_idx'] : null,
             'name'          => trim($post['name'] ?? ''),
-            'field'         => trim($post['field'] ?? ''),
             'sns_youtube'   => trim($post['sns_youtube'] ?? '') ?: null,
             'sns_instagram' => trim($post['sns_instagram'] ?? '') ?: null,
             'sns_facebook'  => trim($post['sns_facebook'] ?? '') ?: null,

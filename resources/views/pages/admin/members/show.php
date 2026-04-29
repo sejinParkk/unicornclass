@@ -8,6 +8,7 @@
  */
 
 // 상태 계산
+$isLoginLocked = !$member['is_active'] && ($member['login_fail_count'] ?? 0) >= 5 && !$member['leave_at'];
 if ($member['is_active']) {
 	$memberStatus     = 'active';
 	$memberStatusText = '정상';
@@ -16,6 +17,10 @@ if ($member['is_active']) {
 	$memberStatus     = 'withdrawn';
 	$memberStatusText = '탈퇴';
 	$memberStatusCls  = 'badge-withdrawn';
+} elseif ($isLoginLocked) {
+	$memberStatus     = 'dormant';
+	$memberStatusText = '로그인잠금';
+	$memberStatusCls  = 'badge-locked';
 } else {
 	$memberStatus     = 'dormant';
 	$memberStatusText = '정지';
@@ -38,7 +43,7 @@ if ($member['is_active']) {
 				기본 정보
 				<span class="badge left <?= $memberStatusCls ?>"><?= $memberStatusText ?></span>
 			</h3>
-			<form method="POST" action="/admin/members/<?= $member['member_idx'] ?>/profile">
+			<form id="memberProfileForm" method="POST" action="/admin/members/<?= $member['member_idx'] ?>/profile">
 				<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
 
 				<div class="info-grid">
@@ -67,18 +72,14 @@ if ($member['is_active']) {
 					<input type="text" name="mb_name" class="form-control <?= isset($errors['mb_name']) ? 'error' : '' ?>"
 							value="<?= htmlspecialchars($_POST['mb_name'] ?? $member['mb_name']) ?>"
 							maxlength="20">
-					<?php if (isset($errors['mb_name'])): ?>
-					<div class="error-msg"><?= htmlspecialchars($errors['mb_name']) ?></div>
-					<?php endif; ?>
+					<div class="error-msg" data-ajax-err="mb_name" style="display:none"></div>
 				</div>
 
 				<div class="form-group">
 					<label class="form-label">이메일</label>
 					<input type="email" name="mb_email" class="form-control <?= isset($errors['mb_email']) ? 'error' : '' ?>"
 							value="<?= htmlspecialchars($_POST['mb_email'] ?? $member['mb_email'] ?? '') ?>">
-					<?php if (isset($errors['mb_email'])): ?>
-					<div class="error-msg"><?= htmlspecialchars($errors['mb_email']) ?></div>
-					<?php endif; ?>
+					<div class="error-msg" data-ajax-err="mb_email" style="display:none"></div>
 				</div>
 
 				<div class="form-group">
@@ -86,11 +87,8 @@ if ($member['is_active']) {
 					<input type="text" name="mb_phone" id="mb_phone" class="form-control <?= isset($errors['mb_phone']) ? 'error' : '' ?>"
 							value="<?= htmlspecialchars($_POST['mb_phone'] ?? $member['mb_phone'] ?? '') ?>"
 							placeholder="010-0000-0000" maxlength="13">
-					<?php if (isset($errors['mb_phone'])): ?>
-					<div class="error-msg"><?= htmlspecialchars($errors['mb_phone']) ?></div>
-					<?php else: ?>
+					<div class="error-msg" data-ajax-err="mb_phone" style="display:none"></div>
 					<div class="hint">숫자 입력 시 하이픈 자동 추가</div>
-					<?php endif; ?>
 					<script>
 					(function () {
 						var el = document.getElementById('mb_phone');
@@ -117,18 +115,14 @@ if ($member['is_active']) {
 					<label class="form-label">새 비밀번호</label>
 					<input type="password" name="new_password" class="form-control <?= isset($errors['new_password']) ? 'error' : '' ?>"
 							placeholder="변경 시에만 입력 (8자 이상)">
-					<?php if (isset($errors['new_password'])): ?>
-					<div class="error-msg"><?= htmlspecialchars($errors['new_password']) ?></div>
-					<?php endif; ?>
+					<div class="error-msg" data-ajax-err="new_password" style="display:none"></div>
 				</div>
 
 				<div class="form-group">
 					<label class="form-label">새 비밀번호 확인</label>
 					<input type="password" name="confirm_password" class="form-control <?= isset($errors['confirm_password']) ? 'error' : '' ?>"
 							placeholder="새 비밀번호 재입력">
-					<?php if (isset($errors['confirm_password'])): ?>
-					<div class="error-msg"><?= htmlspecialchars($errors['confirm_password']) ?></div>
-					<?php endif; ?>
+					<div class="error-msg" data-ajax-err="confirm_password" style="display:none"></div>
 				</div>
 
 				<div class="form-group">
@@ -225,6 +219,11 @@ if ($member['is_active']) {
 				</form>
 				<?php endif; ?>
 			</div>
+			<?php if ($isLoginLocked): ?>
+			<div style="margin-top:12px;padding:10px 14px;background:#fff5f5;border:1px solid #fed7d7;border-radius:6px;font-size:12px;color:#c53030;">
+				⚠ 로그인 실패 5회 초과로 자동 잠금된 계정입니다. "정상으로 변경" 클릭 시 잠금 해제 및 실패 횟수가 초기화됩니다.
+			</div>
+			<?php endif; ?>
 			<div style="margin-top:12px;font-size:12px;color:#a0aec0;">
 				정지: 로그인 불가 (데이터 보존) &nbsp;|&nbsp; 탈퇴: leave_at 기록, 30일 후 개인정보 삭제 배치
 			</div>
@@ -319,4 +318,17 @@ if ($member['is_active']) {
 	var u = sessionStorage.getItem('back_members');
 	if (u) { var el = document.querySelector('.btn-back'); if (el) el.href = u; }
 })();
+
+document.getElementById('memberProfileForm')?.addEventListener('submit', function(e) {
+	e.preventDefault();
+	ajaxSubmit(this, {
+		onSuccess: function() {
+			var toast = document.createElement('div');
+			toast.className = 'toast-msg toast-success';
+			toast.textContent = '✓ 회원 정보가 수정되었습니다.';
+			document.querySelector('.form-layout').insertAdjacentElement('beforebegin', toast);
+			setTimeout(function() { toast.remove(); }, 3000);
+		}
+	});
+});
 </script>

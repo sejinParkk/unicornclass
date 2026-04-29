@@ -1,0 +1,19 @@
+# 업로드 파일 (바이너리)
+storage/uploads/
+
+# 로그
+storage/logs/
+
+# 환경설정
+.env
+.env.local
+
+# OS
+nul
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp

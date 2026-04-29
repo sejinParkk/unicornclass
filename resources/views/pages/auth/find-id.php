@@ -1,12 +1,3 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>아이디 찾기 — 유니콘클래스</title>
-    <link rel="stylesheet" href="/assets/css/styles.css">
-</head>
-<body class="auth-page">
 <div class="auth-card">
 
     <!-- PANEL 1: 휴대폰 인증 -->
@@ -14,7 +5,7 @@
         <div class="auth-title">아이디 찾기</div>
 
         <!-- 휴대전화번호 -->
-        <div class="field-block">
+        <div class="field-block auth-input-group">
             <div class="field-label">휴대전화번호 <span class="required">*</span></div>
             <div class="input-row">
                 <input type="tel" id="phone" placeholder="010-0000-0000" maxlength="13">
@@ -25,7 +16,7 @@
         </div>
 
         <!-- 인증번호 -->
-        <div class="field-block">
+        <div class="field-block auth-input-group">
             <div class="field-label">인증 번호</div>
             <div class="input-row" id="otpRow">
                 <input type="text" id="otp" placeholder="인증요청 후 입력하세요" maxlength="6" disabled style="padding-right: 70px">
@@ -33,13 +24,13 @@
                 <button class="btn-request" id="btnVerify" disabled onclick="verifySms()">인증하기</button>
             </div>
             <div class="error-msg" id="otpErr" style="display:none"></div>
-            <div class="success-msg" id="otpOk" style="display:none">✓ 인증이 완료되었습니다</div>
+            <div class="success-msg" id="otpOk" style="display:none">인증이 완료되었습니다</div>
         </div>
 
-        <button class="btn-next" id="btnNext" disabled onclick="showResult()">다음</button>
-
-        <div class="bottom-links">
-            <a href="/login">로그인</a>
+        <button class="btn-next mgt24" id="btnNext" disabled onclick="showResult()">다음</button>
+        
+        <div class="auth-links">
+            <a href="/find-id">아이디 찾기</a>
             <a href="/find-password">비밀번호 찾기</a>
             <a href="/register">회원가입</a>
         </div>
@@ -48,38 +39,35 @@
     <!-- PANEL 2: 결과 (일반 회원) -->
     <div class="panel" id="panelResult">
         <div class="auth-title">아이디 찾기 결과</div>
-        <p style="font-size:13px;color:#888;margin-bottom:20px;line-height:1.6">입력하신 정보로 가입된 아이디입니다.</p>
-        <div class="result-box">
-            <div class="label">아이디</div>
-            <div class="found-id" id="resultId"></div>
+        <p class="id_result_txt2">입력하신 정보로 가입된 아이디입니다.</p>
+        <div class="result-box">            
+            <div class="found-id" id="resultId">ㅋㅋ</div>
             <div class="hint">일부 정보는 보안을 위해 마스킹 처리됩니다</div>
         </div>
-        <button class="btn-next" onclick="location.href='/login'" style="margin-bottom:10px">로그인하기</button>
-        <button class="btn-outline" onclick="location.href='/find-password'">비밀번호 찾기</button>
+        <button class="btn-next mgt24" onclick="location.href='/login'">로그인하기</button>
+        <button class="btn-next btn-outline mgt12" onclick="location.href='/find-password'">비밀번호 찾기</button>
     </div>
 
     <!-- PANEL 3: 결과 (소셜 회원) -->
     <div class="panel" id="panelSocial">
         <div class="auth-title">아이디 찾기 결과</div>
-        <p style="font-size:13px;color:#888;margin-bottom:20px;line-height:1.6">입력하신 번호로 가입된 정보입니다.</p>
-        <div class="social-box">
-            <div class="ico">🔗</div>
-            <div class="title" id="socialTitle"></div>
-            <div class="desc">별도의 아이디/비밀번호가 없습니다.<br>소셜 로그인 버튼을 이용해 주세요.</div>
+        <p class="id_result_txt2">입력하신 번호로 가입된 정보입니다.</p>
+        <div class="result-box">
+            <div class="found-id" id="socialTitle">123123</div>
+            <div class="hint">별도의 아이디/비밀번호가 없습니다.<br>소셜 로그인 버튼을 이용해 주세요.</div>
         </div>
-        <button class="btn-outline" onclick="location.href='/login'">돌아가기</button>
+        <button class="btn-next btn-outline mgt24" onclick="location.href='/login'">돌아가기</button>
     </div>
 
     <!-- PANEL 4: 가입 정보 없음 -->
     <div class="panel" id="panelNotFound">
         <div class="auth-title">아이디 찾기 결과</div>
-        <div style="text-align:center;padding:24px 0">
-            <div style="font-size:36px;margin-bottom:16px">🔍</div>
-            <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:8px">가입된 정보를 찾을 수 없습니다</div>
-            <div style="font-size:13px;color:#888;line-height:1.6">입력하신 번호로 가입된 계정이 없습니다.</div>
+        <div class="id_result_box">
+            <div class="id_result_txt1">가입된 정보를 찾을 수 없습니다</div>
+            <div class="id_result_txt2">입력하신 번호로 가입된 계정이 없습니다.</div>
         </div>
-        <button class="btn-next" onclick="resetForm()">다시 시도</button>
-        <div class="bottom-links" style="margin-top:16px">
+        <button class="btn-next" onclick="resetForm()">다시 시도</button>        
+        <div class="auth-links">
             <a href="/login">로그인</a>
             <a href="/register">회원가입</a>
         </div>
@@ -180,7 +168,7 @@ async function verifySms() {
         clearInterval(timerInterval);
         document.getElementById('timerDisplay').style.display = 'none';
         document.getElementById('otp').disabled = true;
-        btn.textContent = '✓ 인증완료'; btn.className = 'btn-request done';
+        btn.textContent = '인증완료'; btn.className = 'btn-request done';
         document.getElementById('otpOk').style.display = 'block';
         document.getElementById('btnNext').disabled = false;
         verifyResult = data;
@@ -248,5 +236,3 @@ function formatTime(s) {
     return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
 }
 </script>
-</body>
-</html>

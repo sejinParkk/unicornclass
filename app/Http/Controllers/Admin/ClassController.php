@@ -41,7 +41,7 @@ class ClassController
             'is_active'    => $_GET['is_active'] ?? '',
         ];
         $page  = max(1, (int) ($_GET['page'] ?? 1));
-        $limit = 15;
+        $limit = 10;
 
         $result     = $this->classRepo->getAdminList($filters, $page, $limit);
         $classes    = $result['list'];
@@ -112,7 +112,8 @@ class ClassController
         // 강의 자료 저장
         $this->saveMaterials($classIdx);
 
-        header('Location: /admin/classes/' . $classIdx . '/edit?created=1');
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => true, 'redirect' => '/admin/classes/' . $classIdx . '/edit?created=1']);
         exit;
     }
 
@@ -199,7 +200,8 @@ class ClassController
         // 강의 자료: 새 항목 저장
         $this->saveMaterials($classIdx);
 
-        header('Location: /admin/classes/' . $classIdx . '/edit?updated=1');
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => true, 'redirect' => '/admin/classes/' . $classIdx . '/edit?updated=1']);
         exit;
     }
 
@@ -235,15 +237,9 @@ class ClassController
 
     private function renderForm(?array $class, array $chapters, array $materials, array $errors): void
     {
-        $instructors = $this->instructorRepo->getActiveList();
-        $categories  = DB::select('SELECT * FROM lc_class_category WHERE is_active=1 ORDER BY sort_order');
-        $pageTitle   = $class ? '강의 수정' : '강의 등록';
-        $activeMenu  = 'classes';
-        $csrfToken   = Csrf::token();
-        ob_start();
-        require VIEW_PATH . '/pages/admin/classes/form.php';
-        $content = ob_get_clean();
-        require VIEW_PATH . '/layout/admin.php';
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'errors' => $errors]);
+        exit;
     }
 
     /** DB 챕터를 폼에서 쓰는 형식으로 변환 */
@@ -404,6 +400,15 @@ class ClassController
             $data['sale_end_at'] = date('Y-m-d H:i:s', strtotime($saleEnd));
         } else {
             $errors['sale_end_at'] = '올바른 날짜 형식을 입력해주세요.';
+        }
+
+        $enrollStart = trim($post['enroll_start_at'] ?? '');
+        if ($enrollStart === '') {
+            $data['enroll_start_at'] = null;
+        } elseif (strtotime($enrollStart) !== false) {
+            $data['enroll_start_at'] = date('Y-m-d H:i:s', strtotime($enrollStart));
+        } else {
+            $errors['enroll_start_at'] = '올바른 날짜 형식을 입력해주세요.';
         }
 
         return [$data, $errors];

@@ -18,13 +18,14 @@ class PopupRepository
         $offset = ($page - 1) * $limit;
 
         $total = (int) (DB::selectOne(
-            'SELECT COUNT(*) AS cnt FROM lc_popup'
+            'SELECT COUNT(*) AS cnt FROM lc_popup WHERE deleted_at IS NULL'
         )['cnt'] ?? 0);
 
         $list = DB::select(
             "SELECT popup_idx, image_path, link_url, link_target,
                     start_date, end_date, is_active, sort_order, created_at
              FROM lc_popup
+             WHERE deleted_at IS NULL
              ORDER BY sort_order ASC, popup_idx DESC
              LIMIT {$limit} OFFSET {$offset}"
         );
@@ -39,7 +40,7 @@ class PopupRepository
     public function findByIdx(int $idx): ?array
     {
         return DB::selectOne(
-            'SELECT * FROM lc_popup WHERE popup_idx = ? LIMIT 1',
+            'SELECT * FROM lc_popup WHERE popup_idx = ? AND deleted_at IS NULL LIMIT 1',
             [$idx]
         );
     }
@@ -100,6 +101,6 @@ class PopupRepository
 
     public function delete(int $idx): void
     {
-        DB::execute('DELETE FROM lc_popup WHERE popup_idx = ?', [$idx]);
+        DB::execute('UPDATE lc_popup SET deleted_at = NOW() WHERE popup_idx = ? AND deleted_at IS NULL', [$idx]);
     }
 }

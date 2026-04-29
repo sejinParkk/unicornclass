@@ -7,6 +7,13 @@
 $errMsg = $_GET['err'] ?? '';
 ?>
 
+<div class="mp-wrap">
+  <aside class="mp-sidebar">
+    <?php require VIEW_PATH . '/components/mp-user-area.php'; ?>
+    <?php require VIEW_PATH . '/components/mp-subnav.php'; ?>
+  </aside>
+  <div class="mp-content">
+
 <div class="mp-content-title">회원탈퇴</div>
 
 <div class="withdraw-wrap">
@@ -26,20 +33,13 @@ $errMsg = $_GET['err'] ?? '';
     <!-- 탈퇴 불가 안내 -->
     <?php if ($blockReason): ?>
     <div style="background:#fef0ee;border:1px solid #f5c6c6;border-radius:8px;padding:12px 14px;margin-bottom:20px;font-size:13px;color:#c0392b;font-weight:600;text-align:center">
-      🚫 <?= htmlspecialchars($blockReason) ?>
+      🚫 <?= nl2br(htmlspecialchars($blockReason)) ?>
     </div>
     <a href="/mypage/profile" class="btn-withdraw-cancel" style="display:flex;width:100%">
       ← 정보수정으로 돌아가기
     </a>
 
     <?php else: ?>
-
-    <!-- 오류 메시지 -->
-    <?php if ($errMsg): ?>
-    <div style="background:#fef0ee;border:1px solid #f5c6c6;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#c0392b;text-align:center">
-      <?= htmlspecialchars($errMsg) ?>
-    </div>
-    <?php endif; ?>
 
     <form method="POST" action="/mypage/withdraw" id="withdraw-form">
       <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
@@ -49,6 +49,7 @@ $errMsg = $_GET['err'] ?? '';
              class="withdraw-confirm-input"
              placeholder='확인을 위해 "탈퇴합니다"를 입력하세요'
              autocomplete="off">
+      <div data-ajax-err="confirm_text" style="display:none;font-size:12px;color:#c0392b;margin-top:6px;text-align:center"></div>
 
       <div class="withdraw-btns">
         <a href="/mypage/profile" class="btn-withdraw-cancel">취소</a>
@@ -78,13 +79,13 @@ $errMsg = $_GET['err'] ?? '';
   });
 
   document.getElementById('withdraw-form').addEventListener('submit', function (e) {
-    if (input.value !== '탈퇴합니다') {
-      e.preventDefault();
-      return;
-    }
-    if (!confirm('정말로 탈퇴하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
-      e.preventDefault();
-    }
+    e.preventDefault();
+    if (input.value !== '탈퇴합니다') return;
+    if (!confirm('정말로 탈퇴하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
+    ajaxSubmit(this);
   });
 })();
 </script>
+
+  </div><!-- /.mp-content -->
+</div><!-- /.mp-wrap -->

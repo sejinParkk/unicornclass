@@ -20,7 +20,7 @@
 <?php endif; ?>
 
 <form method="GET" action="/admin/instructors" class="filter-bar">
-<input type="text" name="q" value="<?= htmlspecialchars($filters['q']) ?>" placeholder="강사명/분야 검색">
+<input type="text" name="q" value="<?= htmlspecialchars($filters['q']) ?>" placeholder="강사명 검색">
 <select name="is_active">
 	<option value="">전체 상태</option>
 	<option value="1" <?= $filters['is_active']==='1' ?'selected':'' ?>>활성</option>
@@ -45,9 +45,8 @@
 		<colgroup>
 			<col width="5%">
 			<col width="7%">
-			<col width="7%">
 			<col width="">
-			<col width="">
+			<col width="15%">
 			<col width="7%">
 			<col width="7%">
 			<col width="10%">
@@ -58,7 +57,6 @@
 				<th>NO</th>
 				<th>사진</th>
 				<th>이름</th>
-				<th>분야</th>
 				<th>카테고리</th>
 				<th>담당강의</th>
 				<th>순서</th>
@@ -68,14 +66,14 @@
 		</thead>
 		<tbody>
 		<?php if (empty($instructors)): ?>
-			<tr class="empty-row"><td colspan="9">등록된 강사가 없습니다.</td></tr>
+			<tr class="empty-row"><td colspan="8">등록된 강사가 없습니다.</td></tr>
 		<?php else: ?>
 		<?php foreach ($instructors as $_i => $i): ?>
 			<tr>
 				<td><?= $total - ($page-1)*$limit - $_i ?></td>
 				<td>
 					<?php if ($i['photo']): ?>
-							<img src="/uploads/instructor/<?= htmlspecialchars($i['photo']) ?>" alt="" style="border-radius:50%;">
+							<img src="/uploads/instructor/<?= htmlspecialchars($i['photo']) ?>" alt="">
 					<?php else: ?>
 							<div class="photo-empty">
 									<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +83,6 @@
 					<?php endif; ?>
 				</td>
 				<td><?= htmlspecialchars($i['name']) ?></td>
-				<td><?= htmlspecialchars($i['field'] ?? '') ?></td>
 				<td><?= htmlspecialchars($i['category_name'] ?? '미분류') ?></td>
 				<td><?= (int)($i['class_count'] ?? 0) ?></td>
 				<td><?= (int)$i['sort_order'] ?></td>

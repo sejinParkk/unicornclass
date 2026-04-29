@@ -23,6 +23,14 @@ class NoticeRepository
             $params[] = (int) $filters['is_active'];
         }
 
+        if (!empty($filters['is_pinned'])) {
+            $where[]  = 'is_pinned = 1';
+        }
+
+        if (!empty($filters['is_maintenance'])) {
+            $where[]  = 'is_maintenance = 1';
+        }
+
         $whereStr = implode(' AND ', $where);
         $countSql = "SELECT COUNT(*) AS cnt FROM lc_notice WHERE {$whereStr}";
         $total    = (int) (DB::selectOne($countSql, $params)['cnt'] ?? 0);
@@ -44,16 +52,29 @@ class NoticeRepository
     public function create(array $data): int
     {
         return (int) DB::insert(
-            'INSERT INTO lc_notice (title, content, is_pinned, is_active) VALUES (?, ?, ?, ?)',
-            [$data['title'], $data['content'], (int) ($data['is_pinned'] ?? 0), (int) ($data['is_active'] ?? 1)]
+            'INSERT INTO lc_notice (title, content, is_pinned, is_maintenance, is_active) VALUES (?, ?, ?, ?, ?)',
+            [
+                $data['title'],
+                $data['content'],
+                (int) ($data['is_pinned'] ?? 0),
+                (int) ($data['is_maintenance'] ?? 0),
+                (int) ($data['is_active'] ?? 1),
+            ]
         );
     }
 
     public function update(int $noticeIdx, array $data): void
     {
         DB::execute(
-            'UPDATE lc_notice SET title = ?, content = ?, is_pinned = ?, is_active = ? WHERE notice_idx = ?',
-            [$data['title'], $data['content'], (int) ($data['is_pinned'] ?? 0), (int) ($data['is_active'] ?? 1), $noticeIdx]
+            'UPDATE lc_notice SET title = ?, content = ?, is_pinned = ?, is_maintenance = ?, is_active = ? WHERE notice_idx = ?',
+            [
+                $data['title'],
+                $data['content'],
+                (int) ($data['is_pinned'] ?? 0),
+                (int) ($data['is_maintenance'] ?? 0),
+                (int) ($data['is_active'] ?? 1),
+                $noticeIdx,
+            ]
         );
     }
 
@@ -71,7 +92,7 @@ class NoticeRepository
         $offset = ($page - 1) * $limit;
         $list = DB::select(
             'SELECT * FROM lc_notice WHERE is_active = 1
-             ORDER BY is_pinned DESC, created_at DESC
+             ORDER BY is_pinned DESC, is_maintenance DESC, created_at DESC
              LIMIT ? OFFSET ?',
             [$limit, $offset]
         );

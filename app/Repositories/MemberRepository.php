@@ -146,6 +146,41 @@ class MemberRepository
     }
 
     // =========================================================================
+    // 로그인 실패 카운트
+    // =========================================================================
+
+    /** 실패 횟수 +1 후 새 값 반환 */
+    public function incrementLoginFail(int $memberIdx): int
+    {
+        DB::execute(
+            'UPDATE lc_member SET login_fail_count = login_fail_count + 1 WHERE member_idx = ?',
+            [$memberIdx]
+        );
+        return (int) (DB::selectOne(
+            'SELECT login_fail_count FROM lc_member WHERE member_idx = ? LIMIT 1',
+            [$memberIdx]
+        )['login_fail_count'] ?? 0);
+    }
+
+    /** 로그인 성공 시 실패 횟수 초기화 */
+    public function resetLoginFail(int $memberIdx): void
+    {
+        DB::execute(
+            'UPDATE lc_member SET login_fail_count = 0 WHERE member_idx = ?',
+            [$memberIdx]
+        );
+    }
+
+    /** 실패 5회 도달 시 계정 잠금 */
+    public function lockByLoginFail(int $memberIdx): void
+    {
+        DB::execute(
+            'UPDATE lc_member SET is_active = 0, leave_at = NULL WHERE member_idx = ?',
+            [$memberIdx]
+        );
+    }
+
+    // =========================================================================
     // 관리자 전용
     // =========================================================================
 
@@ -219,7 +254,7 @@ class MemberRepository
     {
         if ($status === 'active') {
             DB::execute(
-                'UPDATE lc_member SET is_active = 1, leave_at = NULL WHERE member_idx = ?',
+                'UPDATE lc_member SET is_active = 1, leave_at = NULL, login_fail_count = 0 WHERE member_idx = ?',
                 [$memberIdx]
             );
         } elseif ($status === 'dormant') {

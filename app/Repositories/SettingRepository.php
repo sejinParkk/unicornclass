@@ -46,26 +46,15 @@ class SettingRepository
     }
 
     // -------------------------------------------------------------------------
-    // 약관 (lc_terms)
+    // 약관 (lc_terms) — 버전 관리는 TermsRepository 사용
     // -------------------------------------------------------------------------
 
-    /** 약관 단일 조회 */
+    /** 약관 현재 버전 조회 (하위 호환용) */
     public function getTerm(string $type): ?array
     {
         return DB::selectOne(
-            "SELECT * FROM lc_terms WHERE type = ? LIMIT 1",
+            'SELECT * FROM lc_terms WHERE type = ? AND is_current = 1 LIMIT 1',
             [$type]
-        );
-    }
-
-    /** 약관 내용 저장 (upsert) */
-    public function saveTerm(string $type, string $title, string $content): void
-    {
-        DB::execute(
-            'INSERT INTO lc_terms (type, title, content)
-             VALUES (?, ?, ?)
-             ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content)',
-            [$type, $title, $content]
         );
     }
 }

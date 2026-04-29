@@ -47,9 +47,8 @@ class HomeController
         }
 
         // 사이트 설정
-        $settings = $this->repo->getSiteSettings(['hero_video', 'hero_poster', 'kakao_channel_url']);
+        $settings = $this->repo->getSiteSettings(['hero_video', 'kakao_channel_url']);
         $heroVideo        = $settings['hero_video']        ?? null;
-        $heroPoster       = $settings['hero_poster']       ?? null;
         $kakaoChannelUrl  = $settings['kakao_channel_url'] ?? null;
 
         $pageTitle   = '유니콘클래스 - 온라인 강의 플랫폼';

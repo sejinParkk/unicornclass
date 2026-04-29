@@ -30,7 +30,7 @@ class OrderController
             'date_to'   => $_GET['date_to'] ?? '',
         ];
         $page  = max(1, (int) ($_GET['page'] ?? 1));
-        $limit = 20;
+        $limit = 10;
 
         $result     = $this->repo->getAdminList($filters, $page, $limit);
         $orders     = $result['list'];
@@ -56,6 +56,8 @@ class OrderController
             http_response_code(404); exit;
         }
 
+        $refundCalc = $this->repo->calcRefundAmount($order);
+
         $csrfToken  = Csrf::token();
         $pageTitle  = '결제 상세 #' . $idx;
         $activeMenu = 'orders';
@@ -79,10 +81,14 @@ class OrderController
             exit;
         }
 
+        // 환불 금액 계산 (전액 or 비례)
+        $refundCalc   = $this->repo->calcRefundAmount($order);
+        $refundAmount = $refundCalc['refund_amount'];
+
         // Toss Payments 환불 API (키가 설정된 경우에만)
         $secretKey = $_ENV['TOSS_SECRET_KEY'] ?? '';
-        if ($secretKey && $order['toss_payment_key']) {
-            $this->callTossRefund($order['toss_payment_key'], $order['amount'], '관리자 환불 승인');
+        if ($secretKey && $order['toss_payment_key'] && $refundAmount > 0) {
+            $this->callTossRefund($order['toss_payment_key'], $refundAmount, '관리자 환불 승인');
         }
 
         $this->repo->approveRefund($idx);

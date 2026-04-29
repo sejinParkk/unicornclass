@@ -8,6 +8,7 @@ $_favicon = \App\Core\DB::selectOne("SELECT config_value FROM lc_site_config WHE
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?= htmlspecialchars($pageTitle ?? '관리자') ?> — 유니콘클래스 관리자</title>
 	<script src="/assets/js/common.js"></script>
+	<script src="/assets/js/form-ajax.js"></script>
 	<?php if ($_favicon): ?>
 	<link rel="icon" href="/uploads/site/<?= htmlspecialchars($_favicon) ?>">
 	<?php endif; ?>
@@ -24,13 +25,13 @@ $_favicon = \App\Core\DB::selectOne("SELECT config_value FROM lc_site_config WHE
 
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
-	<div class="sidebar-logo">유니콘클래스</div>
+	<div class="sidebar-logo"><img src="/assets/img/logo.svg" alt=""></div>
 	</div>
 
 	<?php
 	$_m = $activeMenu ?? '';
-	$_grpContent  = in_array($_m, ['classes', 'instructors', 'instructor-apply']);
-	$_grpOps      = in_array($_m, ['members', 'orders', 'contacts']);
+	$_grpContent  = in_array($_m, ['classes', 'instructors', 'instructor-apply', 'categories']);
+	$_grpOps      = in_array($_m, ['members', 'orders', 'contacts', 'reviews']);
 	$_grpBoard    = in_array($_m, ['notices', 'faqs']);
 	$_grpStats    = in_array($_m, ['search-logs', 'openchat-logs']);
 	$_grpSettings = in_array($_m, ['settings', 'terms', 'profile', 'banners', 'popups']);
@@ -61,6 +62,7 @@ $_favicon = \App\Core\DB::selectOne("SELECT config_value FROM lc_site_config WHE
 				<a href="/admin/classes" class="nav-sub-item <?= $_m === 'classes' ? 'active' : '' ?>">강의 관리</a>
 				<a href="/admin/instructors" class="nav-sub-item <?= $_m === 'instructors' ? 'active' : '' ?>">강사 관리</a>
 				<a href="/admin/instructor-apply" class="nav-sub-item <?= $_m === 'instructor-apply' ? 'active' : '' ?>">강사 지원</a>
+				<a href="/admin/categories" class="nav-sub-item <?= $_m === 'categories' ? 'active' : '' ?>">카테고리 관리</a>
 			</div>
 		</div>
 
@@ -81,6 +83,7 @@ $_favicon = \App\Core\DB::selectOne("SELECT config_value FROM lc_site_config WHE
 				<a href="/admin/members" class="nav-sub-item <?= $_m === 'members' ? 'active' : '' ?>">회원 관리</a>
 				<a href="/admin/orders" class="nav-sub-item <?= $_m === 'orders' ? 'active' : '' ?>">결제 관리</a>
 				<a href="/admin/contacts" class="nav-sub-item <?= $_m === 'contacts' ? 'active' : '' ?>">1:1 문의</a>
+				<a href="/admin/reviews" class="nav-sub-item <?= $_m === 'reviews' ? 'active' : '' ?>">후기 관리</a>
 			</div>
 		</div>
 

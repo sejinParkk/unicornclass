@@ -29,8 +29,12 @@ class AuthController
 
         $csrfToken = Csrf::token();
         $error     = null;
+        $pageTitle = '로그인 — 유니콘클래스';
+        $bodyClass = 'auth-page';
 
+        require VIEW_PATH . '/layout/header.php';
         require VIEW_PATH . '/pages/auth/login.php';
+        require VIEW_PATH . '/layout/footer.php';
     }
 
     // -------------------------------------------------------------------------
@@ -46,26 +50,41 @@ class AuthController
 
         $member = $this->repo->findByMbId($mbId);
 
+        header('Content-Type: application/json; charset=utf-8');
+
+        // 존재하지 않는 아이디
         if (!$member) {
-            $this->renderLoginError('아이디 또는 비밀번호가 올바르지 않습니다.');
-            return;
+            echo json_encode(['ok' => false, 'errorType' => 'wrong']);
+            exit;
         }
 
-        if (!$member['mb_password'] || !password_verify($password, $member['mb_password'])) {
-            $this->renderLoginError('아이디 또는 비밀번호가 올바르지 않습니다.');
-            return;
-        }
-
+        // 비활성 계정 (잠금 or 탈퇴/정지)
         if (!$member['is_active']) {
-            $this->renderLoginError('탈퇴 또는 정지된 계정입니다.');
-            return;
+            $errorType = ($member['login_fail_count'] ?? 0) >= 5 ? 'locked' : 'inactive';
+            echo json_encode(['ok' => false, 'errorType' => $errorType]);
+            exit;
         }
 
+        // 비밀번호 불일치
+        if (!$member['mb_password'] || !password_verify($password, $member['mb_password'])) {
+            $failCount = $this->repo->incrementLoginFail($member['member_idx']);
+            if ($failCount >= 5) {
+                $this->repo->lockByLoginFail($member['member_idx']);
+                echo json_encode(['ok' => false, 'errorType' => 'locked']);
+            } elseif ($failCount >= 3) {
+                echo json_encode(['ok' => false, 'errorType' => 'warn', 'failRemaining' => 5 - $failCount]);
+            } else {
+                echo json_encode(['ok' => false, 'errorType' => 'wrong']);
+            }
+            exit;
+        }
+
+        // 로그인 성공
+        $this->repo->resetLoginFail($member['member_idx']);
         Auth::loginMember($member);
 
-        // 안전한 리다이렉트 (외부 URL 방지)
         $redirect = $this->safeRedirect($redirect);
-        header("Location: {$redirect}");
+        echo json_encode(['ok' => true, 'redirect' => $redirect]);
         exit;
     }
 
@@ -94,8 +113,12 @@ class AuthController
         $errors        = [];
         $old           = [];
         $verifiedPhone = $_SESSION['sms_verified_register'] ?? null;
+        $pageTitle     = '회원가입 — 유니콘클래스';
+        $bodyClass     = 'auth-page';
 
+        require VIEW_PATH . '/layout/header.php';
         require VIEW_PATH . '/pages/auth/register.php';
+        require VIEW_PATH . '/layout/footer.php';
     }
 
     // -------------------------------------------------------------------------
@@ -123,13 +146,13 @@ class AuthController
             'agree_marketing' => ($_POST['agree_marketing'] ?? '0') === '1',
         ];
 
+        header('Content-Type: application/json; charset=utf-8');
+
         $errors = $this->validateRegister($data);
 
         if ($errors) {
-            $csrfToken = Csrf::token();
-            $old       = $data;
-            require VIEW_PATH . '/pages/auth/register.php';
-            return;
+            echo json_encode(['ok' => false, 'errors' => $errors]);
+            exit;
         }
 
         $this->repo->create([
@@ -144,12 +167,7 @@ class AuthController
 
         unset($_SESSION['sms_verified_register']);
 
-        $csrfToken     = Csrf::token();
-        $errors        = [];
-        $old           = [];
-        $verifiedPhone = null;
-        $registerDone  = true;
-        require VIEW_PATH . '/pages/auth/register.php';
+        echo json_encode(['ok' => true, 'redirect' => '/register?done=1']);
         exit;
     }
 
@@ -167,7 +185,11 @@ class AuthController
     public function findId(): void
     {
         $csrfToken = Csrf::token();
+        $pageTitle = '아이디 찾기 — 유니콘클래스';
+        $bodyClass = 'auth-page';
+        require VIEW_PATH . '/layout/header.php';
         require VIEW_PATH . '/pages/auth/find-id.php';
+        require VIEW_PATH . '/layout/footer.php';
     }
 
     // -------------------------------------------------------------------------
@@ -177,8 +199,11 @@ class AuthController
     {
         $csrfToken    = Csrf::token();
         $verifiedInfo = $_SESSION['sms_verified_find_password'] ?? null;
-
+        $pageTitle    = '비밀번호 찾기 — 유니콘클래스';
+        $bodyClass    = 'auth-page';
+        require VIEW_PATH . '/layout/header.php';
         require VIEW_PATH . '/pages/auth/find-password.php';
+        require VIEW_PATH . '/layout/footer.php';
     }
 
     // -------------------------------------------------------------------------
@@ -198,15 +223,15 @@ class AuthController
         $newPw = $_POST['mb_password']  ?? '';
         $newPw2= $_POST['mb_password2'] ?? '';
 
+        header('Content-Type: application/json; charset=utf-8');
+
         $pwRegex = '/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*\-_]).{8,}$/';
         if (!preg_match($pwRegex, $newPw)) {
-            $_SESSION['reset_pw_error'] = '영문 + 숫자 + 특수문자 포함 8자 이상이어야 합니다.';
-            header('Location: /find-password');
+            echo json_encode(['ok' => false, 'errors' => ['mb_password' => '영문 + 숫자 + 특수문자 포함 8자 이상이어야 합니다.']]);
             exit;
         }
         if ($newPw !== $newPw2) {
-            $_SESSION['reset_pw_error'] = '비밀번호가 일치하지 않습니다.';
-            header('Location: /find-password');
+            echo json_encode(['ok' => false, 'errors' => ['mb_password2' => '비밀번호가 일치하지 않습니다.']]);
             exit;
         }
 
@@ -217,12 +242,11 @@ class AuthController
                 password_hash($newPw, PASSWORD_BCRYPT, ['cost' => 12])
             );
             unset($_SESSION['sms_verified_find_password'], $_SESSION['reset_pw_error']);
-            header('Location: /login?reset=1');
+            echo json_encode(['ok' => true, 'redirect' => '/login?reset=1']);
             exit;
         }
 
-        $_SESSION['reset_pw_error'] = '처리 중 오류가 발생했습니다.';
-        header('Location: /find-password');
+        echo json_encode(['ok' => false, 'message' => '처리 중 오류가 발생했습니다.']);
         exit;
     }
 
@@ -230,11 +254,16 @@ class AuthController
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private function renderLoginError(string $message): void
+    private function renderLoginError(string $errorType, int $failRemaining = 0): void
     {
-        $csrfToken = Csrf::token();
-        $error     = $message;
+        $csrfToken    = Csrf::token();
+        $error        = $errorType;    // 'wrong' | 'warn' | 'locked' | 'inactive'
+        $loginFailRem = $failRemaining;
+        $pageTitle    = '로그인 — 유니콘클래스';
+        $bodyClass    = 'auth-page';
+        require VIEW_PATH . '/layout/header.php';
         require VIEW_PATH . '/pages/auth/login.php';
+        require VIEW_PATH . '/layout/footer.php';
     }
 
     private function validateRegister(array $data): array

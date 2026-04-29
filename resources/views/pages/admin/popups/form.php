@@ -137,4 +137,9 @@ function previewImage(input) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+document.getElementById('popupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    ajaxSubmit(this);
+});
 </script>

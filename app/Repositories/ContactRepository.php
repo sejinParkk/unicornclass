@@ -13,7 +13,7 @@ class ContactRepository
     // =========================================================================
     public function getAdminList(array $filters, int $page, int $limit): array
     {
-        $where  = ['1=1'];
+        $where  = ['q.deleted_at IS NULL'];
         $params = [];
 
         if (!empty($filters['q'])) {
@@ -61,7 +61,7 @@ class ContactRepository
             "SELECT q.*, m.mb_id, m.mb_name, m.mb_email, m.mb_phone
              FROM lc_qna q
              JOIN lc_member m ON m.member_idx = q.member_idx
-             WHERE q.qna_idx = ?",
+             WHERE q.qna_idx = ? AND q.deleted_at IS NULL",
             [$qnaIdx]
         );
     }
@@ -82,7 +82,7 @@ class ContactRepository
     // =========================================================================
     public function countPending(): int
     {
-        $row = DB::selectOne("SELECT COUNT(*) AS cnt FROM lc_qna WHERE status = 'wait'");
+        $row = DB::selectOne("SELECT COUNT(*) AS cnt FROM lc_qna WHERE status = 'wait' AND deleted_at IS NULL");
         return (int) ($row['cnt'] ?? 0);
     }
 }

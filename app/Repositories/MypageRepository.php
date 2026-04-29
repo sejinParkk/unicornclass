@@ -16,7 +16,7 @@ class MypageRepository
      * 회원의 수강 목록 (진도율 포함)
      * type: 'all' | 'free' | 'premium'
      */
-    public function getMyClasses(int $memberIdx, string $type = 'all'): array
+    public function getMyClasses(int $memberIdx, string $type = 'all', int $page = 1, int $limit = 10): array
     {
         $where  = ['e.member_idx = ?'];
         $params = [$memberIdx];
@@ -27,11 +27,17 @@ class MypageRepository
         }
 
         $whereStr = implode(' AND ', $where);
+        $offset   = ($page - 1) * $limit;
 
-        return DB::select(
+        $total = (int) DB::selectOne(
+            "SELECT COUNT(*) AS cnt FROM lc_enroll e WHERE {$whereStr}",
+            $params
+        )['cnt'];
+
+        $list = DB::select(
             "SELECT e.*,
                     c.title, c.thumbnail, c.type AS class_type, c.kakao_url,
-                    c.total_episodes,
+                    c.total_episodes, c.sale_end_at,
                     c.vimeo_url AS class_vimeo_url,
                     i.name AS instructor_name,
                     cat.name AS category_name,
@@ -44,9 +50,12 @@ class MypageRepository
              LEFT JOIN lc_instructor    i   ON i.instructor_idx = c.instructor_idx
              LEFT JOIN lc_class_category cat ON cat.category_idx = c.category_idx
              WHERE {$whereStr}
-             ORDER BY e.enrolled_at DESC",
+             ORDER BY e.enrolled_at DESC
+             LIMIT {$limit} OFFSET {$offset}",
             $params
         );
+
+        return ['list' => $list, 'total' => $total];
     }
 
     /**
@@ -74,9 +83,19 @@ class MypageRepository
     // 찜목록
     // =========================================================================
 
-    public function getWishlist(int $memberIdx): array
+    public function getWishlist(int $memberIdx, int $page = 1, int $limit = 12): array
     {
-        return DB::select(
+        $offset = ($page - 1) * $limit;
+
+        $total = (int) (DB::selectOne(
+            "SELECT COUNT(*) AS cnt
+             FROM lc_wishlist w
+             JOIN lc_class c ON c.class_idx = w.class_idx
+             WHERE w.member_idx = ? AND c.is_active = 1",
+            [$memberIdx]
+        )['cnt'] ?? 0);
+
+        $list = DB::select(
             "SELECT w.wish_idx, w.created_at AS wished_at,
                     c.class_idx, c.title, c.thumbnail, c.type AS class_type,
                     c.price, c.price_origin, c.sale_end_at,
@@ -87,9 +106,12 @@ class MypageRepository
              JOIN lc_class c ON c.class_idx = w.class_idx
              WHERE w.member_idx = ?
                AND c.is_active = 1
-             ORDER BY w.created_at DESC",
+             ORDER BY w.created_at DESC
+             LIMIT {$limit} OFFSET {$offset}",
             [$memberIdx, $memberIdx]
         );
+
+        return ['list' => $list, 'total' => $total];
     }
 
     public function removeWish(int $wishIdx, int $memberIdx): void
@@ -116,12 +138,16 @@ class MypageRepository
         $list = DB::select(
             "SELECT o.*, c.title AS class_title, c.type AS class_type,
                     c.thumbnail, c.total_episodes,
+                    i.name AS instructor_name,
+                    cat.name AS category_name,
                     (SELECT COUNT(*) FROM lc_progress p
                      WHERE p.member_idx = o.member_idx
                        AND p.class_idx  = o.class_idx
                        AND p.is_complete = 1) AS done_count
              FROM lc_order o
              JOIN lc_class c ON c.class_idx = o.class_idx
+             LEFT JOIN lc_instructor i ON i.instructor_idx = c.instructor_idx
+             LEFT JOIN lc_class_category cat ON cat.category_idx = c.category_idx
              WHERE o.member_idx = ?
              ORDER BY o.created_at DESC
              LIMIT {$limit} OFFSET {$offset}",
@@ -136,12 +162,16 @@ class MypageRepository
         return DB::selectOne(
             "SELECT o.*, c.title AS class_title, c.type AS class_type,
                     c.thumbnail, c.total_episodes,
+                    i.name AS instructor_name,
+                    cat.name AS category_name,
                     (SELECT COUNT(*) FROM lc_progress p
                      WHERE p.member_idx = o.member_idx
                        AND p.class_idx  = o.class_idx
                        AND p.is_complete = 1) AS done_count
              FROM lc_order o
              JOIN lc_class c ON c.class_idx = o.class_idx
+             LEFT JOIN lc_instructor i ON i.instructor_idx = c.instructor_idx
+             LEFT JOIN lc_class_category cat ON cat.category_idx = c.category_idx
              WHERE o.order_idx = ? AND o.member_idx = ?",
             [$orderIdx, $memberIdx]
         );
@@ -165,9 +195,9 @@ class MypageRepository
     // 1:1 문의
     // =========================================================================
 
-    public function getQnaList(int $memberIdx, string $status = ''): array
+    public function getQnaList(int $memberIdx, string $status = '', int $page = 1, int $limit = 10): array
     {
-        $where  = ['member_idx = ?'];
+        $where  = ['member_idx = ?', 'deleted_at IS NULL'];
         $params = [$memberIdx];
 
         if ($status === 'wait' || $status === 'done') {
@@ -176,20 +206,29 @@ class MypageRepository
         }
 
         $whereStr = implode(' AND ', $where);
+        $offset   = ($page - 1) * $limit;
 
-        return DB::select(
+        $total = (int) (DB::selectOne(
+            "SELECT COUNT(*) AS cnt FROM lc_qna WHERE {$whereStr}",
+            $params
+        )['cnt'] ?? 0);
+
+        $list = DB::select(
             "SELECT qna_idx, category, title, status, created_at
              FROM lc_qna
              WHERE {$whereStr}
-             ORDER BY created_at DESC",
+             ORDER BY created_at DESC
+             LIMIT {$limit} OFFSET {$offset}",
             $params
         );
+
+        return ['list' => $list, 'total' => $total];
     }
 
     public function getQnaDetail(int $qnaIdx, int $memberIdx): ?array
     {
         return DB::selectOne(
-            "SELECT * FROM lc_qna WHERE qna_idx = ? AND member_idx = ?",
+            "SELECT * FROM lc_qna WHERE qna_idx = ? AND member_idx = ? AND deleted_at IS NULL",
             [$qnaIdx, $memberIdx]
         );
     }
@@ -212,7 +251,8 @@ class MypageRepository
     public function deleteQna(int $qnaIdx, int $memberIdx): bool
     {
         $affected = DB::execute(
-            "DELETE FROM lc_qna WHERE qna_idx = ? AND member_idx = ? AND status = 'wait'",
+            "UPDATE lc_qna SET deleted_at = NOW()
+             WHERE qna_idx = ? AND member_idx = ? AND status = 'wait' AND deleted_at IS NULL",
             [$qnaIdx, $memberIdx]
         );
         return $affected > 0;
@@ -249,22 +289,51 @@ class MypageRepository
      * 후기 탭용: 프리미엄 수강 강의 목록 + 후기 작성 여부
      * (후기 작성 가능 목록 + 수정 가능 목록 통합)
      */
-    public function getReviewableClasses(int $memberIdx): array
+    public function getReviewableClasses(int $memberIdx, string $type = '0', int $page = 1, int $limit = 10): array
     {
-        return DB::select(
-            "SELECT e.class_idx, c.title, c.thumbnail,
-                    e.enrolled_at,
-                    r.review_idx, r.rating, r.content, r.created_at AS review_at
+        $where  = ["e.member_idx = ?", "e.type = 'premium'"];
+        $params = [$memberIdx];
+
+        if ($type === '0') {
+            $where[] = 'r.review_idx IS NULL';
+        } elseif ($type === '1') {
+            $where[] = 'r.review_idx IS NOT NULL';
+        }
+
+        $whereStr = implode(' AND ', $where);
+        $offset   = ($page - 1) * $limit;
+
+        $total = (int) (DB::selectOne(
+            "SELECT COUNT(*) AS cnt
              FROM lc_enroll e
              JOIN lc_class c ON c.class_idx = e.class_idx
              LEFT JOIN lc_review r ON r.class_idx = e.class_idx
                                    AND r.member_idx = e.member_idx
                                    AND r.is_active = 1
-             WHERE e.member_idx = ?
-               AND e.type = 'premium'
-             ORDER BY e.enrolled_at DESC",
-            [$memberIdx]
+             WHERE {$whereStr}",
+            $params
+        )['cnt'] ?? 0);
+
+        $list = DB::select(
+            "SELECT e.class_idx, e.type,
+                    c.title AS class_title, c.thumbnail, c.type AS class_type,
+                    e.enrolled_at,
+                    (SELECT o.paid_at FROM lc_order o
+                     WHERE o.class_idx = e.class_idx AND o.member_idx = e.member_idx
+                       AND o.status = 'paid' ORDER BY o.paid_at ASC LIMIT 1) AS paid_at,
+                    r.review_idx, r.title AS review_title, r.rating, r.content, r.created_at AS review_at
+             FROM lc_enroll e
+             JOIN lc_class c ON c.class_idx = e.class_idx
+             LEFT JOIN lc_review r ON r.class_idx = e.class_idx
+                                   AND r.member_idx = e.member_idx
+                                   AND r.is_active = 1
+             WHERE {$whereStr}
+             ORDER BY e.enrolled_at DESC
+             LIMIT {$limit} OFFSET {$offset}",
+            $params
         );
+
+        return ['list' => $list, 'total' => $total];
     }
 
     /**
@@ -282,18 +351,18 @@ class MypageRepository
     public function createReview(int $memberIdx, array $data): int
     {
         return (int) DB::insert(
-            "INSERT INTO lc_review (class_idx, member_idx, rating, content)
-             VALUES (?, ?, ?, ?)",
-            [$data['class_idx'], $memberIdx, $data['rating'], $data['content']]
+            "INSERT INTO lc_review (class_idx, member_idx, rating, title, content)
+             VALUES (?, ?, ?, ?, ?)",
+            [$data['class_idx'], $memberIdx, $data['rating'], $data['title'] ?? null, $data['content']]
         );
     }
 
     public function updateReview(int $reviewIdx, int $memberIdx, array $data): void
     {
         DB::execute(
-            "UPDATE lc_review SET rating = ?, content = ?, updated_at = NOW()
+            "UPDATE lc_review SET rating = ?, title = ?, content = ?, updated_at = NOW()
              WHERE review_idx = ? AND member_idx = ?",
-            [$data['rating'], $data['content'], $reviewIdx, $memberIdx]
+            [$data['rating'], $data['title'] ?? null, $data['content'], $reviewIdx, $memberIdx]
         );
     }
 
@@ -304,6 +373,61 @@ class MypageRepository
             [$reviewIdx, $memberIdx]
         );
         return $affected > 0;
+    }
+
+    public function getReviewImages(int $reviewIdx): array
+    {
+        return DB::select(
+            "SELECT image_path FROM lc_review_image WHERE review_idx = ? AND deleted_at IS NULL ORDER BY sort_order ASC",
+            [$reviewIdx]
+        );
+    }
+
+    /**
+     * 여러 review_idx의 이미지를 한 번에 조회
+     * 반환: [ review_idx => ['image_path', ...], ... ]
+     */
+    public function getReviewImagesByIds(array $reviewIds): array
+    {
+        if (empty($reviewIds)) return [];
+
+        $placeholders = implode(',', array_fill(0, count($reviewIds), '?'));
+        $rows = DB::select(
+            "SELECT review_idx, image_path
+             FROM lc_review_image
+             WHERE review_idx IN ({$placeholders}) AND deleted_at IS NULL
+             ORDER BY review_idx, sort_order ASC",
+            $reviewIds
+        );
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row['review_idx']][] = $row['image_path'];
+        }
+        return $map;
+    }
+
+    public function saveReviewImages(int $reviewIdx, array $filenames): void
+    {
+        $order = (int) (DB::selectOne(
+            "SELECT COALESCE(MAX(sort_order), -1) AS m FROM lc_review_image WHERE review_idx = ? AND deleted_at IS NULL",
+            [$reviewIdx]
+        )['m'] ?? -1) + 1;
+
+        foreach ($filenames as $filename) {
+            DB::insert(
+                "INSERT INTO lc_review_image (review_idx, image_path, sort_order) VALUES (?, ?, ?)",
+                [$reviewIdx, $filename, $order++]
+            );
+        }
+    }
+
+    public function deleteReviewImageByPath(int $reviewIdx, string $imagePath): void
+    {
+        DB::execute(
+            "UPDATE lc_review_image SET deleted_at = NOW() WHERE review_idx = ? AND image_path = ? AND deleted_at IS NULL",
+            [$reviewIdx, $imagePath]
+        );
     }
 
     // =========================================================================

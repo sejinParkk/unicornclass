@@ -6,7 +6,7 @@
    강사 카드:  .i-info  .i-name  .i-photo-wrap  .i-photo-ph  .i-photo-img
                .i-desc-list  .i-social-fixed  .i-social-icon
    공통 태그:  .ctag  .ct-hot  .ct-new  .ct-free  .ct-premium
-   페이지네이션: .pagination  .page-btn  .page-arrow
+   페이지네이션: .pagination  .page-btn  .page-prev, .page-next
 
    ── 충돌 주의 ─────────────────────────────────────────────────────────────
    styles.css 의 .result-box 는 아이디찾기 결과 박스 전용입니다.

@@ -94,8 +94,8 @@ class ClassRepository
             'INSERT INTO lc_class
                 (category_idx, instructor_idx, type, title, summary, description,
                  thumbnail, price, price_origin, duration_days, kakao_url, vimeo_url,
-                 badge_hot, badge_new, sale_end_at, is_active, sort_order)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+                 badge_hot, badge_new, sale_end_at, enroll_start_at, is_active, sort_order)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
             [
                 $data['category_idx'] ?: null,
                 $data['instructor_idx'],
@@ -112,6 +112,7 @@ class ClassRepository
                 (int) ($data['badge_hot'] ?? 0),
                 (int) ($data['badge_new'] ?? 0),
                 $data['sale_end_at'] ?: null,
+                $data['enroll_start_at'] ?: null,
                 (int) ($data['is_active'] ?? 0),
                 (int) ($data['sort_order'] ?? 0),
             ]
@@ -127,7 +128,7 @@ class ClassRepository
             'category_idx', 'instructor_idx', 'title', 'summary', 'description',
             'thumbnail', 'price', 'price_origin', 'duration_days',
             'kakao_url', 'vimeo_url', 'badge_hot', 'badge_new',
-            'sale_end_at', 'is_active', 'sort_order',
+            'sale_end_at', 'enroll_start_at', 'is_active', 'sort_order',
         ];
 
         foreach ($fields as $f) {
@@ -233,19 +234,21 @@ class ClassRepository
     {
         $row = DB::selectOne(
             'SELECT c.*, i.name AS instructor_name, i.instructor_idx,
-                    i.photo AS instructor_photo, i.field AS instructor_field,
+                    i.photo AS instructor_photo,
                     i.sns_youtube, i.sns_instagram, i.sns_facebook,
-                    cat.name AS category_name
+                    cat.name AS category_name,
+                    ic.name AS instructor_category_name
              FROM lc_class c
              JOIN lc_instructor i ON i.instructor_idx = c.instructor_idx
              LEFT JOIN lc_class_category cat ON cat.category_idx = c.category_idx
+             LEFT JOIN lc_instructor_category ic ON ic.category_idx = i.category_idx
              WHERE c.class_idx = ? AND c.is_active = 1 AND c.deleted_at IS NULL',
             [$classIdx]
         );
         if (!$row) return null;
 
         $row['chapters'] = DB::select(
-            'SELECT chapter_idx, title, duration
+            'SELECT chapter_idx, title, duration, vimeo_url
              FROM lc_class_chapter
              WHERE class_idx = ? AND is_active = 1
              ORDER BY sort_order ASC',
@@ -287,10 +290,17 @@ class ClassRepository
     /** 무료 수강 등록 */
     public function createFreeEnroll(int $memberIdx, int $classIdx, ?string $kakaoUrl, ?string $vimeoUrl): int
     {
+        // 결제내역에 표시되도록 lc_order에 status='free', amount=0 row 생성
+        $orderIdx = (int) DB::insert(
+            "INSERT INTO lc_order (member_idx, class_idx, amount, amount_origin, status, paid_at)
+             VALUES (?, ?, 0, 0, 'free', NOW())",
+            [$memberIdx, $classIdx]
+        );
+
         return (int) DB::insert(
-            'INSERT INTO lc_enroll (member_idx, class_idx, type, kakao_url, vimeo_url)
-             VALUES (?, ?, \'free\', ?, ?)',
-            [$memberIdx, $classIdx, $kakaoUrl, $vimeoUrl]
+            'INSERT INTO lc_enroll (member_idx, class_idx, order_idx, type, kakao_url, vimeo_url)
+             VALUES (?, ?, ?, \'free\', ?, ?)',
+            [$memberIdx, $classIdx, $orderIdx, $kakaoUrl, $vimeoUrl]
         );
     }
 
@@ -304,13 +314,36 @@ class ClassRepository
         );
     }
 
+    /** 만료된 프리미엄 수강권 기간 연장 (enroll 행 UPDATE) */
+    public function extendPremiumEnroll(int $memberIdx, int $classIdx, int $orderIdx, string $expireAt): void
+    {
+        DB::execute(
+            'UPDATE lc_enroll SET order_idx = ?, expire_at = ?, enrolled_at = NOW()
+             WHERE member_idx = ? AND class_idx = ? AND type = \'premium\'',
+            [$orderIdx, $expireAt, $memberIdx, $classIdx]
+        );
+    }
+
     /** 주문 생성 (결제 성공 후) */
-    public function createOrder(int $memberIdx, int $classIdx, int $amount, int $amountOrigin): int
+    public function createOrder(int $memberIdx, int $classIdx, int $amount, int $amountOrigin, array $payInfo = []): int
     {
         return (int) DB::insert(
-            'INSERT INTO lc_order (member_idx, class_idx, amount, amount_origin, status, paid_at)
-             VALUES (?, ?, ?, ?, \'paid\', NOW())',
-            [$memberIdx, $classIdx, $amount, $amountOrigin]
+            "INSERT INTO lc_order
+                (member_idx, class_idx, amount, amount_origin, status, paid_at,
+                 toss_payment_key, toss_order_id,
+                 pay_method, card_company, card_type, card_number, card_install, card_approve_no)
+             VALUES (?, ?, ?, ?, 'paid', NOW(), ?, ?, ?, ?, ?, ?, ?, ?)",
+            [
+                $memberIdx, $classIdx, $amount, $amountOrigin,
+                $payInfo['toss_payment_key'] ?? null,
+                $payInfo['toss_order_id']    ?? null,
+                $payInfo['pay_method']       ?? null,
+                $payInfo['card_company']     ?? null,
+                $payInfo['card_type']        ?? null,
+                $payInfo['card_number']      ?? null,
+                (int) ($payInfo['card_install'] ?? 0),
+                $payInfo['card_approve_no']  ?? null,
+            ]
         );
     }
 
@@ -399,6 +432,35 @@ class ClassRepository
             [$memberIdx, $classIdx, $chapterIdx]
         );
         return true;
+    }
+
+    /**
+     * 챕터를 완료 상태로만 설정 (토글 아님 — 영상 종료 시 사용)
+     * 이미 완료된 경우 그대로 유지.
+     */
+    public function markComplete(int $memberIdx, int $classIdx, int $chapterIdx): void
+    {
+        $row = DB::selectOne(
+            'SELECT progress_idx, is_complete FROM lc_progress
+             WHERE member_idx = ? AND class_idx = ? AND chapter_idx = ?',
+            [$memberIdx, $classIdx, $chapterIdx]
+        );
+
+        if ($row) {
+            if (!$row['is_complete']) {
+                DB::execute(
+                    'UPDATE lc_progress SET is_complete = 1, completed_at = NOW()
+                     WHERE progress_idx = ?',
+                    [$row['progress_idx']]
+                );
+            }
+        } else {
+            DB::insert(
+                'INSERT INTO lc_progress (member_idx, class_idx, chapter_idx, is_complete, completed_at)
+                 VALUES (?, ?, ?, 1, NOW())',
+                [$memberIdx, $classIdx, $chapterIdx]
+            );
+        }
     }
 
     /** total_episodes 카운트 갱신 */

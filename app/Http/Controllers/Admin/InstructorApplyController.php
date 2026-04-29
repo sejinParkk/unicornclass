@@ -28,7 +28,7 @@ class InstructorApplyController
             'q'      => trim($_GET['q'] ?? ''),
         ];
         $page  = max(1, (int) ($_GET['page'] ?? 1));
-        $limit = 15;
+        $limit = 10;
 
         $result     = $this->instructorRepo->getApplyList($filters, $page, $limit);
         $applies    = $result['list'];

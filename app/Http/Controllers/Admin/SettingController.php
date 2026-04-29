@@ -97,24 +97,6 @@ class SettingController
             $data['hero_video'] = null;
         }
 
-        // 히어로 포스터 이미지 업로드
-        if (!empty($_FILES['hero_poster']['tmp_name'])) {
-            try {
-                $old = $this->repo->get('hero_poster');
-                $data['hero_poster'] = FileUploader::uploadSiteImage($_FILES['hero_poster']);
-                FileUploader::deleteSiteImage($old);
-            } catch (\RuntimeException $e) {
-                $this->redirectWithError('/admin/settings', $e->getMessage());
-                return;
-            }
-        }
-
-        // 히어로 포스터 이미지 삭제 요청
-        if (!empty($_POST['delete_hero_poster'])) {
-            FileUploader::deleteSiteImage($this->repo->get('hero_poster'));
-            $data['hero_poster'] = null;
-        }
-
         $this->repo->saveMany($data);
         header('Location: /admin/settings?saved=1');
         exit;

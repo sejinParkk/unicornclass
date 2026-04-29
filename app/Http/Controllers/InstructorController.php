@@ -99,8 +99,10 @@ class InstructorController
                                           $errors[] = '희망 강의 형태를 선택해 주세요.';
         if ($agree !== '1')              $errors[] = '개인정보 수집 및 이용에 동의해 주세요.';
 
+        header('Content-Type: application/json; charset=utf-8');
+
         if ($errors) {
-            header('Location: /instructors/apply?error=' . urlencode(implode(' ', $errors)));
+            echo json_encode(['ok' => false, 'message' => implode('<br>', $errors)]);
             exit;
         }
 
@@ -154,7 +156,7 @@ class InstructorController
             }
         }
 
-        header('Location: /instructors/apply?success=1');
+        echo json_encode(['ok' => true, 'redirect' => '/instructors/apply?success=1']);
         exit;
     }
 }

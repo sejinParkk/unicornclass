@@ -148,13 +148,12 @@ class InstructorRepository
     {
         return (int) DB::insert(
             'INSERT INTO lc_instructor
-                (category_idx, name, field, photo,
+                (category_idx, name, photo,
                  sns_youtube, sns_instagram, sns_facebook, sort_order, is_active)
-             VALUES (?,?,?,?,?,?,?,?,?)',
+             VALUES (?,?,?,?,?,?,?,?)',
             [
                 $data['category_idx'] ?: null,
                 $data['name'],
-                $data['field'] ?? '',
                 $data['photo'] ?? null,
                 $data['sns_youtube'] ?? null,
                 $data['sns_instagram'] ?? null,
@@ -171,7 +170,7 @@ class InstructorRepository
         $params = [];
 
         $fields = [
-            'category_idx', 'name', 'field', 'photo',
+            'category_idx', 'name', 'photo',
             'sns_youtube', 'sns_instagram', 'sns_facebook', 'sort_order', 'is_active',
         ];
         foreach ($fields as $f) {
@@ -276,12 +275,76 @@ class InstructorRepository
         );
     }
 
+    /**
+     * 회사소개 페이지용 — 카테고리별 강사 그룹 (카테고리당 최대 $limit명, 활성 강사만)
+     * 반환: [['category_idx'=>, 'category_name'=>, 'instructors'=>[...]], ...]
+     */
+    public function getGroupedByCategory(int $limit = 999): array
+    {
+        $categories = DB::select(
+            'SELECT category_idx, name FROM lc_instructor_category
+             WHERE is_active = 1
+             ORDER BY sort_order ASC, category_idx ASC'
+        );
+
+        $groups = [];
+        $allIds = [];
+
+        foreach ($categories as $cat) {
+            $instructors = DB::select(
+                'SELECT instructor_idx, name, photo,
+                        sns_youtube, sns_instagram, sns_facebook
+                 FROM lc_instructor
+                 WHERE category_idx = ? AND is_active = 1 AND deleted_at IS NULL
+                 ORDER BY sort_order ASC, instructor_idx ASC
+                 LIMIT ' . $limit,
+                [$cat['category_idx']]
+            );
+            if (empty($instructors)) continue;
+            $groups[] = [
+                'category_idx'  => $cat['category_idx'],
+                'category_name' => $cat['name'],
+                'instructors'   => $instructors,
+            ];
+            foreach ($instructors as $ins) {
+                $allIds[] = $ins['instructor_idx'];
+            }
+        }
+
+        if (empty($groups)) return [];
+
+        // intro 일괄 조회 후 값으로 매핑
+        $placeholders = implode(',', array_fill(0, count($allIds), '?'));
+        $intros       = DB::select(
+            "SELECT instructor_idx, content FROM lc_instructor_intro
+             WHERE instructor_idx IN ({$placeholders})
+             ORDER BY instructor_idx ASC, sort_order ASC",
+            $allIds
+        );
+        $introMap = [];
+        foreach ($intros as $row) {
+            $idx = $row['instructor_idx'];
+            if (!isset($introMap[$idx])) $introMap[$idx] = $row['content'];
+        }
+        foreach ($groups as &$group) {
+            foreach ($group['instructors'] as &$ins) {
+                $ins['intro'] = $introMap[$ins['instructor_idx']] ?? '';
+            }
+            unset($ins);
+        }
+        unset($group);
+
+        return $groups;
+    }
+
     /** 공개 목록 (페이지네이션, 활성 강사만) */
     public function getPublicList(int $page = 1, int $limit = 12): array
     {
         $offset = ($page - 1) * $limit;
         $list = DB::select(
-            'SELECT i.*, ic.name AS category_name
+            'SELECT i.instructor_idx, i.name, i.photo,
+                    i.sns_youtube, i.sns_instagram, i.sns_facebook,
+                    ic.name AS category_name
              FROM lc_instructor i
              LEFT JOIN lc_instructor_category ic ON ic.category_idx = i.category_idx
              WHERE i.is_active = 1 AND i.deleted_at IS NULL
@@ -293,7 +356,32 @@ class InstructorRepository
             'SELECT COUNT(*) AS cnt FROM lc_instructor WHERE is_active = 1 AND deleted_at IS NULL'
         )['cnt'] ?? 0);
 
+        $this->attachIntros($list);
+
         return ['list' => $list, 'total' => $total];
+    }
+
+    /** 강사 목록에 첫 번째 소개 문구(intro)를 일괄 매핑 */
+    private function attachIntros(array &$list): void
+    {
+        if (empty($list)) return;
+        $ids          = array_column($list, 'instructor_idx');
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $intros       = DB::select(
+            "SELECT instructor_idx, content FROM lc_instructor_intro
+             WHERE instructor_idx IN ({$placeholders})
+             ORDER BY instructor_idx ASC, sort_order ASC",
+            $ids
+        );
+        $introMap = [];
+        foreach ($intros as $row) {
+            $idx = $row['instructor_idx'];
+            if (!isset($introMap[$idx])) $introMap[$idx] = $row['content'];
+        }
+        foreach ($list as &$item) {
+            $item['intro'] = $introMap[$item['instructor_idx']] ?? '';
+        }
+        unset($item);
     }
 
     /** 강사 공개 상세 (담당 강의 포함) */
@@ -303,10 +391,12 @@ class InstructorRepository
         if (!$row || !$row['is_active']) return null;
 
         $row['classes'] = DB::select(
-            'SELECT class_idx, title, type, thumbnail, summary
-             FROM lc_class
-             WHERE instructor_idx = ? AND is_active = 1 AND deleted_at IS NULL
-             ORDER BY sort_order ASC, class_idx DESC',
+            'SELECT c.class_idx, c.title, c.type, c.thumbnail, c.summary,
+                    c.badge_hot, c.badge_new, cat.name AS category_name
+             FROM lc_class c
+             LEFT JOIN lc_class_category cat ON cat.category_idx = c.category_idx
+             WHERE c.instructor_idx = ? AND c.is_active = 1 AND c.deleted_at IS NULL
+             ORDER BY c.sort_order ASC, c.class_idx DESC',
             [$instructorIdx]
         );
 

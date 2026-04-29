@@ -26,7 +26,7 @@ if (!empty($_POST['careers_json'])) {
 ?>
 
 <div class="">
-<form method="POST" action="<?= $action ?>" enctype="multipart/form-data">
+<form id="instructorForm" method="POST" action="<?= $action ?>" enctype="multipart/form-data">
 	<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
 
 	<div class="form-layout ver2">
@@ -41,15 +41,7 @@ if (!empty($_POST['careers_json'])) {
 								<input type="text" name="name" class="form-control <?= isset($errors['name']) ? 'error' : '' ?>"
 												value="<?= htmlspecialchars($_POST['name'] ?? $instructor['name'] ?? '') ?>"
 												placeholder="강사명을 입력하세요">
-								<?php if (isset($errors['name'])): ?>
-										<div class="error-msg"><?= htmlspecialchars($errors['name']) ?></div>
-								<?php endif; ?>
-						</div>
-						<div class="form-group">
-								<label>전문 분야</label>
-								<input type="text" name="field" class="form-control"
-												value="<?= htmlspecialchars($_POST['field'] ?? $instructor['field'] ?? '') ?>"
-												placeholder="예: 마케팅, 브랜딩">
+								<div class="error-msg" data-ajax-err="name" style="display:none"></div>
 						</div>
 				</div>
 
@@ -119,10 +111,11 @@ if (!empty($_POST['careers_json'])) {
 					<img src="" alt="" class="photo-preview" id="photoPreview" style="display:none">
 				<?php endif; ?>
 				<input type="file" name="photo" id="photoInput" accept="image/jpeg,image/png,image/webp" style="margin-top:4px">
-				<div class="hint">jpg, png, webp / 최대 5MB / 권장 1:1 비율</div>
-				<?php if (isset($errors['photo'])): ?>
-				<div class="error-msg"><?= htmlspecialchars($errors['photo']) ?></div>
-				<?php endif; ?>
+				<div class="hint">
+					jpg, png, webp / 최대 5MB
+					<br>권장 비율은 존재하지 않으나 모두 같은 비율로 등록 권장
+				</div>
+				<div class="error-msg" data-ajax-err="photo" style="display:none"></div>
 			</div>
 
 			<!-- SNS -->
@@ -234,10 +227,15 @@ document.getElementById('photoInput').addEventListener('change', function () {
 	if (placeholder) placeholder.style.display = 'none';
 });
 
-// ── 폼 제출 시 JSON 직렬화 ────────────────────────────────────
-document.querySelector('form').addEventListener('submit', function () {
-	document.getElementById('introsJson').value  = JSON.stringify(intros.filter(v => v.trim() !== ''));
-	document.getElementById('careersJson').value = JSON.stringify(careers.filter(v => v.trim() !== ''));
+// ── 폼 제출 (AJAX) ───────────────────────────────────────────
+document.getElementById('instructorForm').addEventListener('submit', function (e) {
+	e.preventDefault();
+	ajaxSubmit(this, {
+		beforeSubmit: function() {
+			document.getElementById('introsJson').value  = JSON.stringify(intros.filter(v => v.trim() !== ''));
+			document.getElementById('careersJson').value = JSON.stringify(careers.filter(v => v.trim() !== ''));
+		}
+	});
 });
 
 // ── 초기 렌더링 ──────────────────────────────────────────────

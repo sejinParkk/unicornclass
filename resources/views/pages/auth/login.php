@@ -1,21 +1,6 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>로그인 — 유니콘클래스</title>
-  <link rel="stylesheet" href="/assets/css/styles.css">
-</head>
-<body class="auth-page">
 <div class="auth-card">
 	<div class="auth-logo">
-		<div class="auth-logo-placeholder">
-			<div class="auth-logo-icon"><span>UNICORN<br>CLASS</span></div>
-			<div class="auth-logo-text">
-				<span class="l1">UNICORN</span>
-				<span class="l2">CLASS</span>
-			</div>
-		</div>
+		<img src="/assets/img/logo2.svg" alt="유니콘클래스">
 	</div>
 
 	<?php if (!empty($_GET['reset'])): ?>
@@ -24,19 +9,17 @@
 
 	<!-- 소셜 버튼 (키 미설정으로 비활성) -->
 	<div class="social-btns">
-		<button class="btn-social btn-kakao" disabled title="준비 중">
-			<div class="social-icon-k">💬</div>
-			카카오로 3초만에 시작하기
+		<button class="btn-social btn_kakao" disabled title="준비 중">
+			<img src="/assets/img/auth_sns_kakao.svg" alt="카카오 로그인">
+			<strong>카카오로 3초만에 시작하기</strong>
 			<span class="badge-soon">준비중</span>
 		</button>
-		<button class="btn-social btn-naver" disabled title="준비 중">
-			<div class="social-icon-n">N</div>
-			네이버로 시작하기
+		<button class="btn-social btn_naver" disabled title="준비 중">
+			<img src="/assets/img/auth_sns_naver.svg" alt="네이버 로그인">
+			<strong>네이버로 3초만에 시작하기</strong>
 			<span class="badge-soon">준비중</span>
 		</button>
-	</div>
-
-  <div class="auth-divider"><span>또는 아이디로 로그인</span></div>
+	</div>  
 
 	<form method="POST" action="/login" id="loginForm" novalidate>
 		<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken ?? '') ?>">
@@ -57,72 +40,93 @@
 				autocomplete="current-password">
 			<div class="error-msg" id="pwError" style="display:none"></div>
 		</div>
-		<button type="submit" class="btn-next" id="loginBtn" style="margin-top:6px">로그인</button>
+		<button type="submit" class="btn-next mgt24" id="loginBtn">로그인</button>
 	</form>
 
 	<div class="auth-links">
 		<a href="/find-id">아이디 찾기</a>
 		<a href="/find-password">비밀번호 찾기</a>
-		<a href="/register">일반회원 가입하기</a>
+		<a href="/register">회원가입</a>
 	</div>
 </div>
 
-<!-- 서버 에러 모달 -->
-<?php if (!empty($error)): ?>
-<div class="auth-modal-overlay show" id="errorModal">
+<!-- 에러 모달 (JS로 동적 제어) -->
+<div class="auth-modal-overlay" id="errorModal">
 	<div class="auth-modal-card">
-		<button class="auth-modal-close" onclick="closeModal()">×</button>
-		<div class="auth-modal-title">
-			<?php if (str_contains($error, '탈퇴') || str_contains($error, '정지')): ?>
-			이미 탈퇴한 계정입니다.
-			<?php else: ?>
-			일치하는 정보가 없습니다.
-			<?php endif; ?>
-		</div>
-		<div class="auth-modal-desc">
-			<?php if (str_contains($error, '탈퇴') || str_contains($error, '정지')): ?>
-			해당 계정은 이용하실 수 없습니다.<br>관련 문의는 고객센터로 연락해 주세요.
-			<?php else: ?>
-			아이디 또는 비밀번호를 다시 확인해 주세요.
-			<?php endif; ?>
-		</div>
-		<button class="auth-modal-btn" onclick="closeModal()">확인</button>
+		<div class="auth-modal-title" id="modalTitle"></div>
+		<div class="auth-modal-desc" id="modalDesc"></div>
+		<button class="btn-next mgt24 auth-modal-btn" onclick="closeModal()">확인</button>
 	</div>
 </div>
-<?php endif; ?>
 
 <script>
+const _loginErrorMessages = {
+  wrong:    { title: '일치하는 정보가 없습니다',     desc: '아이디 또는 비밀번호를 다시 확인해 주세요.' },
+  warn:     { title: '로그인 정보를 확인해 주세요',  desc: null },
+  locked:   { title: '계정이 잠겼습니다',            desc: '로그인 5회 이상 실패로 계정이 잠겼습니다.<br>고객센터로 문의해 주세요.' },
+  inactive: { title: '이용할 수 없는 계정입니다',    desc: '탈퇴 또는 정지된 계정입니다.<br>관련 문의는 고객센터로 연락해 주세요.' },
+};
+
 function closeModal() {
   document.getElementById('errorModal')?.classList.remove('show');
 }
 
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-	const id = document.getElementById('mb_id').value.trim();
-	const pw = document.getElementById('mb_password').value;
-	let valid = true;
+function _showLoginModal(errorType, failRemaining) {
+  const m = _loginErrorMessages[errorType] || _loginErrorMessages.wrong;
+  document.getElementById('modalTitle').textContent = m.title;
+  const descEl = document.getElementById('modalDesc');
+  if (errorType === 'warn') {
+    descEl.innerHTML = '아이디 또는 비밀번호를 다시 확인해 주세요.<br>'
+      + '<span style="color:#e53e3e;font-weight:600;">' + failRemaining + '회 더 실패 시 계정이 잠깁니다.</span>';
+  } else {
+    descEl.innerHTML = m.desc || '';
+  }
+  document.getElementById('errorModal').classList.add('show');
+}
 
-	const idGroup = document.getElementById('idGroup');
-	const idErr   = document.getElementById('idError');
-	const pwGroup = document.getElementById('pwGroup');
-	const pwErr   = document.getElementById('pwError');
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
 
-	idGroup.classList.remove('error'); idErr.style.display = 'none';
-	pwGroup.classList.remove('error'); pwErr.style.display = 'none';
+  const id = document.getElementById('mb_id').value.trim();
+  const pw = document.getElementById('mb_password').value;
 
-	if (id.length < 3) {
-		idGroup.classList.add('error');
-		idErr.textContent = '아이디는 최소 3자 이상이어야 합니다.';
-		idErr.style.display = 'block';
-		valid = false;
-	}
-	if (pw.length < 8) {
-		pwGroup.classList.add('error');
-		pwErr.textContent = '비밀번호는 최소 8자 이상이어야 합니다.';
-		pwErr.style.display = 'block';
-		valid = false;
-	}
-	if (!valid) e.preventDefault();
+  const idGroup = document.getElementById('idGroup');
+  const idErr   = document.getElementById('idError');
+  const pwGroup = document.getElementById('pwGroup');
+  const pwErr   = document.getElementById('pwError');
+  idGroup.classList.remove('error'); idErr.style.display = 'none';
+  pwGroup.classList.remove('error'); pwErr.style.display = 'none';
+
+  let valid = true;
+  if (id.length < 3) {
+    idGroup.classList.add('error');
+    idErr.textContent = '아이디는 최소 3자 이상이어야 합니다.';
+    idErr.style.display = 'block';
+    valid = false;
+  }
+  if (pw.length < 8) {
+    pwGroup.classList.add('error');
+    pwErr.textContent = '비밀번호는 최소 8자 이상이어야 합니다.';
+    pwErr.style.display = 'block';
+    valid = false;
+  }
+  if (!valid) return;
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = '로그인 중...';
+
+  try {
+    const res  = await fetch('/login', { method: 'POST', body: new FormData(this), headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    const data = await res.json();
+    if (data.ok) {
+      location.href = data.redirect || '/';
+    } else {
+      _showLoginModal(data.errorType, data.failRemaining ?? 0);
+    }
+  } catch {
+    _showLoginModal('wrong');
+  } finally {
+    btn.disabled = false; btn.textContent = '로그인';
+  }
 });
 </script>
-</body>
-</html>

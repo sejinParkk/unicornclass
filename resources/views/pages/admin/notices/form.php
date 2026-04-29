@@ -49,10 +49,26 @@ $h       = fn(string $k, string $d = '') => htmlspecialchars($notice[$k] ?? $d);
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="checkbox-row">
-						<input type="checkbox" name="is_pinned" value="1" <?= ($notice['is_pinned'] ?? 0) ? 'checked' : '' ?>>
-						상단 고정
-					</label>
+					<label>공지 유형</label>
+					<?php
+					$noticeType = 'none';
+					if (!empty($notice['is_maintenance'])) $noticeType = 'maintenance';
+					elseif (!empty($notice['is_pinned']))   $noticeType = 'pinned';
+					?>
+					<div class="radio-row">
+						<label class="radio-item">
+							<input type="radio" name="notice_type" value="none" <?= $noticeType === 'none' ? 'checked' : '' ?>>
+							없음
+						</label>
+						<label class="radio-item">
+							<input type="radio" name="notice_type" value="pinned" <?= $noticeType === 'pinned' ? 'checked' : '' ?>>
+							상단고정
+						</label>
+						<label class="radio-item">
+							<input type="radio" name="notice_type" value="maintenance" <?= $noticeType === 'maintenance' ? 'checked' : '' ?>>
+							점검
+						</label>
+					</div>
 				</div>
 			</div>
 			<div class="form-actions">
@@ -88,18 +104,17 @@ $(document).ready(function() {
 			['table', ['table']],
 			['para', ['ul', 'ol', 'paragraph']],
 			['height', ['height']],
-			['insert',['picture','link','video']],
+			//['insert',['picture','link','video']],
+			['insert',['picture']],
 			['view', ['codeview']]
 		]
 	});
 
-	// 2. ★ 추가된 부분: 저장 버튼 누를 때 강제 동기화 ★
-	$('#noticeForm').on('submit', function() {
-		// 현재 썸머노트가 가지고 있는 모든 내용(코드뷰 포함)을 가져옵니다.
-		var htmlContent = $('#notice-editor').summernote('code');
-
-		// 가져온 내용을 폼과 연결된 textarea에 확실하게 밀어 넣습니다.
-		$('#notice-editor').val(htmlContent);
+	// 2. 저장 버튼: 써머노트 동기화 후 AJAX 제출
+	$('#noticeForm').on('submit', function(e) {
+		e.preventDefault();
+		$('#notice-editor').val($('#notice-editor').summernote('code'));
+		ajaxSubmit(document.getElementById('noticeForm'));
 	});
 });
 </script>

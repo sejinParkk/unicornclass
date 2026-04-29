@@ -1,92 +1,58 @@
 <?php
 /**
- * 관리자 약관 관리
- * @var array       $termData   ['terms' => row, 'privacy' => row, ...]
- * @var array       $termTypes  ['terms' => '이용약관', ...]
- * @var string      $csrfToken
- * @var string|null $saved      저장된 type 키
+ * 관리자 약관 관리 — 유형별 현재 버전 요약
+ * @var array  $summary    type => {terms_idx, title, effective_at, updated_at, version_count}
+ * @var array  $termTypes  type => 한글명
+ * @var string $csrfToken
  */
-$activeTab = $saved ?? array_key_first($termTypes);
 ?>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/lang/summernote-ko-KR.min.js"></script>
-
-<?php if ($saved && isset($termTypes[$saved])): ?>
-<div class="toast-msg toast-success">✓ <?= htmlspecialchars($termTypes[$saved]) ?>이(가) 저장되었습니다.</div>
-<?php endif; ?>
 <?php if (isset($_GET['error'])): ?>
 <div class="toast-msg toast-error"><?= htmlspecialchars($_GET['error']) ?></div>
 <?php endif; ?>
 
-<!-- 탭 -->
-<div class="terms-tabs">
-	<?php foreach ($termTypes as $key => $label): ?>
-	<button class="terms-tab <?= $activeTab === $key ? 'active' : '' ?>"
-		onclick="switchTab('<?= $key ?>', this)"><?= htmlspecialchars($label) ?></button>
-	<?php endforeach; ?>
+<div class="top-bar">
+  <div class="total-label">약관 유형 <strong><?= count($termTypes) ?></strong>종</div>
 </div>
 
-<!-- 패널 -->
-<?php foreach ($termTypes as $key => $label):
-	$row = $termData[$key] ?? null;
-?>
-<div id="panel-<?= $key ?>" class="terms-panel <?= $activeTab === $key ? 'active' : '' ?>">
-	<form method="POST" action="/admin/terms/<?= $key ?>" id="form-<?= $key ?>">
-		<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
-		<div class="form-card">
-			<div class="form-group">
-				<label>제목</label>
-				<input type="text" name="title" class="form-control"
-					value="<?= htmlspecialchars($row['title'] ?? $label) ?>">
-			</div>
-			<div class="form-group">
-				<label>내용</label>
-				<textarea id="editor-<?= $key ?>" name="content"><?= htmlspecialchars($row['content'] ?? '') ?></textarea>
-			</div>
-		</div>
-		<div class="form-actions">
-			<button type="submit" class="btn-save"><?= htmlspecialchars($label) ?> 저장</button>
-		</div>
-	</form>
+<div class="tbl-wrap">
+  <table class="data-table">
+    <colgroup>
+      <col width="18%">
+      <col width="">
+      <col width="10%">
+      <col width="12%">
+      <col width="14%">
+      <col width="14%">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>약관 유형</th>
+        <th>현재 버전 제목</th>
+        <th>버전 수</th>
+        <th>시행일</th>
+        <th>최종 수정일</th>
+        <th>관리</th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($termTypes as $type => $label):
+      $row = $summary[$type] ?? null;
+    ?>
+      <tr>
+        <td><span class="badge badge-default"><?= htmlspecialchars($label) ?></span></td>
+        <td><?= $row ? htmlspecialchars($row['title']) : '<span style="color:#aaa">미등록</span>' ?></td>
+        <td style="text-align:center"><?= $row ? number_format((int)$row['version_count']) : 0 ?></td>
+        <td><?= $row ? date('Y.m.d', strtotime($row['effective_at'])) : '-' ?></td>
+        <td><?= $row ? date('Y.m.d', strtotime($row['updated_at'] ?? $row['effective_at'])) : '-' ?></td>
+        <td>
+          <div class="act-btn-wrap">
+            <a href="/admin/terms/<?= $type ?>/versions" class="act-btn act-edit">버전 관리</a>
+            <a href="/admin/terms/<?= $type ?>/create" class="act-btn act-create">새 버전</a>
+          </div>
+        </td>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table>
 </div>
-<?php endforeach; ?>
-
-<script>
-$(document).ready(function() {
-	var summernoteConfig = {
-		height: 480,
-		minHeight: null,
-		maxHeight: null,
-		focus: false,
-		lang: 'ko-KR',
-		toolbar: [
-			['fontname', ['fontname']],
-			['fontsize', ['fontsize']],
-			['style', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
-			['color', ['forecolor', 'color']],
-			['table', ['table']],
-			['para', ['ul', 'ol', 'paragraph']],
-			['height', ['height']],
-			['insert', ['picture', 'link', 'video']],
-			['view', ['codeview']]
-		]
-	};
-
-	<?php foreach (array_keys($termTypes) as $key): ?>
-	$('#editor-<?= $key ?>').summernote(summernoteConfig);
-	$('#form-<?= $key ?>').on('submit', function() {
-		$('#editor-<?= $key ?>').val($('#editor-<?= $key ?>').summernote('code'));
-	});
-	<?php endforeach; ?>
-});
-
-function switchTab(type, btn) {
-	document.querySelectorAll('.terms-tab').forEach(t => t.classList.remove('active'));
-	document.querySelectorAll('.terms-panel').forEach(p => p.classList.remove('active'));
-	btn.classList.add('active');
-	document.getElementById('panel-' + type).classList.add('active');
-}
-</script>

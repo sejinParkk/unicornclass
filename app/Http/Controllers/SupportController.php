@@ -7,18 +7,21 @@ namespace App\Http\Controllers;
 use App\Repositories\FaqRepository;
 use App\Repositories\NoticeRepository;
 use App\Repositories\SettingRepository;
+use App\Repositories\TermsRepository;
 
 class SupportController
 {
     private FaqRepository     $faqRepo;
     private NoticeRepository  $noticeRepo;
     private SettingRepository $settingRepo;
+    private TermsRepository   $termsRepo;
 
     public function __construct()
     {
         $this->faqRepo     = new FaqRepository();
         $this->noticeRepo  = new NoticeRepository();
         $this->settingRepo = new SettingRepository();
+        $this->termsRepo   = new TermsRepository();
     }
 
     // =========================================================================
@@ -87,8 +90,20 @@ class SupportController
     // =========================================================================
     public function terms(): void
     {
-        $term      = $this->settingRepo->getTerm('terms');
-        $ajaxMode  = !empty($_GET['ajax']);
+        $ajaxMode = !empty($_GET['ajax']);
+        $verIdx   = (int) ($_GET['ver'] ?? 0);
+
+        if ($ajaxMode) {
+            // 팝업형: 현재 버전만
+            $term     = $this->termsRepo->getCurrentByType('terms');
+            $versions = [];
+        } else {
+            // 내부 페이지: 버전 선택 지원
+            $versions = $this->termsRepo->getVersionsByType('terms');
+            $term     = $verIdx > 0
+                ? $this->termsRepo->getByIdx($verIdx)
+                : $this->termsRepo->getCurrentByType('terms');
+        }
         $pageTitle = '이용약관 - 고객센터';
 
         if ($ajaxMode) {
@@ -106,8 +121,18 @@ class SupportController
     // =========================================================================
     public function privacy(): void
     {
-        $term      = $this->settingRepo->getTerm('privacy');
-        $ajaxMode  = !empty($_GET['ajax']);
+        $ajaxMode = !empty($_GET['ajax']);
+        $verIdx   = (int) ($_GET['ver'] ?? 0);
+
+        if ($ajaxMode) {
+            $term     = $this->termsRepo->getCurrentByType('privacy');
+            $versions = [];
+        } else {
+            $versions = $this->termsRepo->getVersionsByType('privacy');
+            $term     = $verIdx > 0
+                ? $this->termsRepo->getByIdx($verIdx)
+                : $this->termsRepo->getCurrentByType('privacy');
+        }
         $pageTitle = '개인정보처리방침 - 고객센터';
 
         if ($ajaxMode) {
@@ -138,19 +163,12 @@ class SupportController
             exit;
         }
 
-        $term      = $this->settingRepo->getTerm($type);
+        $term        = $this->termsRepo->getCurrentByType($type);
         $policyTitle = self::POLICY_TYPES[$type];
-        $ajaxMode  = !empty($_GET['ajax']);
-        $pageTitle = $policyTitle . ' - 고객센터';
+        $pageTitle   = $policyTitle . ' - 고객센터';
 
-        if ($ajaxMode) {
-            require VIEW_PATH . '/pages/supports/policy.php';
-            exit;
-        }
-
-        require VIEW_PATH . '/layout/header.php';
         require VIEW_PATH . '/pages/supports/policy.php';
-        require VIEW_PATH . '/layout/footer.php';
+        exit;
     }
 
     // =========================================================================

@@ -93,21 +93,33 @@ class ClassController
         // 'login_required' — 비로그인
         // 'enrolled'        — 이미 수강 중 (무료 신청 완료 or 유료 구매 완료)
         // 'closed'          — sale_end_at 이 이미 지남 (마감)
+        // 'waiting'         — enroll_start_at 이 아직 되지 않음 (신청 대기)
         // 'apply'           — 신청/결제 가능
         // ─────────────────────────────────────────────────────────────────
+        // 프리미엄 수강권이 만료된 경우 재구매 가능하도록 enrolled 처리 제외
+        $isExpiredEnroll = $isEnrolled
+            && ($enroll['type'] ?? '') === 'premium'
+            && !empty($enroll['expire_at'])
+            && strtotime($enroll['expire_at']) < time();
+
         if (!$member) {
             $btnStatus = 'login_required';
-        } elseif ($isEnrolled) {
+        } elseif ($isEnrolled && !$isExpiredEnroll) {
             $btnStatus = 'enrolled';
         } elseif (!empty($class['sale_end_at']) && strtotime($class['sale_end_at']) < time()) {
             $btnStatus = 'closed';
+        } elseif (!empty($class['enroll_start_at']) && strtotime($class['enroll_start_at']) > time()) {
+            $btnStatus = 'waiting';
         } else {
             $btnStatus = 'apply';
         }
 
-        // 할인율 계산 (프리미엄)
+        // 실제 판매가: price=0이면 정가(price_origin)로 판매
+        $effectivePrice = ($class['price'] > 0) ? (int)$class['price'] : (int)$class['price_origin'];
+
+        // 할인율 계산 (프리미엄 / price > 0일 때만 유효)
         $discountRate = 0;
-        if ($class['price_origin'] > 0 && $class['price'] < $class['price_origin']) {
+        if ($class['price'] > 0 && $class['price_origin'] > 0 && $class['price'] < $class['price_origin']) {
             $discountRate = (int) round(($class['price_origin'] - $class['price']) / $class['price_origin'] * 100);
         }
 
@@ -210,7 +222,13 @@ class ClassController
             exit;
         }
 
-        if ($this->repo->findEnroll($memberIdx, $classIdx)) {
+        $existingEnroll  = $this->repo->findEnroll($memberIdx, $classIdx);
+        $isExpiredEnroll = $existingEnroll
+            && ($existingEnroll['type'] ?? '') === 'premium'
+            && !empty($existingEnroll['expire_at'])
+            && strtotime($existingEnroll['expire_at']) < time();
+
+        if ($existingEnroll && !$isExpiredEnroll) {
             echo json_encode(['success' => false, 'error' => '이미 구매하셨습니다.']);
             exit;
         }
@@ -218,10 +236,13 @@ class ClassController
         // ─────────────────────────────────────────────────────────────────────
         // 결제 처리 스텁 — PG사 결정 후 이 부분을 교체하세요
         // ─────────────────────────────────────────────────────────────────────
+        // 실제 판매가: price=0이면 정가(price_origin)로 판매
+        $effectivePrice = ($class['price'] > 0) ? (int)$class['price'] : (int)$class['price_origin'];
+
         $payResult = $this->processPayment([
             'member_idx'   => $memberIdx,
             'class_idx'    => $classIdx,
-            'amount'       => $class['price'],
+            'amount'       => $effectivePrice,
             'amount_origin'=> $class['price_origin'],
             'method'       => $_POST['pay_method'] ?? 'card',
             'orderer_name' => $_POST['orderer_name'] ?? $member['mb_name'],
@@ -235,15 +256,28 @@ class ClassController
             exit;
         }
 
-        // 주문 생성
-        $orderIdx = $this->repo->createOrder($memberIdx, $classIdx, $class['price'], $class['price_origin']);
+        // 주문 생성 (토스 응답의 결제수단 정보 포함)
+        $orderIdx = $this->repo->createOrder($memberIdx, $classIdx, $effectivePrice, $class['price_origin'], [
+            'toss_payment_key' => $payResult['toss_payment_key'] ?? null,
+            'toss_order_id'    => $payResult['toss_order_id']    ?? null,
+            'pay_method'       => $payResult['pay_method']       ?? null,
+            'card_company'     => $payResult['card_company']     ?? null,
+            'card_type'        => $payResult['card_type']        ?? null,
+            'card_number'      => $payResult['card_number']      ?? null,
+            'card_install'     => $payResult['card_install']     ?? 0,
+            'card_approve_no'  => $payResult['card_approve_no']  ?? null,
+        ]);
 
         // 수강 기간 계산
         $durationDays = (int) ($class['duration_days'] ?? 180);
         $expireAt     = date('Y-m-d H:i:s', strtotime("+{$durationDays} days"));
 
-        // 수강 등록 (premium은 vimeo_url 대신 learn_url 사용)
-        $this->repo->createPremiumEnroll($memberIdx, $classIdx, $orderIdx, $class['kakao_url'], null, $expireAt);
+        // 기간 연장(만료된 수강권) vs 신규 등록 분기
+        if ($isExpiredEnroll) {
+            $this->repo->extendPremiumEnroll($memberIdx, $classIdx, $orderIdx, $expireAt);
+        } else {
+            $this->repo->createPremiumEnroll($memberIdx, $classIdx, $orderIdx, $class['kakao_url'], null, $expireAt);
+        }
 
         echo json_encode([
             'success'   => true,
@@ -259,18 +293,24 @@ class ClassController
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 결제 처리 스텁 — PG사 결정 후 이 메서드를 교체하세요
+    // 결제 처리 — 토스페이먼츠 연동 후 이 메서드를 교체하세요
     //
-    // 현재 동작:
-    //   성공 시뮬레이션 → ['success' => true, ...]
+    // 현재: 성공 시뮬레이션 (실결제 없음)
     //
-    // 실패 테스트 방법:
-    //   아래 첫 번째 return 주석 해제, 두 번째 return 주석 처리
-    //
-    // PG사 연동 후:
-    //   1. 해당 PG사 SDK / API 를 이곳에서 호출
-    //   2. 결제 성공 시 pg_payment_key, pg_order_id 등을 함께 반환
-    //   3. createOrder() 에 pg 값 추가 (OrderRepository 수정 필요)
+    // 토스페이먼츠 연동 시 교체 구조:
+    //   1. 프론트에서 토스 SDK로 결제창 호출 → paymentKey, orderId, amount 수신
+    //   2. 이 메서드에서 토스 승인 API 호출:
+    //      POST https://api.tosspayments.com/v1/payments/confirm
+    //      { paymentKey, orderId, amount }
+    //   3. 응답에서 아래 필드 파싱 후 반환:
+    //      - toss_payment_key : $tossRes['paymentKey']
+    //      - toss_order_id    : $tossRes['orderId']
+    //      - pay_method       : $tossRes['method']          // "카드"|"가상계좌"|"계좌이체" 등
+    //      - card_company     : $tossRes['card']['company']      // "삼성"|"신한"|"KB국민" 등
+    //      - card_type        : $tossRes['card']['cardType']    // "신용"|"체크"|"기프트"
+    //      - card_number      : $tossRes['card']['number']      // "12**-****-****-3456"
+    //      - card_install     : $tossRes['card']['installmentPlanMonths'] // 0=일시불
+    //      - card_approve_no  : $tossRes['card']['approveNo']
     // ─────────────────────────────────────────────────────────────────────────
     private function processPayment(array $orderData): array
     {
@@ -279,7 +319,16 @@ class ClassController
 
         // ★ 현재: 항상 성공으로 시뮬레이션
         $orderNo = 'UC-' . date('Ymd') . '-' . str_pad((string) rand(1, 99999), 5, '0', STR_PAD_LEFT);
-        return ['success' => true, 'order_no' => $orderNo];
+        return [
+            'success'          => true,
+            'toss_payment_key' => null,
+            'toss_order_id'    => $orderNo,
+            'pay_method'       => null,
+            'card_company'     => null,
+            'card_number'      => null,
+            'card_install'     => 0,
+            'card_approve_no'  => null,
+        ];
     }
 
     // =========================================================================
@@ -427,6 +476,43 @@ class ClassController
         $isDone = $this->repo->toggleProgress($memberIdx, $classIdx, $chapterIdx);
 
         echo json_encode(['success' => true, 'is_complete' => $isDone]);
+        exit;
+    }
+
+    // =========================================================================
+    // POST /api/classes/{class_idx}/complete  (AJAX — 영상 종료 시 챕터 완료 처리)
+    // =========================================================================
+    public function completeChapter(string $class_idx): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!Auth::isMember()) {
+            echo json_encode(['success' => false, 'error' => 'login_required']);
+            exit;
+        }
+
+        verifyCsrfJson();
+
+        $memberIdx  = (int) Auth::member()['member_idx'];
+        $classIdx   = (int) $class_idx;
+        $chapterIdx = (int) ($_POST['chapter_idx'] ?? 0);
+
+        if ($chapterIdx <= 0) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'invalid_chapter']);
+            exit;
+        }
+
+        $enroll = $this->repo->findEnroll($memberIdx, $classIdx);
+        if (!$enroll) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'no_enroll']);
+            exit;
+        }
+
+        $this->repo->markComplete($memberIdx, $classIdx, $chapterIdx);
+
+        echo json_encode(['success' => true]);
         exit;
     }
 }

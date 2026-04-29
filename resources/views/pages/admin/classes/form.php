@@ -2,6 +2,11 @@
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/lang/summernote-ko-KR.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/confirmDate/confirmDate.js"></script>
 <?php
 /**
  * 강의 등록/수정 폼 (공용)
@@ -65,16 +70,16 @@ if ($isEdit) {
 									<input type="text" name="title"
 													class="form-control <?= isset($errors['title']) ? 'has-error' : '' ?>"
 													value="<?= $v('title') ?>" placeholder="강의 제목 입력">
-									<?php if (isset($errors['title'])): ?>
-											<p class="field-error"><?= htmlspecialchars($errors['title']) ?></p>
-									<?php endif; ?>
+									<p class="field-error" data-ajax-err="title" style="display:none"></p>
 							</div>
 
+							<?php /*
 							<div class="form-group">
 									<label class="form-label">한줄 요약</label>
 									<input type="text" name="summary" class="form-control"
 													value="<?= $v('summary') ?>" placeholder="강의 목록에 표시될 짧은 설명 (선택)">
 							</div>
+							*/ ?>
 
 							<div class="form-group">
 									<label class="form-label">강의 소개</label>
@@ -104,9 +109,7 @@ if ($isEdit) {
 													class="form-control <?= isset($errors['thumbnail']) ? 'has-error' : '' ?>"
 													id="thumbInput">
 									<p class="form-hint">jpg, png, webp / 최대 5MB / 권장 1280×720px</p>
-									<?php if (isset($errors['thumbnail'])): ?>
-											<p class="field-error" id="thumbError"><?= htmlspecialchars($errors['thumbnail']) ?></p>
-									<?php endif; ?>
+									<p class="field-error" id="thumbError" data-ajax-err="thumbnail" style="display:none"></p>
 									<div class="thumb-preview">
 											<?php if ($isEdit && !empty($class['thumbnail'])): ?>
 													<img src="/uploads/class/<?= htmlspecialchars($class['thumbnail']) ?>"
@@ -137,9 +140,7 @@ if ($isEdit) {
 											</option>
 											<?php endforeach; ?>
 									</select>
-									<?php if (isset($errors['instructor_idx'])): ?>
-											<p class="field-error"><?= htmlspecialchars($errors['instructor_idx']) ?></p>
-									<?php endif; ?>
+									<p class="field-error" data-ajax-err="instructor_idx" style="display:none"></p>
 							</div>
 
 							<div class="form-group">
@@ -170,9 +171,7 @@ if ($isEdit) {
 													<option value="free"    <?= ($class['type'] ?? '') === 'free'    ? 'selected' : '' ?>>무료</option>
 													<option value="premium" <?= ($class['type'] ?? '') === 'premium' ? 'selected' : '' ?>>프리미엄</option>
 											</select>
-											<?php if (isset($errors['type'])): ?>
-													<p class="field-error"><?= htmlspecialchars($errors['type']) ?></p>
-											<?php endif; ?>
+											<p class="field-error" data-ajax-err="type" style="display:none"></p>
 									<?php endif; ?>
 							</div>
 
@@ -202,13 +201,27 @@ if ($isEdit) {
 							</div>
 
 							<div class="form-group">
+									<label class="form-label">판매 시작일</label>
+									<div style="display:flex;gap:8px;align-items:center">
+										<input type="text" name="enroll_start_at" id="enrollStartAt" class="form-control" readonly
+														placeholder="날짜 선택" value="<?= $isEdit && !empty($class['enroll_start_at']) ? date('Y-m-d H:i', strtotime($class['enroll_start_at'])) : ($_POST['enroll_start_at'] ?? '') ?>">
+										<button type="button" class="btn btn-sm btn-secondary" style="white-space:nowrap;flex-shrink:0"
+														onclick="fpEnrollStart.clear()">초기화</button>
+									</div>
+									<p class="form-hint">이 시각 이전에는 사용자 화면에서 '신청 대기 중'으로 표시됩니다. 비워두면 즉시 신청 가능합니다.</p>
+									<p class="field-error" data-ajax-err="enroll_start_at" style="display:none"></p>
+							</div>
+
+							<div class="form-group">
 									<label class="form-label">판매 종료일</label>
-									<input type="datetime-local" name="sale_end_at" class="form-control"
-													value="<?= $isEdit && $class['sale_end_at'] ? date('Y-m-d\TH:i', strtotime($class['sale_end_at'])) : '' ?>">
+									<div style="display:flex;gap:8px;align-items:center">
+										<input type="text" name="sale_end_at" id="saleEndAt" class="form-control" readonly
+														placeholder="날짜 선택" value="<?= $isEdit && $class['sale_end_at'] ? date('Y-m-d H:i', strtotime($class['sale_end_at'])) : '' ?>">
+										<button type="button" class="btn btn-sm btn-secondary" style="white-space:nowrap;flex-shrink:0"
+														onclick="fpSaleEnd.clear()">초기화</button>
+									</div>
 									<p class="form-hint">비워두면 무기한 판매됩니다.</p>
-									<?php if (isset($errors['sale_end_at'])): ?>
-											<p class="field-error"><?= htmlspecialchars($errors['sale_end_at']) ?></p>
-									<?php endif; ?>
+									<p class="field-error" data-ajax-err="sale_end_at" style="display:none"></p>
 							</div>
 
 							<div class="form-group">
@@ -225,7 +238,7 @@ if ($isEdit) {
 											<span class="toggle-label">활성화 (노출)</span>
 											<label class="toggle-switch">
 													<input type="checkbox" name="is_active" value="1"
-																	<?= ($class['is_active'] ?? 0) ? 'checked' : '' ?>>
+																	<?= (!$classIdx || $class['is_active'] ?? 0) ? 'checked' : '' ?>>
 													<span class="toggle-slider"></span>
 											</label>
 									</div>
@@ -418,10 +431,10 @@ document.getElementById('chapterModal').addEventListener('click', function(e) {
 	if (e.target === this) closeModal();
 });
 
-// ── Vimeo oEmbed로 재생시간 자동 가져오기 ────────────────────
+// ── Vimeo oEmbed로 재생시간 자동 가져오기 (blur 트리거) ──────
 document.getElementById('modalVimeoUrl').addEventListener('blur', async function() {
-	const url = this.value.trim();
-	const statusEl  = document.getElementById('vimeoFetchStatus');
+	const url        = this.value.trim();
+	const statusEl   = document.getElementById('vimeoFetchStatus');
 	const durationEl = document.getElementById('modalDuration');
 
 	if (!url || !url.includes('vimeo.com')) {
@@ -432,20 +445,12 @@ document.getElementById('modalVimeoUrl').addEventListener('blur', async function
 	statusEl.style.color = '#8898aa';
 	statusEl.textContent = '시간 불러오는 중...';
 
-	try {
-		const res = await fetch('https://vimeo.com/api/oembed.json?url=' + encodeURIComponent(url));
-		if (!res.ok) throw new Error('not ok');
-		const data = await res.json();
-		if (data.duration) {
-			const m = Math.floor(data.duration / 60);
-			const s = data.duration % 60;
-			durationEl.value = `${m}:${String(s).padStart(2, '0')}`;
-			statusEl.style.color = '#38a169';
-			statusEl.textContent = '✓ 재생 시간 자동 입력됨';
-		} else {
-			throw new Error('no duration');
-		}
-	} catch (_) {
+	const fetched = await fetchVimeoDuration(url);
+	if (fetched) {
+		durationEl.value     = fetched;
+		statusEl.style.color = '#38a169';
+		statusEl.textContent = '✓ 재생 시간 자동 입력됨';
+	} else {
 		statusEl.style.color = '#e53e3e';
 		statusEl.textContent = '불러오기 실패 — 직접 입력해주세요';
 	}
@@ -453,14 +458,49 @@ document.getElementById('modalVimeoUrl').addEventListener('blur', async function
 	setTimeout(() => { statusEl.textContent = ''; }, 4000);
 });
 
+// ── Vimeo duration fetch (공통) ──────────────
+async function fetchVimeoDuration(url) {
+	try {
+		const res  = await fetch('https://vimeo.com/api/oembed.json?url=' + encodeURIComponent(url));
+		if (!res.ok) return null;
+		const data = await res.json();
+		if (!data.duration) return null;
+		const m = Math.floor(data.duration / 60);
+		const s = data.duration % 60;
+		return `${m}:${String(s).padStart(2, '0')}`;
+	} catch (_) {
+		return null;
+	}
+}
+
 // ── 챕터 로컬 저장/삭제 ──────────────────────
-function saveChapterLocal() {
-	const keyStr   = document.getElementById('modalChapterKey').value;
-	const title    = document.getElementById('modalChTitle').value.trim();
-	const vimeoUrl = document.getElementById('modalVimeoUrl').value.trim();
-	const duration = document.getElementById('modalDuration').value.trim() || '0:00';
+async function saveChapterLocal() {
+	const keyStr    = document.getElementById('modalChapterKey').value;
+	const title     = document.getElementById('modalChTitle').value.trim();
+	const vimeoUrl  = document.getElementById('modalVimeoUrl').value.trim();
+	const durationEl = document.getElementById('modalDuration');
+	const statusEl  = document.getElementById('vimeoFetchStatus');
+	let   duration  = durationEl.value.trim();
 
 	if (!title) { alert('챕터 제목을 입력해주세요.'); return; }
+
+	// Vimeo URL은 있는데 duration이 아직 비어 있으면 저장 전에 한 번 더 fetch
+	if (vimeoUrl && vimeoUrl.includes('vimeo.com') && !duration) {
+		statusEl.style.color = '#8898aa';
+		statusEl.textContent = '시간 불러오는 중...';
+		const fetched = await fetchVimeoDuration(vimeoUrl);
+		if (fetched) {
+			duration = fetched;
+			durationEl.value = fetched;
+			statusEl.style.color = '#38a169';
+			statusEl.textContent = '✓ 재생 시간 자동 입력됨';
+		} else {
+			statusEl.style.color = '#e53e3e';
+			statusEl.textContent = '불러오기 실패 — 직접 입력해주세요';
+		}
+	}
+
+	duration = duration || '0:00';
 
 	if (keyStr === '') {
 			// 신규 추가
@@ -520,41 +560,43 @@ function deleteChapterLocal(key) {
 	});
 })();
 
-// ── 폼 제출 시 chapters_json 직렬화 ──────────
+// ── 폼 제출 (AJAX) ───────────────────────────
 document.getElementById('classForm').addEventListener('submit', function (e) {
+	e.preventDefault();
 	const typeEl = document.getElementById('typeSelect');
 	const type   = typeEl ? typeEl.value : '<?= htmlspecialchars($class['type'] ?? '') ?>';
 
 	if (type === 'premium' && chapters.length === 0) {
-		e.preventDefault();
 		alert('프리미엄 강의는 챕터를 1개 이상 등록해야 합니다.');
 		document.getElementById('chapterList').scrollIntoView({behavior: 'smooth', block: 'center'});
 		return;
 	}
 
-	const json = JSON.stringify(chapters.map((ch, i) => ({
-			chapter_idx: ch.chapter_idx ?? null,
-			title:       ch.title,
-			vimeo_url:   ch.vimeo_url || '',
-			duration:    ch.duration  || '0:00',
-			sort_order:  i + 1,
-	})));
-	document.getElementById('chaptersJson').value = json;
-	document.getElementById('deleteFileIds').value = deleteFileIds.join(',');
+	ajaxSubmit(this, {
+		beforeSubmit: function(form) {
+			// Summernote 동기화
+			$('#classDescription').val($('#classDescription').summernote('code'));
+			// chapters_json 직렬화
+			const json = JSON.stringify(chapters.map((ch, i) => ({
+				chapter_idx: ch.chapter_idx ?? null,
+				title:       ch.title,
+				vimeo_url:   ch.vimeo_url || '',
+				duration:    ch.duration  || '0:00',
+				sort_order:  i + 1,
+			})));
+			document.getElementById('chaptersJson').value = json;
+			document.getElementById('deleteFileIds').value = deleteFileIds.join(',');
+		},
+		onError: function(data) {
+			const firstErr = document.querySelector('[data-ajax-err]:not([style*="display:none"]), .has-error');
+			if (firstErr) firstErr.scrollIntoView({behavior:'smooth', block:'center'});
+		}
+	});
 });
 
 // ── 초기 렌더링 ───────────────────────────────
 renderChapterList();
 
-// ── 에러 위치로 스크롤 ─────────────────────────
-(function() {
-	const thumbErr = document.getElementById('thumbError');
-	if (thumbErr) { thumbErr.scrollIntoView({behavior:'smooth', block:'center'}); }
-	else {
-		const firstErr = document.querySelector('.field-error, .has-error');
-		if (firstErr) firstErr.scrollIntoView({behavior:'smooth', block:'center'});
-	}
-})();
 
 // ============================================================
 // 강의 자료 관리
@@ -619,10 +661,7 @@ function escHtml(str) {
 	if (u) { var el = document.querySelector('.btn-cancel'); if (el) el.href = u; }
 })();
 
-// ── 폼 submit 시 써머노트 → textarea 동기화 ──
-document.getElementById('classForm').addEventListener('submit', function () {
-	$('#classDescription').val($('#classDescription').summernote('code'));
-}, true);
+
 </script>
 <script>
 $(document).ready(function () {
@@ -634,9 +673,28 @@ $(document).ready(function () {
 			['color',  ['forecolor', 'color']],
 			['para',   ['ul', 'ol', 'paragraph']],
 			['table',  ['table']],
-			['insert', ['link', 'video']],
+			//['insert', ['link', 'video']],
+			['insert',['picture']],
 			['view',   ['codeview']]
 		]
 	});
 });
+</script>
+
+<script>
+var fpConfig = {
+    locale: 'ko',
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i',
+    time_24hr: true,
+    allowInput: false,
+    plugins: [new confirmDatePlugin({
+        confirmIcon: '',
+        confirmText: '확인',
+        showAlways: true,
+        theme: 'light'
+    })]
+};
+var fpEnrollStart = flatpickr('#enrollStartAt', fpConfig);
+var fpSaleEnd     = flatpickr('#saleEndAt',     fpConfig);
 </script>

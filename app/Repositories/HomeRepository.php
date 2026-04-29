@@ -99,9 +99,9 @@ class HomeRepository
      */
     public function getHomeReviews(int $limit = 6): array
     {
-        return DB::select(
+        $reviews = DB::select(
             "SELECT r.review_idx, r.rating, r.content, r.created_at,
-                    c.title AS class_title,
+                    c.title AS class_title, c.thumbnail AS class_thumbnail,
                     m.mb_name AS member_name
              FROM lc_review r
              JOIN lc_class   c ON c.class_idx   = r.class_idx
@@ -110,6 +110,27 @@ class HomeRepository
              ORDER BY r.created_at DESC
              LIMIT {$limit}",
         );
+
+        if (empty($reviews)) return [];
+
+        $ids          = array_column($reviews, 'review_idx');
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $imgRows      = DB::select(
+            "SELECT review_idx, image_path FROM lc_review_image
+             WHERE review_idx IN ({$placeholders}) AND deleted_at IS NULL ORDER BY review_idx, sort_order",
+            $ids
+        );
+
+        $imageMap = [];
+        foreach ($imgRows as $row) {
+            $imageMap[$row['review_idx']][] = $row['image_path'];
+        }
+        foreach ($reviews as &$rv) {
+            $rv['images'] = $imageMap[$rv['review_idx']] ?? [];
+        }
+        unset($rv);
+
+        return $reviews;
     }
 
     // =========================================================================
@@ -127,6 +148,7 @@ class HomeRepository
             "SELECT banner_idx, image_path, link_url, link_target, alt_text
              FROM lc_banner
              WHERE is_active = 1
+               AND deleted_at IS NULL
                AND (start_date IS NULL OR start_date <= CURDATE())
                AND (end_date   IS NULL OR end_date   >= CURDATE())
              ORDER BY sort_order ASC, banner_idx ASC"
@@ -148,6 +170,7 @@ class HomeRepository
             "SELECT popup_idx, image_path, link_url, link_target
              FROM lc_popup
              WHERE is_active = 1
+               AND deleted_at IS NULL
                AND (start_date IS NULL OR start_date <= CURDATE())
                AND (end_date   IS NULL OR end_date   >= CURDATE())
              ORDER BY sort_order ASC, popup_idx ASC"

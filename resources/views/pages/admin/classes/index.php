@@ -76,7 +76,7 @@
 		<tr>
 			<th>NO</th>
 			<th>썸네일</th>
-			<th>제목</th>
+			<th class="text_left">제목</th>
 			<th>강사</th>
 			<th>카테고리</th>
 			<th>유형</th>
@@ -105,11 +105,11 @@
 					<div class="thumb-empty">No img</div>
 				<?php endif; ?>
 			</td>
-			<td>
+			<td class="text_left">
 				<div class="class-title"><?= htmlspecialchars($c['title']) ?></div>
-				<?php if ($c['summary']): ?>
+				<!-- <?php if ($c['summary']): ?>
 				<div class="class-summary"><?= htmlspecialchars($c['summary']) ?></div>
-				<?php endif; ?>
+				<?php endif; ?> -->
 			</td>
 			<td><?= htmlspecialchars($c['instructor_name']) ?></td>
 			<td><?= htmlspecialchars($c['category_name'] ?? '미분류') ?></td>

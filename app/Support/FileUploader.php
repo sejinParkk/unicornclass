@@ -378,6 +378,113 @@ class FileUploader
     }
 
     // -------------------------------------------------------------------------
+    // 후기 이미지
+    // -------------------------------------------------------------------------
+
+    /**
+     * 후기 이미지 업로드. jpg·png·webp 허용, 최대 5MB.
+     * @throws \RuntimeException
+     */
+    public static function uploadReviewImage(array $file): ?string
+    {
+        if (empty($file['tmp_name']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            throw new \RuntimeException('파일 업로드 중 오류가 발생했습니다. (code: ' . $file['error'] . ')');
+        }
+        if ($file['size'] > 5 * 1024 * 1024) {
+            throw new \RuntimeException('이미지 크기는 5MB 이하여야 합니다.');
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime  = $finfo->file($file['tmp_name']);
+
+        if (!array_key_exists($mime, self::ALLOWED_IMAGE_MIMES)) {
+            throw new \RuntimeException('jpg, png, webp 형식만 업로드할 수 있습니다.');
+        }
+
+        $ext      = self::ALLOWED_IMAGE_MIMES[$mime];
+        $filename = bin2hex(random_bytes(16)) . '.' . $ext;
+        $dir      = ROOT_PATH . '/storage/uploads/review/';
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        if (!move_uploaded_file($file['tmp_name'], $dir . $filename)) {
+            throw new \RuntimeException('파일 저장에 실패했습니다.');
+        }
+
+        return $filename;
+    }
+
+    public static function deleteReviewImage(?string $filename): void
+    {
+        if (!$filename) return;
+        $filename = basename($filename);
+        $path = ROOT_PATH . '/storage/uploads/review/' . $filename;
+        if (file_exists($path)) @unlink($path);
+    }
+
+    // -------------------------------------------------------------------------
+    // QnA 첨부파일
+    // -------------------------------------------------------------------------
+
+    private const ALLOWED_QNA_MIMES = [
+        'image/jpeg'      => 'jpg',
+        'image/png'       => 'png',
+        'image/webp'      => 'webp',
+        'application/pdf' => 'pdf',
+    ];
+
+    /**
+     * QnA 첨부파일 업로드. 이미지(jpg/png/webp) + PDF 허용, 최대 5MB.
+     * @throws \RuntimeException
+     */
+    public static function uploadQnaFile(array $file): ?string
+    {
+        if (empty($file['tmp_name']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            throw new \RuntimeException('파일 업로드 중 오류가 발생했습니다. (code: ' . $file['error'] . ')');
+        }
+        if ($file['size'] > 5 * 1024 * 1024) {
+            throw new \RuntimeException('파일 크기는 5MB 이하여야 합니다.');
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime  = $finfo->file($file['tmp_name']);
+
+        if (!array_key_exists($mime, self::ALLOWED_QNA_MIMES)) {
+            throw new \RuntimeException('이미지(jpg, png, webp) 또는 PDF 파일만 업로드할 수 있습니다.');
+        }
+
+        $ext      = self::ALLOWED_QNA_MIMES[$mime];
+        $filename = bin2hex(random_bytes(16)) . '.' . $ext;
+        $dir      = ROOT_PATH . '/storage/uploads/qna/';
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        if (!move_uploaded_file($file['tmp_name'], $dir . $filename)) {
+            throw new \RuntimeException('파일 저장에 실패했습니다.');
+        }
+
+        return $filename;
+    }
+
+    public static function deleteQnaFile(?string $filename): void
+    {
+        if (!$filename) return;
+        $filename = basename($filename);
+        $path = ROOT_PATH . '/storage/uploads/qna/' . $filename;
+        if (file_exists($path)) @unlink($path);
+    }
+
+    // -------------------------------------------------------------------------
     // 강사 지원 포트폴리오 파일
     // -------------------------------------------------------------------------
 

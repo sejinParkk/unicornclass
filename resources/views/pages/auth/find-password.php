@@ -1,12 +1,3 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>비밀번호 찾기 — 유니콘클래스</title>
-    <link rel="stylesheet" href="/assets/css/styles.css">
-</head>
-<body class="auth-page">
 <?php
 $verifiedInfo = $verifiedInfo ?? null;
 $pwError      = $_SESSION['reset_pw_error'] ?? null;
@@ -20,25 +11,25 @@ $showStep2    = ($verifiedInfo !== null);
         <div class="auth-title">비밀번호 찾기</div>
 
         <!-- 아이디 -->
-        <div class="field-block">
+        <div class="field-block auth-input-group">
             <div class="field-label">아이디 <span class="required">*</span></div>
             <input type="text" class="single-input" id="mbId" placeholder="아이디를 입력해주세요">
             <div class="error-msg" id="idErr" style="display:none"></div>
         </div>
 
         <!-- 휴대전화번호 -->
-        <div class="field-block">
+        <div class="field-block auth-input-group">
             <div class="field-label">휴대전화번호 <span class="required">*</span></div>
             <div class="input-row">
                 <input type="tel" id="phone" placeholder="010-0000-0000" maxlength="13">
                 <button class="btn-request" id="btnSend" disabled onclick="sendSms()">인증요청</button>
             </div>
             <div class="error-msg" id="phoneErr" style="display:none"></div>
-            <div class="success-msg" id="phoneSent" style="display:none">✓ 인증번호가 생성되었습니다</div>
+            <div class="success-msg" id="phoneSent" style="display:none">인증번호가 생성되었습니다</div>
         </div>
 
         <!-- 인증번호 -->
-        <div class="field-block">
+        <div class="field-block auth-input-group">
             <div class="field-label">인증 번호</div>
             <div class="input-row">
                 <input type="text" id="otp" placeholder="인증요청 후 입력하세요" maxlength="6" disabled style="padding-right:70px">
@@ -46,27 +37,23 @@ $showStep2    = ($verifiedInfo !== null);
                 <button class="btn-request" id="btnVerify" disabled onclick="verifySms()">인증하기</button>
             </div>
             <div class="error-msg" id="otpErr" style="display:none"></div>
-            <div class="success-msg" id="otpOk" style="display:none">✓ 인증이 완료되었습니다</div>
+            <div class="success-msg" id="otpOk" style="display:none">인증이 완료되었습니다</div>
         </div>
 
-        <button class="btn-next" id="btnNext" disabled onclick="showPwForm()">비밀번호 찾기</button>
+        <button class="btn-next mgt24" id="btnNext" disabled onclick="showPwForm()">비밀번호 찾기</button>
     </div>
 
     <!-- PANEL 2: 새 비밀번호 설정 -->
     <div class="panel <?= $showStep2 ? 'active' : '' ?>" id="panelReset">
         <div class="auth-title">비밀번호 찾기</div>
 
-        <?php if ($pwError): ?>
-        <div class="error-banner"><?= htmlspecialchars($pwError) ?></div>
-        <?php endif; ?>
-
         <!-- 완료된 필드 (dimmed) -->
         <?php if ($showStep2): ?>
-        <div class="field-block dimmed">
+        <div class="field-block auth-input-group dimmed">
             <div class="field-label">아이디</div>
             <input class="single-input" type="text" value="<?= htmlspecialchars($verifiedInfo['mb_id'] ?? '') ?>" disabled>
         </div>
-        <div class="field-block dimmed">
+        <div class="field-block auth-input-group dimmed">
             <div class="field-label">휴대전화번호</div>
             <div class="input-row">
                 <input type="tel" value="<?= htmlspecialchars($verifiedInfo['phone'] ?? '') ?>" disabled>
@@ -79,36 +66,35 @@ $showStep2    = ($verifiedInfo !== null);
         <form method="POST" action="/find-password/reset" id="resetForm" novalidate>
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken ?? '') ?>">
 
-            <div class="field-block">
+            <div class="field-block auth-input-group">
                 <div class="field-label">새 비밀번호 <span class="required">*</span></div>
                 <div class="pw-eye-wrap">
                     <input type="password" name="mb_password" id="newPw" placeholder="영문 + 숫자 + 특수문자 8자 이상" autocomplete="new-password">
                     <button type="button" class="eye-btn" onclick="toggleEye('newPw',this)">👁</button>
                 </div>
                 <div class="field-hint">영문 + 숫자 + 특수문자(!@#$%^&*) 포함 8자 이상</div>
-                <div class="error-msg" id="pwErr" style="display:none"></div>
+                <div class="error-msg" id="pwErr" data-ajax-err="mb_password" style="display:none"></div>
             </div>
 
-            <div class="field-block">
+            <div class="field-block auth-input-group">
                 <div class="field-label">새 비밀번호 확인 <span class="required">*</span></div>
                 <div class="pw-eye-wrap">
                     <input type="password" name="mb_password2" id="newPw2" placeholder="비밀번호를 한번 더 입력해주세요" autocomplete="new-password">
                     <button type="button" class="eye-btn" onclick="toggleEye('newPw2',this)">👁</button>
                 </div>
-                <div class="error-msg" id="pw2Err" style="display:none"></div>
+                <div class="error-msg" id="pw2Err" data-ajax-err="mb_password2" style="display:none"></div>
             </div>
 
-            <button type="submit" class="btn-next" id="btnChange" disabled>비밀번호 변경</button>
+            <button type="submit" class="btn-next mgt24" id="btnChange" disabled>비밀번호 변경</button>
         </form>
     </div>
 
     <!-- PANEL 3: 변경 완료 -->
     <div class="panel" id="panelDone">
         <div class="complete-wrap">
-            <div class="complete-icon">✅</div>
-            <div class="complete-title">비밀번호가 변경되었습니다!</div>
-            <div class="complete-desc">새 비밀번호로 로그인해 주세요.</div>
-            <button class="btn-next" style="margin-top:0" onclick="location.href='/login'">로그인하기</button>
+            <div class="id_result_txt1">비밀번호가 변경되었습니다!</div>
+            <div class="id_result_txt2">새 비밀번호로 로그인해 주세요.</div>
+            <button class="btn-next mgt24" onclick="location.href='/login'">로그인하기</button>
         </div>
     </div>
 
@@ -264,8 +250,14 @@ function showPwForm() {
 }
 
 document.getElementById('resetForm')?.addEventListener('submit', function(e) {
-    let ok = validatePw() && validatePw2();
-    if (!ok) { e.preventDefault(); }
+    e.preventDefault();
+    if (!validatePw() || !validatePw2()) return;
+    ajaxSubmit(this, {
+        onSuccess: function() {
+            document.getElementById('panelReset').classList.remove('active');
+            document.getElementById('panelDone').classList.add('active');
+        }
+    });
 });
 
 function startTimer(seconds = 180) {
@@ -291,5 +283,3 @@ function formatTime(s) {
     return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 }
 </script>
-</body>
-</html>

@@ -29,7 +29,7 @@ class MemberController
             'signup_type' => $_GET['signup_type'] ?? '',
         ];
         $page  = max(1, (int) ($_GET['page'] ?? 1));
-        $limit = 20;
+        $limit = 10;
 
         $result     = $this->memberRepo->getAdminList($filters, $page, $limit);
         $members    = $result['list'];
@@ -106,7 +106,8 @@ class MemberController
 
         $name      = trim($_POST['mb_name']  ?? '');
         $email     = trim($_POST['mb_email'] ?? '');
-        $phone     = preg_replace('/[^0-9]/', '', $_POST['mb_phone'] ?? '');
+        $phoneDigits = preg_replace('/[^0-9]/', '', $_POST['mb_phone'] ?? '');
+        $phone       = $this->formatPhone($phoneDigits);
         $mailling  = isset($_POST['mb_mailling']) ? 1 : 0;
         $sms       = isset($_POST['mb_sms'])      ? 1 : 0;
         $newPw     = $_POST['new_password']     ?? '';
@@ -126,7 +127,7 @@ class MemberController
             $errors['mb_email'] = '이미 사용 중인 이메일입니다.';
         }
 
-        if ($phone !== '' && strlen($phone) !== 11) {
+        if ($phoneDigits !== '' && strlen($phoneDigits) !== 11) {
             $errors['mb_phone'] = '연락처는 11자리 숫자로 입력해주세요.';
         } elseif ($phone !== '' && $this->memberRepo->existsByPhoneExcept($phone, $memberIdx)) {
             $errors['mb_phone'] = '이미 사용 중인 연락처입니다.';
@@ -140,17 +141,11 @@ class MemberController
             }
         }
 
+        header('Content-Type: application/json; charset=utf-8');
+
         if ($errors) {
-            $enrolls   = $this->memberRepo->getEnrollList($memberIdx);
-            $orders    = $this->memberRepo->getOrderList($memberIdx);
-            $csrfToken = Csrf::token();
-            $pageTitle  = '회원 상세 — ' . htmlspecialchars($member['mb_name']);
-            $activeMenu = 'members';
-            ob_start();
-            require VIEW_PATH . '/pages/admin/members/show.php';
-            $content = ob_get_clean();
-            require VIEW_PATH . '/layout/admin.php';
-            return;
+            echo json_encode(['ok' => false, 'errors' => $errors]);
+            exit;
         }
 
         $this->memberRepo->updateProfile($memberIdx, [
@@ -166,7 +161,18 @@ class MemberController
             $this->memberRepo->updatePassword($memberIdx, $hashed);
         }
 
-        header("Location: /admin/members/{$memberIdx}?profile_updated=1");
+        echo json_encode(['ok' => true, 'redirect' => "/admin/members/{$memberIdx}?profile_updated=1"]);
         exit;
+    }
+
+    private function formatPhone(string $digits): string
+    {
+        if (strlen($digits) === 11) {
+            return substr($digits, 0, 3) . '-' . substr($digits, 3, 4) . '-' . substr($digits, 7);
+        }
+        if (strlen($digits) === 10) {
+            return substr($digits, 0, 3) . '-' . substr($digits, 3, 3) . '-' . substr($digits, 6);
+        }
+        return $digits;
     }
 }

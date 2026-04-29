@@ -23,7 +23,7 @@ $sl = $statusLabel($order['status']);
 <?php endif; ?>
 
 <div class="form-card">
-	<h3>주문 정보 <span class="badge <?= $sl['cls'] ?>"><?= $sl['text'] ?></span></h3>
+	<h3 class="form-card-title">주문 정보 <span class="badge <?= $sl['cls'] ?>"><?= $sl['text'] ?></span></h3>
 	<div class="info-grid">
 		<div class="info-item">
 			<div class="label">주문번호</div>
@@ -104,8 +104,20 @@ $sl = $statusLabel($order['status']);
 <div class="form-card">
 	<h3>환불 처리</h3>
 	<p style="font-size:13px;color:#718096;margin-bottom:16px;">
-			환불 신청된 주문입니다. 승인 시 Toss Payments 환불 API가 호출되고 수강이 비활성화됩니다.
+		환불 신청된 주문입니다. 승인 시 Toss Payments 환불 API가 호출되고 수강이 비활성화됩니다.
 	</p>
+	<div class="info-grid" style="margin-bottom:16px;">
+		<div class="info-item">
+			<div class="label">환불 유형</div>
+			<div class="value" style="font-weight:600;"><?= htmlspecialchars($refundCalc['type']) ?></div>
+		</div>
+		<div class="info-item">
+			<div class="label">예상 환불금액</div>
+			<div class="value" style="font-weight:700;font-size:16px;color:#c0392b;">
+				<?= $refundCalc['refund_amount'] > 0 ? number_format($refundCalc['refund_amount']) . '원' : '-' ?>
+			</div>
+		</div>
+	</div>
 	<div class="action-bar">
 		<form method="POST" action="/admin/orders/<?= $order['order_idx'] ?>/refund/approve"
 						onsubmit="return confirm('환불을 승인하시겠습니까?')">

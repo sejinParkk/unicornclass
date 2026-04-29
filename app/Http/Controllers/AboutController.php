@@ -8,6 +8,9 @@ class AboutController
 {
     public function index(): void
     {
+        $repo             = new \App\Repositories\InstructorRepository();
+        $instructorGroups = $repo->getGroupedByCategory();
+
         $pageTitle   = '회사소개 - 유니콘클래스';
         $extraStyles = '<link rel="stylesheet" href="/assets/css/about.css">';
 

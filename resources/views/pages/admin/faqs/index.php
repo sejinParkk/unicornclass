@@ -52,7 +52,7 @@
 			<tr>
 				<th>NO</th>
 				<th>카테고리</th>
-				<th style="text-align:left;">질문</th>
+				<th class="text_left">질문</th>
 				<th>순서</th>
 				<th>상태</th>
 				<th>관리</th>

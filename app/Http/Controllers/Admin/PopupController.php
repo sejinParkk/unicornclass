@@ -25,7 +25,7 @@ class PopupController
     public function index(): void
     {
         $page       = max(1, (int) ($_GET['page'] ?? 1));
-        $limit      = 20;
+        $limit = 10;
         $result     = $this->repo->getAdminList($page, $limit);
         $popups     = $result['list'];
         $total      = $result['total'];
@@ -62,10 +62,12 @@ class PopupController
     {
         Csrf::verify();
 
+        header('Content-Type: application/json; charset=utf-8');
+
         try {
             $imagePath = FileUploader::uploadPopupImage($_FILES['image'] ?? []);
         } catch (\RuntimeException $e) {
-            header('Location: /admin/popups/create?error=' . urlencode($e->getMessage()));
+            echo json_encode(['ok' => false, 'message' => $e->getMessage()]);
             exit;
         }
 
@@ -79,7 +81,7 @@ class PopupController
             'sort_order'  => (int) ($_POST['sort_order'] ?? 0),
         ]);
 
-        header("Location: /admin/popups/{$idx}/edit?saved=1");
+        echo json_encode(['ok' => true, 'redirect' => "/admin/popups/{$idx}/edit?saved=1"]);
         exit;
     }
 
@@ -121,6 +123,8 @@ class PopupController
         ];
 
         // 새 이미지 업로드 시 기존 파일 삭제 후 교체
+        header('Content-Type: application/json; charset=utf-8');
+
         try {
             $newImage = FileUploader::uploadPopupImage($_FILES['image'] ?? []);
             if ($newImage) {
@@ -128,12 +132,12 @@ class PopupController
                 $data['image_path'] = $newImage;
             }
         } catch (\RuntimeException $e) {
-            header("Location: /admin/popups/{$idx}/edit?error=" . urlencode($e->getMessage()));
+            echo json_encode(['ok' => false, 'message' => $e->getMessage()]);
             exit;
         }
 
         $this->repo->update($idx, $data);
-        header("Location: /admin/popups/{$idx}/edit?saved=1");
+        echo json_encode(['ok' => true, 'redirect' => "/admin/popups/{$idx}/edit?saved=1"]);
         exit;
     }
 

@@ -17,7 +17,7 @@ $action    = $isEdit ? '/admin/faqs/' . $faq['faq_idx'] : '/admin/faqs';
 <?php endif; ?>
 
 <div class="form-card">
-	<form method="POST" action="<?= $action ?>">
+	<form id="faqForm" method="POST" action="<?= $action ?>">
 		<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
 
 		<div class="form-row">
@@ -84,4 +84,8 @@ $action    = $isEdit ? '/admin/faqs/' . $faq['faq_idx'] : '/admin/faqs';
 	var u = sessionStorage.getItem('back_faqs');
 	if (u) { var el = document.querySelector('.btn-back'); if (el) el.href = u; }
 })();
+document.getElementById('faqForm').addEventListener('submit', function(e) {
+	e.preventDefault();
+	ajaxSubmit(this);
+});
 </script>

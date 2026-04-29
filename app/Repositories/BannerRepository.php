@@ -18,13 +18,14 @@ class BannerRepository
         $offset = ($page - 1) * $limit;
 
         $total = (int) (DB::selectOne(
-            'SELECT COUNT(*) AS cnt FROM lc_banner'
+            'SELECT COUNT(*) AS cnt FROM lc_banner WHERE deleted_at IS NULL'
         )['cnt'] ?? 0);
 
         $list = DB::select(
             "SELECT banner_idx, image_path, link_url, link_target,
                     alt_text, start_date, end_date, is_active, sort_order, created_at
              FROM lc_banner
+             WHERE deleted_at IS NULL
              ORDER BY sort_order ASC, banner_idx DESC
              LIMIT {$limit} OFFSET {$offset}"
         );
@@ -39,7 +40,7 @@ class BannerRepository
     public function findByIdx(int $idx): ?array
     {
         return DB::selectOne(
-            'SELECT * FROM lc_banner WHERE banner_idx = ? LIMIT 1',
+            'SELECT * FROM lc_banner WHERE banner_idx = ? AND deleted_at IS NULL LIMIT 1',
             [$idx]
         );
     }
@@ -101,6 +102,6 @@ class BannerRepository
 
     public function delete(int $idx): void
     {
-        DB::execute('DELETE FROM lc_banner WHERE banner_idx = ?', [$idx]);
+        DB::execute('UPDATE lc_banner SET deleted_at = NOW() WHERE banner_idx = ? AND deleted_at IS NULL', [$idx]);
     }
 }

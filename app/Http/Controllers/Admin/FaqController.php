@@ -84,8 +84,11 @@ class FaqController
 
         $question = trim($_POST['question'] ?? '');
         $answer   = trim($_POST['answer'] ?? '');
+
+        header('Content-Type: application/json; charset=utf-8');
+
         if ($question === '' || $answer === '') {
-            header('Location: /admin/faqs?error=' . urlencode('질문과 답변을 모두 입력해주세요.'));
+            echo json_encode(['ok' => false, 'message' => '질문과 답변을 모두 입력해주세요.']);
             exit;
         }
 
@@ -97,7 +100,7 @@ class FaqController
             'is_active'  => (int) ($_POST['is_active'] ?? 1),
         ]);
 
-        header('Location: /admin/faqs?saved=1');
+        echo json_encode(['ok' => true, 'redirect' => '/admin/faqs?saved=1']);
         exit;
     }
 
@@ -116,8 +119,11 @@ class FaqController
 
         $question = trim($_POST['question'] ?? '');
         $answer   = trim($_POST['answer'] ?? '');
+
+        header('Content-Type: application/json; charset=utf-8');
+
         if ($question === '' || $answer === '') {
-            header('Location: /admin/faqs?error=' . urlencode('질문과 답변을 모두 입력해주세요.'));
+            echo json_encode(['ok' => false, 'message' => '질문과 답변을 모두 입력해주세요.']);
             exit;
         }
 
@@ -129,7 +135,7 @@ class FaqController
             'is_active'  => (int) ($_POST['is_active'] ?? 1),
         ]);
 
-        header("Location: /admin/faqs/{$idx}/edit?saved=1");
+        echo json_encode(['ok' => true, 'redirect' => "/admin/faqs/{$idx}/edit?saved=1"]);
         exit;
     }
 

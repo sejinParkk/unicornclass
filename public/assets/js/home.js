@@ -17,40 +17,61 @@ function setCookie(name, days) {
 ============================================================ */
 function initSwipers() {
 
-  // 강의 슬라이더 공통 옵션
-  const classOptions = {
-    grabCursor: true,
-    slidesPerView: 3,
-    spaceBetween: 16,
-    navigation: true,
-    pagination: { clickable: true },
-    breakpoints: {
-      0:   { slidesPerView: 1 },
-      480: { slidesPerView: 2 },
-      768: { slidesPerView: 3 },
-    },
-  };
+  // 강의 슬라이더 — pagination/navigation이 swiper 밖 .home_swp_controll에 있으므로 개별 초기화
+  function initClassSwiper(id) {
+    const swiperEl = document.getElementById(id);
+    if (!swiperEl) return;
+    const area = swiperEl.closest('.home_swiper_area');
+    new Swiper('#' + id, {
+      grabCursor: true,
+      slidesPerView: 'auto',
+      spaceBetween: 20,
+      navigation: {
+        prevEl: area.querySelector('.swiper-button-prev'),
+        nextEl: area.querySelector('.swiper-button-next'),
+      },
+      pagination: {
+        el: area.querySelector('.swiper-pagination'),
+        clickable: true,
+      },
+    });
+  }
 
-  if (document.getElementById('swiper-free')) {
-    new Swiper('#swiper-free', classOptions);
-  }
-  if (document.getElementById('swiper-premium')) {
-    new Swiper('#swiper-premium', classOptions);
-  }
+  initClassSwiper('swiper-free');
+  initClassSwiper('swiper-premium');
 
   // 강사 슬라이더
   if (document.getElementById('swiper-inst')) {
     new Swiper('#swiper-inst', {
       grabCursor: true,
-      slidesPerView: 5,
-      spaceBetween: 12,
+      slidesPerView: 'auto',
+      spaceBetween: 30,
       navigation: true,
       pagination: { clickable: true },
-      breakpoints: {
-        0:    { slidesPerView: 2 },
-        480:  { slidesPerView: 3 },
-        768:  { slidesPerView: 4 },
-        1024: { slidesPerView: 5 },
+      // breakpoints: {
+      //   0:    { slidesPerView: 2 },
+      //   480:  { slidesPerView: 3 },
+      //   768:  { slidesPerView: 4 },
+      //   1024: { slidesPerView: 5 },
+      // },
+    });
+  }
+
+  // 수강생 후기 슬라이더
+  if (document.getElementById('swiper-reviews')) {
+    const reviewEl = document.getElementById('swiper-reviews');
+    const reviewArea = reviewEl.closest('.home_swiper_area');
+    new Swiper('#swiper-reviews', {
+      grabCursor: true,
+      slidesPerView: 'auto',
+      spaceBetween: 20,
+      navigation: {
+        prevEl: reviewArea.querySelector('.swiper-button-prev'),
+        nextEl: reviewArea.querySelector('.swiper-button-next'),
+      },
+      pagination: {
+        el: reviewArea.querySelector('.swiper-pagination'),
+        clickable: true,
       },
     });
   }
@@ -60,7 +81,8 @@ function initSwipers() {
     new Swiper('#swiper-banner', {
       grabCursor: true,
       loop: true,
-      autoplay: { delay: 4000, disableOnInteraction: false },
+      spaceBetween: 20,
+      // autoplay: { delay: 5000, disableOnInteraction: false },
       navigation: true,
       pagination: { clickable: true },
     });
@@ -68,11 +90,11 @@ function initSwipers() {
 }
 
 /* ============================================================
-   메인 팝업 (커스텀 — 팝업 내부 슬라이더)
+   메인 팝업 (Swiper — 5초 자동슬라이드 + 드래그)
 ============================================================ */
 const homePopup = (() => {
-  const COOKIE  = 'uc_popup_hide';
-  let current   = 0;
+  const COOKIE = 'uc_popup_hide';
+  let swiper = null;
 
   function init() {
     if (typeof HOME_POPUPS_COUNT === 'undefined' || HOME_POPUPS_COUNT === 0) return;
@@ -83,56 +105,94 @@ const homePopup = (() => {
     overlay.style.display = 'flex';
 
     overlay.addEventListener('click', e => {
-      if (e.target === overlay) close(false);
+      if (e.target === overlay) close();
     });
-  }
 
-  function slide(dir) { goTo(current + dir); }
-
-  function goTo(index) {
-    const track = document.getElementById('popup-track');
-    if (!track) return;
-    const count = track.children.length;
-    current = (index + count) % count;
-    track.style.transform = `translateX(-${current * 100}%)`;
-    updateDots();
-  }
-
-  function updateDots() {
-    const dotsEl = document.getElementById('popup-dots');
-    if (!dotsEl) return;
-    dotsEl.querySelectorAll('.popup-dot').forEach((d, i) => {
-      d.classList.toggle('active', i === current);
-    });
+    if (HOME_POPUPS_COUNT > 1) {
+      swiper = new Swiper('#popup-swiper', {
+        loop: true,
+        grabCursor: true,
+        autoplay: { delay: 5000, disableOnInteraction: false },
+        pagination: { el: '#popup-swiper .swiper-pagination', clickable: true },
+        navigation: {
+          prevEl: '#popup-swiper .swiper-button-prev',
+          nextEl: '#popup-swiper .swiper-button-next',
+        },
+      });
+    }
   }
 
   function close() {
-    const chk = document.getElementById('popup-today-chk');
-    if (chk && chk.checked) {
-      setCookie(COOKIE, 1);
-    }
+    if (swiper) swiper.autoplay.stop();
     const overlay = document.getElementById('popup-overlay');
     if (overlay) overlay.style.display = 'none';
   }
 
-  return { init, slide, goTo, close };
+  function closeToday() {
+    setCookie(COOKIE, 1);
+    close();
+  }
+
+  return { init, close, closeToday };
 })();
 
 /* ============================================================
    수강생 후기 모달
 ============================================================ */
+let _rmImgSwiper = null;
+
+function closeReviewModal() {
+  document.getElementById('review-modal').style.display = 'none';
+}
+
 function initReviewModal() {
   document.querySelectorAll('.home-review-card').forEach(card => {
     card.addEventListener('click', () => {
-      const stars = '★'.repeat(parseInt(card.dataset.rating || '5', 10))
-                  + '☆'.repeat(5 - parseInt(card.dataset.rating || '5', 10));
+      const rating    = parseInt(card.dataset.rating || '5', 10);
+      const images    = JSON.parse(card.dataset.images || '[]');
+      const thumbnail = card.dataset.thumbnail || '';
 
-      document.getElementById('rm-avatar').textContent  = (card.dataset.name || '').charAt(0);
-      document.getElementById('rm-name').textContent    = card.dataset.name    || '';
-      document.getElementById('rm-stars').textContent   = stars;
-      document.getElementById('rm-date').textContent    = card.dataset.date    || '';
-      document.getElementById('rm-title').textContent   = card.dataset.title   || '';
-      document.getElementById('rm-content').textContent = card.dataset.content || '';
+      // 별점바
+      document.getElementById('rm-star-bar').style.width = (rating * 20) + '%';
+      document.getElementById('rm-avg').textContent      = rating + '.0';
+      document.getElementById('rm-name').textContent     = card.dataset.name    || '';
+      document.getElementById('rm-title').textContent    = card.dataset.title   || '';
+      document.getElementById('rm-content').textContent  = card.dataset.content || '';
+      document.getElementById('rm-class-name').textContent = card.dataset.title || '';
+
+      // 강의 썸네일
+      const classImgEl = document.getElementById('rm-class-img');
+      if (thumbnail) {
+        classImgEl.innerHTML = `<img src="/uploads/class/${thumbnail}" alt="" style="min-width:100%;min-height:100%;width:auto;height:auto;">`;
+      } else {
+        classImgEl.innerHTML = `<div class="rv-thumb-ph"><img src="/assets/img/logo.svg" alt=""></div>`;
+      }
+
+      // 이미지 스와이퍼
+      const imgArea   = document.getElementById('rm-img-area');
+      const imgSlides = document.getElementById('rm-img-slides');
+
+      if (_rmImgSwiper) { _rmImgSwiper.destroy(true, true); _rmImgSwiper = null; }
+
+      if (images.length > 0) {
+        imgSlides.innerHTML = images.map(f =>
+          `<div class="swiper-slide"><img src="/uploads/review/${f}" alt="후기 이미지"></div>`
+        ).join('');
+        imgArea.style.display = 'block';
+
+        _rmImgSwiper = new Swiper('#rm-img-swiper', {
+          loop: images.length > 1,
+          grabCursor: true,
+          pagination: { el: '#rm-img-swiper .swiper-pagination', clickable: true },
+          navigation: {
+            prevEl: '#rm-img-swiper .swiper-button-prev',
+            nextEl: '#rm-img-swiper .swiper-button-next',
+          },
+        });
+      } else {
+        imgArea.style.display = 'none';
+        imgSlides.innerHTML   = '';
+      }
 
       document.getElementById('review-modal').style.display = 'flex';
     });
@@ -143,20 +203,35 @@ function initReviewModal() {
    DOMContentLoaded
 ============================================================ */
 /* ============================================================
-   히어로 포스터 페이드아웃
+   인트로 스플래시
 ============================================================ */
-function initHeroPoster() {
-  const video  = document.getElementById('heroVideo');
-  const poster = document.getElementById('heroPoster');
-  if (!video || !poster) return;
+function initSiteIntro() {
+  const intro = document.getElementById('site-intro');
+  if (!intro) return;
 
-  const fadeOut = () => poster.classList.add('fade-out');
+  const video = document.getElementById('heroVideo');
+  let dismissed = false;
 
-  // 이미 재생 가능한 상태면 즉시 페이드 (캐시된 경우)
-  if (video.readyState >= 3) {
-    fadeOut();
-  } else {
-    video.addEventListener('canplay', fadeOut, { once: true });
+  function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
+    intro.classList.add('fade-out');
+    intro.addEventListener('transitionend', () => intro.remove(), { once: true });
+  }
+
+  // 최대 1.5초 후 강제 해제 (영상 없을 때 포함)
+  const timer = setTimeout(dismiss, 1500);
+
+  if (video) {
+    if (video.readyState >= 3) {
+      clearTimeout(timer);
+      dismiss();
+    } else {
+      video.addEventListener('canplay', () => {
+        clearTimeout(timer);
+        dismiss();
+      }, { once: true });
+    }
   }
 }
 
@@ -164,5 +239,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initSwipers();
   homePopup.init();
   initReviewModal();
-  initHeroPoster();
+  initSiteIntro();
 });
