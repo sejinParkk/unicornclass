@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 민감한 디렉토리/파일 직접 접근 차단
+    RewriteRule ^(app|bootstrap|resources|storage|database|docker|vendor|composer\.(json|lock)|\.env.*)$ - [F,L]
+
+    # 이미 public/ 경로면 통과
+    RewriteCond %{REQUEST_URI} ^/public/
+    RewriteRule ^ - [L]
+
+    # 나머지 모두 public/ 으로 투명하게 포워드 (URL은 그대로 유지)
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>
