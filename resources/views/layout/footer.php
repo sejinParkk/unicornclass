@@ -14,6 +14,9 @@ $_siteName2 = DB::selectOne("SELECT config_value FROM lc_site_config WHERE confi
 $_footerSiteName = $_siteName2['config_value'] ?? '유니콘클래스';
 ?>
 
+<?php if (!empty($isClassDetail)): ?>
+<div class="cd-fixed-spacer"></div>
+<?php endif; ?>
 </main>
 <!-- ====== FOOTER ====== -->
 <footer class="site-footer <?php echo !empty($isHome) || !empty($isApply) || !empty($isAbout) ? 'mgt0' : '';?>">

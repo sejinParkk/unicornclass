@@ -21,10 +21,10 @@ $csrfToken = \App\Core\Csrf::token();
         <?php else: ?>
           <div class="wish-grid">
             <?php foreach ($wishlist as $w):
-              $isFree     = $w['class_type'] === 'free';
-              $isEnrolled = (bool) $w['is_enrolled'];
-              $saleEnded  = !empty($w['sale_end_at']) && (new DateTimeImmutable($w['sale_end_at'])) < $now;
-              //$thumbOpacity = $saleEnded ? '0.4' : ($isEnrolled ? '0.7' : '1');
+              $isFree       = $w['class_type'] === 'free';
+              $isEnrolled   = (bool) $w['is_enrolled'];
+              $saleEnded    = !empty($w['sale_end_at']) && (new DateTimeImmutable($w['sale_end_at'])) < $now;
+              $thumbOpacity = $saleEnded ? '0.45' : '1';
             ?>
             <div class="wish-card" id="wish-<?= (int)$w['wish_idx'] ?>">
 

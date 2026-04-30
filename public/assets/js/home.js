@@ -48,12 +48,12 @@ function initSwipers() {
       spaceBetween: 30,
       navigation: true,
       pagination: { clickable: true },
-      // breakpoints: {
-      //   0:    { slidesPerView: 2 },
-      //   480:  { slidesPerView: 3 },
-      //   768:  { slidesPerView: 4 },
-      //   1024: { slidesPerView: 5 },
-      // },
+      breakpoints: {
+        0:    { spaceBetween: 15 },
+        //480:  { slidesPerView: 3 },
+        768:  { spaceBetween: 30 },
+        //1024: { slidesPerView: 5 },
+      },
     });
   }
 
@@ -81,10 +81,12 @@ function initSwipers() {
     new Swiper('#swiper-banner', {
       grabCursor: true,
       loop: true,
+      slidesPerView: 'auto',
       spaceBetween: 20,
       // autoplay: { delay: 5000, disableOnInteraction: false },
       navigation: true,
       pagination: { clickable: true },
+      centeredSlides: true,
     });
   }
 }

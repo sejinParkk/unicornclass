@@ -145,7 +145,7 @@ class HomeRepository
     public function getActiveBanners(): array
     {
         return DB::select(
-            "SELECT banner_idx, image_path, link_url, link_target, alt_text
+            "SELECT banner_idx, image_path, mobile_image_path, link_url, link_target, alt_text
              FROM lc_banner
              WHERE is_active = 1
                AND deleted_at IS NULL

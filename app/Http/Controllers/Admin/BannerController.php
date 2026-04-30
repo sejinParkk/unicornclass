@@ -65,21 +65,23 @@ class BannerController
         header('Content-Type: application/json; charset=utf-8');
 
         try {
-            $imagePath = FileUploader::uploadBannerImage($_FILES['image'] ?? []);
+            $imagePath       = FileUploader::uploadBannerImage($_FILES['image']        ?? []);
+            $mobileImagePath = FileUploader::uploadBannerImage($_FILES['mobile_image'] ?? []);
         } catch (\RuntimeException $e) {
             echo json_encode(['ok' => false, 'message' => $e->getMessage()]);
             exit;
         }
 
         $idx = $this->repo->create([
-            'image_path'  => $imagePath,
-            'link_url'    => trim($_POST['link_url']   ?? ''),
-            'link_target' => $_POST['link_target']     ?? '_blank',
-            'alt_text'    => trim($_POST['alt_text']   ?? ''),
-            'start_date'  => $_POST['start_date']      ?: null,
-            'end_date'    => $_POST['end_date']         ?: null,
-            'is_active'   => (int) ($_POST['is_active'] ?? 1),
-            'sort_order'  => (int) ($_POST['sort_order'] ?? 0),
+            'image_path'        => $imagePath,
+            'mobile_image_path' => $mobileImagePath,
+            'link_url'          => trim($_POST['link_url']    ?? ''),
+            'link_target'       => $_POST['link_target']      ?? '_blank',
+            'alt_text'          => trim($_POST['alt_text']    ?? ''),
+            'start_date'        => $_POST['start_date']       ?: null,
+            'end_date'          => $_POST['end_date']          ?: null,
+            'is_active'         => (int) ($_POST['is_active']  ?? 1),
+            'sort_order'        => (int) ($_POST['sort_order'] ?? 0),
         ]);
 
         echo json_encode(['ok' => true, 'redirect' => "/admin/banners/{$idx}/edit?saved=1"]);
@@ -133,6 +135,12 @@ class BannerController
                 FileUploader::deleteBannerImage($banner['image_path']);
                 $data['image_path'] = $newImage;
             }
+
+            $newMobileImage = FileUploader::uploadBannerImage($_FILES['mobile_image'] ?? []);
+            if ($newMobileImage) {
+                FileUploader::deleteBannerImage($banner['mobile_image_path']);
+                $data['mobile_image_path'] = $newMobileImage;
+            }
         } catch (\RuntimeException $e) {
             echo json_encode(['ok' => false, 'message' => $e->getMessage()]);
             exit;
@@ -155,6 +163,7 @@ class BannerController
         if (!$banner) { http_response_code(404); exit; }
 
         FileUploader::deleteBannerImage($banner['image_path']);
+        FileUploader::deleteBannerImage($banner['mobile_image_path']);
         $this->repo->delete($idx);
 
         header('Location: /admin/banners?deleted=1');

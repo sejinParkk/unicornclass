@@ -71,10 +71,12 @@ $typeLabel = match($type) {
             </p>
           </div>
           <div class="card-info">
+            <?php if ($class['badge_hot'] || $class['badge_new']): ?>
             <div class="card-tags">
               <?php if ($class['badge_hot']): ?><span class="ctags ct-hot">HOT</span><?php endif; ?>
               <?php if ($class['badge_new']): ?><span class="ctags ct-new">NEW</span><?php endif; ?>          
             </div>
+            <?php endif; ?>
             <div class="card-title"><?= htmlspecialchars($class['title']) ?></div>
             <div class="card-meta">
               <?= htmlspecialchars($class['instructor_name']) ?>

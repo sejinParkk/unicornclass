@@ -1,8 +1,9 @@
-# 업로드 파일 (바이너리)
-storage/uploads/
+# 업로드 파일 (바이너리) — 실제 파일만 무시, 폴더 구조 유지
+storage/uploads/*/*
+!storage/uploads/*/.gitkeep
 
 # 로그
-storage/logs/
+storage/logs/*.log
 
 # 환경설정
 .env

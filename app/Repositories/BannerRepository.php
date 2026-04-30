@@ -22,7 +22,7 @@ class BannerRepository
         )['cnt'] ?? 0);
 
         $list = DB::select(
-            "SELECT banner_idx, image_path, link_url, link_target,
+            "SELECT banner_idx, image_path, mobile_image_path, link_url, link_target,
                     alt_text, start_date, end_date, is_active, sort_order, created_at
              FROM lc_banner
              WHERE deleted_at IS NULL
@@ -53,16 +53,17 @@ class BannerRepository
     {
         return (int) DB::insert(
             'INSERT INTO lc_banner
-                (image_path, link_url, link_target, alt_text,
+                (image_path, mobile_image_path, link_url, link_target, alt_text,
                  start_date, end_date, is_active, sort_order)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
-                $data['image_path']  ?? null,
-                $data['link_url']    ?: null,
-                $data['link_target'] ?? '_blank',
-                $data['alt_text']    ?? '',
-                $data['start_date']  ?: null,
-                $data['end_date']    ?: null,
+                $data['image_path']        ?? null,
+                $data['mobile_image_path'] ?? null,
+                $data['link_url']          ?: null,
+                $data['link_target']       ?? '_blank',
+                $data['alt_text']          ?? '',
+                $data['start_date']        ?: null,
+                $data['end_date']          ?: null,
                 (int) ($data['is_active']  ?? 1),
                 (int) ($data['sort_order'] ?? 0),
             ]
@@ -79,7 +80,7 @@ class BannerRepository
         $params = [];
 
         $fields = [
-            'image_path', 'link_url', 'link_target', 'alt_text',
+            'image_path', 'mobile_image_path', 'link_url', 'link_target', 'alt_text',
             'start_date', 'end_date', 'is_active', 'sort_order',
         ];
         foreach ($fields as $f) {

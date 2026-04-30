@@ -127,6 +127,7 @@ class ClassController
         $csrfToken = Csrf::token();
 
         $pageTitle = htmlspecialchars($class['title']) . ' - 유니콘클래스';
+        $isClassDetail = true;
         require VIEW_PATH . '/layout/header.php';
         require VIEW_PATH . '/pages/classes/show.php';
         require VIEW_PATH . '/layout/footer.php';

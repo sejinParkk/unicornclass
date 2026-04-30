@@ -55,12 +55,7 @@ function starRating(int $rating): string
       <p class="home-section-en">Webinar</p>    
     </div>
   </div>
-  <div class="home_swiper_area">
-    <div class="home_swp_controll">
-      <div class="swiper-button-prev"></div>
-      <div class="swiper-pagination"></div>      
-      <div class="swiper-button-next"></div>
-    </div>
+  <div class="home_swiper_area">    
     <div class="swiper home-class-swiper" id="swiper-free">
       <div class="swiper-wrapper">
         <?php foreach ($freeClasses as $c): ?>
@@ -78,11 +73,12 @@ function starRating(int $rating): string
               </p>
             </div>
             <div class="card-info">
+               <?php if ($c['badge_hot'] || $c['badge_new']): ?>
               <div class="card-tags">
                 <?php if ($c['badge_hot']): ?><span class="ctags ct-hot">HOT</span><?php endif; ?>
-                <?php if ($c['badge_new']): ?><span class="ctags ct-new">NEW</span><?php endif; ?>
-                
+                <?php if ($c['badge_new']): ?><span class="ctags ct-new">NEW</span><?php endif; ?>                
               </div>
+              <?php endif; ?>
               <div class="card-title"><?= htmlspecialchars($c['title']) ?></div>
               <div class="card-meta">
                 <?= htmlspecialchars($c['instructor_name']) ?>
@@ -93,6 +89,11 @@ function starRating(int $rating): string
         </div>
         <?php endforeach; ?>
       </div>      
+    </div>
+    <div class="home_swp_controll">
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>      
+      <div class="swiper-button-next"></div>
     </div>
   </div>
   <div class="home-section-more-area">
@@ -121,12 +122,7 @@ function starRating(int $rating): string
       <p class="home-section-en">Premium Class</p>    
     </div>
   </div>
-  <div class="home_swiper_area">
-    <div class="home_swp_controll">
-      <div class="swiper-button-prev"></div>
-      <div class="swiper-pagination"></div>      
-      <div class="swiper-button-next"></div>
-    </div>
+  <div class="home_swiper_area">    
     <div class="swiper home-class-swiper" id="swiper-premium">
       <div class="swiper-wrapper">
         <?php foreach ($premiumClasses as $c): ?>
@@ -144,10 +140,12 @@ function starRating(int $rating): string
               </p>
             </div>
             <div class="card-info">
+              <?php if ($c['badge_hot'] || $c['badge_new']): ?>
               <div class="card-tags">
                 <?php if ($c['badge_hot']): ?><span class="ctags ct-hot">HOT</span><?php endif; ?>
                 <?php if ($c['badge_new']): ?><span class="ctags ct-new">NEW</span><?php endif; ?>                
               </div>
+              <?php endif; ?>
               <div class="card-title"><?= htmlspecialchars($c['title']) ?></div>
               <div class="card-meta">
                 <?= htmlspecialchars($c['instructor_name']) ?>
@@ -161,6 +159,11 @@ function starRating(int $rating): string
         </div>
         <?php endforeach; ?>
       </div>
+    </div>
+    <div class="home_swp_controll">
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>      
+      <div class="swiper-button-next"></div>
     </div>
   </div>
   <div class="home-section-more-area">
@@ -182,15 +185,28 @@ function starRating(int $rating): string
   <div class="swiper home-banner-swiper" id="swiper-banner">
     <div class="swiper-wrapper">
       <?php foreach ($banners as $b): ?>
+      <?php
+        $pcSrc     = !empty($b['image_path'])        ? '/uploads/banner/' . htmlspecialchars($b['image_path'])        : '';
+        $mobSrc    = !empty($b['mobile_image_path']) ? '/uploads/banner/' . htmlspecialchars($b['mobile_image_path']) : $pcSrc;
+        $alt       = htmlspecialchars($b['alt_text']);
+        $hasLink   = !empty($b['link_url']);
+        $linkHref  = $hasLink ? htmlspecialchars($b['link_url'])    : '';
+        $linkTarget= $hasLink ? htmlspecialchars($b['link_target']) : '';
+      ?>
       <div class="swiper-slide home-banner-slide">
-        <?php if (!empty($b['image_path'])): ?>
-          <?php if (!empty($b['link_url'])): ?>
-          <a href="<?= htmlspecialchars($b['link_url']) ?>"
-             target="<?= htmlspecialchars($b['link_target']) ?>">
-            <img src="/uploads/banner/<?= htmlspecialchars($b['image_path']) ?>" alt="<?= htmlspecialchars($b['alt_text']) ?>">
+        <?php if ($pcSrc): ?>
+          <?php if ($hasLink): ?>
+          <a href="<?= $linkHref ?>" target="<?= $linkTarget ?>">
+            <img class="banner-img-pc"  src="<?= $pcSrc ?>"  alt="<?= $alt ?>">
+            <?php if (!empty($b['mobile_image_path'])): ?>
+            <img class="banner-img-mob" src="<?= $mobSrc ?>" alt="<?= $alt ?>">
+            <?php endif; ?>
           </a>
           <?php else: ?>
-          <img src="/uploads/banner/<?= htmlspecialchars($b['image_path']) ?>" alt="<?= htmlspecialchars($b['alt_text']) ?>">
+          <img class="banner-img-pc"  src="<?= $pcSrc ?>"  alt="<?= $alt ?>">
+          <?php if (!empty($b['mobile_image_path'])): ?>
+          <img class="banner-img-mob" src="<?= $mobSrc ?>" alt="<?= $alt ?>">
+          <?php endif; ?>
           <?php endif; ?>
         <?php else: ?>
         <div class="home-banner-ph"><img src="/assets/img/logo.svg"></div>
@@ -221,12 +237,7 @@ function starRating(int $rating): string
       <p class="home-section-en">Reviews</p>    
     </div>
   </div>
-  <div class="home_swiper_area">
-    <div class="home_swp_controll">
-      <div class="swiper-button-prev"></div>
-      <div class="swiper-pagination"></div>
-      <div class="swiper-button-next"></div>
-    </div>
+  <div class="home_swiper_area">    
     <div class="swiper home-review-swiper" id="swiper-reviews">
       <div class="swiper-wrapper">
         <?php
@@ -270,6 +281,11 @@ function starRating(int $rating): string
         </div>
         <?php endforeach; ?>
       </div>
+    </div>
+    <div class="home_swp_controll">
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-next"></div>
     </div>
   </div>
 </section>
@@ -324,9 +340,9 @@ function starRating(int $rating): string
       </div>
       <?php endforeach; ?>
     </div>
-    <div class="swiper-pagination"></div>
+    <!-- <div class="swiper-pagination"></div>
     <div class="swiper-button-prev"></div>
-    <div class="swiper-button-next"></div>
+    <div class="swiper-button-next"></div> -->
   </div>
   <div class="home-section-more-area">
     <div class="home_inner">      

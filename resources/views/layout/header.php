@@ -133,29 +133,68 @@ $_navActive = function(string $prefix) use ($_uri): string {
     <div class="drawer-overlay" onclick="closeDrawer()"></div>
     <div class="drawer-body">
         <button class="drawer-close" onclick="closeDrawer()">×</button>
-        <a href="/classes">클래스</a>
-        <a href="/classes?type=free" class="drawer-sub">└ 무료강의</a>
-        <a href="/classes?type=premium" class="drawer-sub">└ 프리미엄강의</a>
-        <a href="/about">회사소개</a>
-        <a href="/instructors">강사진</a>
-        <a href="/supports/faqs">고객센터</a>
-        <a href="/supports/faqs" class="drawer-sub">└ FAQ</a>
-        <a href="/supports/notices" class="drawer-sub">└ 공지사항</a>        
-        <a href="/instructors/apply">🎓 강사 지원하기</a>
-        <a href="/search">🔍 검색</a>
+
+        <!-- 검색 -->
+        <form class="drawer-search" action="/search" method="GET">
+            <button type="submit"><img src="/assets/img/hd_sch.svg" alt="검색"></button>
+            <input type="text" name="q" placeholder="강사 / 과정명을 입력해 주세요." value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
+        </form>
+
+        <!-- 클래스 (아코디언) -->
+        <div class="drawer-acc <?= $_navActive('/classes') ?>">
+            <button class="drawer-acc-btn" onclick="toggleDrawerAcc(this)">
+                <span>클래스</span>
+                <svg class="drawer-acc-arr" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="drawer-acc-body <?= $_navActive('/classes') ? 'open' : '' ?>">
+                <a href="/classes?type=free" class="drawer-acc-sub <?= str_contains($_uri.'?'.($_SERVER['QUERY_STRING']??''), 'type=free') ? 'active' : '' ?>">무료강의</a>
+                <a href="/classes?type=premium" class="drawer-acc-sub <?= str_contains($_uri.'?'.($_SERVER['QUERY_STRING']??''), 'type=premium') ? 'active' : '' ?>">프리미엄강의</a>
+            </div>
+        </div>
+
+        <!-- 회사소개 -->
+        <a href="/about" class="drawer-link <?= $_navActive('/about') ?>">회사소개</a>
+
+        <!-- 강사진 -->
+        <a href="/instructors" class="drawer-link <?= $_navActive('/instructors') ?>">강사진</a>
+
+        <!-- 고객센터 (아코디언) -->
+        <div class="drawer-acc <?= $_navActive('/supports') ?>">
+            <button class="drawer-acc-btn" onclick="toggleDrawerAcc(this)">
+                <span>고객센터</span>
+                <svg class="drawer-acc-arr" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="drawer-acc-body <?= $_navActive('/supports') ? 'open' : '' ?>">
+                <a href="/supports/faqs"    class="drawer-acc-sub <?= $_navActive('/supports/faqs') ?>">FAQ</a>
+                <a href="/supports/notices" class="drawer-acc-sub <?= $_navActive('/supports/notices') ?>">공지사항</a>
+            </div>
+        </div>
+
+        <!-- 강사 지원하기 -->
+        <a href="/instructors/apply" class="drawer-link">강사 지원하기</a>
+
+        <!-- 마이페이지 / 로그인 -->
+        <?php if ($_member): ?>
+        <div class="drawer-acc <?= $_navActive('/mypage') ?>">
+            <button class="drawer-acc-btn" onclick="toggleDrawerAcc(this)">
+                <span>마이페이지</span>
+                <svg class="drawer-acc-arr" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="drawer-acc-body <?= $_navActive('/mypage') ? 'open' : '' ?>">
+                <a href="/mypage/my-class"  class="drawer-acc-sub <?= $_navActive('/mypage/my-class') ?>">나의 강의</a>
+                <a href="/mypage/wishlist"  class="drawer-acc-sub <?= $_navActive('/mypage/wishlist') ?>">찜목록</a>
+                <a href="/mypage/orders"    class="drawer-acc-sub <?= $_navActive('/mypage/orders') ?>">결제내역</a>
+                <a href="/mypage/qna"       class="drawer-acc-sub <?= $_navActive('/mypage/qna') ?>">1:1 문의</a>
+                <a href="/mypage/profile"   class="drawer-acc-sub <?= $_navActive('/mypage/profile') ?>">정보수정</a>
+                <button type="button" class="drawer-acc-sub drawer-acc-logout" onclick="closeDrawer();openModal('logoutModal')">로그아웃</button>
+            </div>
+        </div>
+        <?php else: ?>
         <div class="drawer-auth">
-            <?php if ($_member): ?>
-            <a href="/mypage/my-class">📚 나의 강의</a>
-            <a href="/mypage/wishlist">❤️ 찜목록</a>
-            <a href="/mypage/orders">💳 결제내역</a>
-            <a href="/mypage/qna">💬 1:1 문의</a>
-            <a href="/mypage/profile">⚙️ 정보수정</a>
-            <button type="button" class="drawer-btn-login" style="width:100%;cursor:pointer" onclick="closeDrawer();openModal('logoutModal')">🚪 로그아웃</button>
-            <?php else: ?>
             <a href="/login" class="drawer-btn-login">로그인</a>
             <a href="/register" class="drawer-btn-mypage">회원가입</a>
-            <?php endif; ?>
         </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -164,9 +203,20 @@ document.getElementById('hamburgerBtn').addEventListener('click', function() {
     document.getElementById('mobileDrawer').classList.add('open');
     document.body.style.overflow = 'hidden';
 });
+// 현재 페이지 기준으로 열려 있는 아코디언 화살표 초기 회전
+document.querySelectorAll('.drawer-acc-body.open').forEach(function(body) {
+    var arr = body.previousElementSibling.querySelector('.drawer-acc-arr');
+    if (arr) arr.style.transform = 'rotate(180deg)';
+});
 function closeDrawer() {
     document.getElementById('mobileDrawer').classList.remove('open');
     document.body.style.overflow = '';
+}
+function toggleDrawerAcc(btn) {
+    const body = btn.nextElementSibling;
+    const arr  = btn.querySelector('.drawer-acc-arr');
+    const isOpen = body.classList.toggle('open');
+    arr.style.transform = isOpen ? 'rotate(180deg)' : '';
 }
 function openModal(id) {
   const el = document.getElementById(id);

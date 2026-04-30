@@ -23,25 +23,46 @@ $h = fn(string $k, string $d = '') => htmlspecialchars($banner[$k] ?? $d);
 
     <div class="form-card">
 
-        <!-- 이미지 업로드 -->
+        <!-- PC 이미지 업로드 -->
         <div class="form-group">
-            <label>배너 이미지 <span style="color:#888;font-weight:400;font-size:12px;">jpg·png·webp, 최대 5MB (권장 1200×300px)</span></label>
+            <label>PC 배너 이미지 <span style="color:#888;font-weight:400;font-size:12px;">jpg·png·webp, 최대 5MB (권장 1800×260px)</span></label>
             <?php if ($isEdit && !empty($banner['image_path'])): ?>
             <div style="margin-bottom:10px;">
                 <img id="preview-img"
                      src="/uploads/banner/<?= htmlspecialchars($banner['image_path']) ?>"
-                     alt="현재 배너 이미지"
-                     style="max-width:100%;max-height:160px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
+                     alt="현재 PC 배너 이미지"
+                     style="max-width:100%;max-height:120px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
                 <div style="font-size:11px;color:#aaa;margin-top:4px;">현재 이미지 — 새 파일 선택 시 교체됩니다.</div>
             </div>
             <?php else: ?>
             <div style="margin-bottom:10px;">
                 <img id="preview-img" src="" alt=""
-                     style="display:none;max-width:100%;max-height:160px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
+                     style="display:none;max-width:100%;max-height:120px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
             </div>
             <?php endif; ?>
             <input type="file" name="image" id="imageInput" accept="image/jpeg,image/png,image/webp"
-                   class="form-control" onchange="previewImage(this)">
+                   class="form-control" onchange="previewImage(this, 'preview-img')">
+        </div>
+
+        <!-- 모바일 이미지 업로드 -->
+        <div class="form-group">
+            <label>모바일 배너 이미지 <span style="color:#888;font-weight:400;font-size:12px;">jpg·png·webp, 최대 5MB (권장 750×400px) — 없으면 PC 이미지로 대체</span></label>
+            <?php if ($isEdit && !empty($banner['mobile_image_path'])): ?>
+            <div style="margin-bottom:10px;">
+                <img id="preview-mobile-img"
+                     src="/uploads/banner/<?= htmlspecialchars($banner['mobile_image_path']) ?>"
+                     alt="현재 모바일 배너 이미지"
+                     style="max-width:100%;max-height:160px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
+                <div style="font-size:11px;color:#aaa;margin-top:4px;">현재 모바일 이미지 — 새 파일 선택 시 교체됩니다.</div>
+            </div>
+            <?php else: ?>
+            <div style="margin-bottom:10px;">
+                <img id="preview-mobile-img" src="" alt=""
+                     style="display:none;max-width:100%;max-height:160px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
+            </div>
+            <?php endif; ?>
+            <input type="file" name="mobile_image" id="mobileImageInput" accept="image/jpeg,image/png,image/webp"
+                   class="form-control" onchange="previewImage(this, 'preview-mobile-img')">
         </div>
 
         <!-- 링크 URL -->
@@ -133,8 +154,8 @@ $h = fn(string $k, string $d = '') => htmlspecialchars($banner[$k] ?? $d);
 <?php endif; ?>
 
 <script>
-function previewImage(input) {
-    const img = document.getElementById('preview-img');
+function previewImage(input, previewId) {
+    const img = document.getElementById(previewId);
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = e => {

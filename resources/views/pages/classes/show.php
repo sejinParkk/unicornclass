@@ -41,6 +41,12 @@ $ordererPhone = htmlspecialchars($member['mb_phone'] ?? '');
 
 // 유효 파일 목록
 $files = $class['files'] ?? [];
+
+// 강의 자료 접근 권한 (cd-right · cd-mobile-info 공용)
+$canAccessFiles = $isEnrolled;
+$fileBlockMsg   = !$member
+    ? '로그인 후 이용 가능'
+    : (!$isEnrolled ? ($isFree ? '신청 후 이용 가능' : '구매 후 열람 가능') : '');
 ?>
 <div class="inner">
   <!-- <?php /* ──────────────── 브레드크럼 ──────────────── */ ?>
@@ -81,6 +87,105 @@ $files = $class['files'] ?? [];
           </span>
         </p>
       </div>
+
+      <?php /* ── 모바일 전용 정보 블록 (PC: hidden / mobile: visible) ── */ ?>
+      <div class="cd-mobile-info">
+
+        <div class="cd-box-badges">
+          <?php if ($class['badge_hot']): ?><span class="dbadge db-hot">HOT</span><?php endif; ?>
+          <?php if ($class['badge_new']): ?><span class="dbadge db-new">NEW</span><?php endif; ?>
+          <?php if ($isFree): ?><span class="dbadge db-free">무료강의</span>
+          <?php else: ?><span class="dbadge db-premium">Premium</span><?php endif; ?>
+        </div>
+
+        <div class="cd-box-title"><?= htmlspecialchars($class['title']) ?></div>
+        <div class="cd-box-inst-name"><?= htmlspecialchars($class['instructor_name']) ?></div>
+
+        <div class="cd-box-actions">
+          <button class="action-btn wish-sync <?= $isWished ? 'wished' : '' ?>" onclick="toggleWish()">
+            <img src="/assets/img/icon_like_<?= $isWished ? 'on' : 'off' ?>.svg" alt="" class="wish-sync-icon">
+            <span class="wish-sync-text"><?= $isWished ? ' 찜완료' : ' 찜하기' ?></span>
+          </button>
+          <button class="action-btn" onclick="copyLink()">
+            <img src="/assets/img/icon_share.svg" alt="">
+            <span>공유하기</span>
+          </button>
+        </div>
+
+        <?php if ($isFree && $saleEndFmt): ?>
+        <div class="class_date_box">
+          <div class="class_date_info">
+            <p><img src="/assets/img/icon_calendar.svg" alt=""><span>무료 강의일</span></p>
+            <p><?= $saleEndFmt ?></p>
+          </div>
+          <?php if ($btnStatus === 'apply' && $saleEndTs > time()): ?>
+          <div class="cd-timer-wrap">강의까지 <span class="cd-timer-val cd-countdown">계산 중...</span></div>
+          <?php endif; ?>
+        </div>
+        <?php elseif ($isPremium): ?>
+        <div class="cd-price-wrap">
+          <p class="cd-price-per"><?= $discountRate > 0 ? $discountRate.'%할인' : '' ?></p>
+          <div class="cd-price-box">
+            <?php if ($discountRate > 0): ?>
+            <p class="cd-price-origin"><?= number_format($class['price_origin']) ?></p>
+            <p class="cd-price-val"><?= number_format($effectivePrice) ?>원</p>
+            <?php else: ?>
+            <p class="cd-price-val"><?= number_format($effectivePrice) ?>원</p>
+            <?php endif; ?>
+          </div>
+        </div>
+        <?php endif; ?>
+
+        <?php if (!empty($files)): ?>
+        <div class="cd-files-wrap">
+          <button class="cd-files-label" onclick="toggleFiles(this)" aria-expanded="false">
+            <p><strong>강의 자료</strong><span class="cd-files-count"><?= count($files) ?>개</span></p>
+            <span class="cd-files-arrow"><img src="/assets/img/icon_onoff.svg" alt=""></span>
+          </button>
+          <div class="cd-files-body" style="display:none">
+            <?php foreach ($files as $f): ?>
+            <?php if ($f['file_type'] === 'file'): ?>
+            <div class="cd-file-row">
+              <div>
+                <div class="cd-file-name"><?= htmlspecialchars($f['title']) ?></div>
+                <div class="cd-file-meta">
+                  <?= $f['file_size'] ? number_format($f['file_size'] / 1048576, 1).'MB' : '' ?>
+                  <?= $fileBlockMsg ? ' · '.$fileBlockMsg : '' ?>
+                </div>
+              </div>
+              <?php if ($canAccessFiles): ?>
+              <a href="/uploads/materials/<?= htmlspecialchars($f['file_path']) ?>" class="btn-file-dl" download>다운로드</a>
+              <?php elseif (!$member): ?>
+              <button class="btn-file-dl" onclick="requireLogin()">다운로드</button>
+              <?php elseif ($isFree): ?>
+              <button class="btn-file-dl" onclick="openFreeModal()" style="background:#27ae60">신청 후 이용</button>
+              <?php else: ?>
+              <button class="btn-file-dl" onclick="openPayModal()" style="background:#8e44ad">구매 후 이용</button>
+              <?php endif; ?>
+            </div>
+            <?php else: ?>
+            <div class="cd-file-row link">
+              <div>
+                <div class="cd-file-name"><?= htmlspecialchars($f['title']) ?></div>
+                <div class="cd-file-meta">외부 링크<?= $fileBlockMsg ? ' · '.$fileBlockMsg : '' ?></div>
+              </div>
+              <?php if ($canAccessFiles): ?>
+              <a href="<?= htmlspecialchars($f['external_url']) ?>" target="_blank" rel="noopener" class="btn-file-link">열기</a>
+              <?php elseif (!$member): ?>
+              <button class="btn-file-dl" onclick="requireLogin()" style="background:#3b5bdb">열기</button>
+              <?php elseif ($isFree): ?>
+              <button class="btn-file-dl" onclick="openFreeModal()" style="background:#27ae60">신청 후 이용</button>
+              <?php else: ?>
+              <button class="btn-file-dl" onclick="openPayModal()" style="background:#8e44ad">구매 후 이용</button>
+              <?php endif; ?>
+            </div>
+            <?php endif; ?>
+            <?php endforeach; ?>
+          </div>
+        </div>
+        <?php endif; ?>
+
+      </div><!-- /cd-mobile-info -->
 
       <?php /* 내용 탭 */ ?>
       <div class="cd-tabs">
@@ -189,12 +294,9 @@ $files = $class['files'] ?? [];
 
         <?php /* 찜하기 / 링크복사 */ ?>
         <div class="cd-box-actions">
-          <button class="action-btn <?= $isWished ? 'wished' : '' ?>" id="wishBtn" onclick="toggleWish()">
-            <!-- <span id="wishIcon"><?= $isWished ? '❤️' : '🤍' ?></span>
-            <span id="wishText"><?= $isWished ? ' 찜완료' : ' 찜하기' ?></span> -->
-
-            <img src="/assets/img/icon_like_<?= $isWished ? 'on' : 'off' ?>.svg" alt="" id="wishIcon">
-            <span id="wishText"><?= $isWished ? ' 찜완료' : ' 찜하기' ?></span>
+          <button class="action-btn wish-sync <?= $isWished ? 'wished' : '' ?>" id="wishBtn" onclick="toggleWish()">
+            <img src="/assets/img/icon_like_<?= $isWished ? 'on' : 'off' ?>.svg" alt="" id="wishIcon" class="wish-sync-icon">
+            <span id="wishText" class="wish-sync-text"><?= $isWished ? ' 찜완료' : ' 찜하기' ?></span>
           </button>
           <button class="action-btn" onclick="copyLink()">
             <img src="/assets/img/icon_share.svg" alt="">
@@ -214,7 +316,7 @@ $files = $class['files'] ?? [];
           </div>
           <?php if ($btnStatus === 'apply' && $saleEndTs > time()): ?>
           <div class="cd-timer-wrap">
-            강의까지 <span class="cd-timer-val" id="countdown">계산 중...</span>
+            강의까지 <span class="cd-timer-val cd-countdown" id="countdown">계산 중...</span>
           </div>
           <?php endif; ?>
         </div>
@@ -248,7 +350,7 @@ $files = $class['files'] ?? [];
 
         <?php if ($btnStatus === 'apply' && $saleEndTs && $saleEndTs > time()): ?>
         <div class="cd-timer-wrap">
-          판매 종료까지 <span class="cd-timer-val" id="countdown">계산 중...</span>
+          판매 종료까지 <span class="cd-timer-val cd-countdown" id="countdown">계산 중...</span>
         </div>
         <?php endif; ?>
 
@@ -274,13 +376,6 @@ $files = $class['files'] ?? [];
 
         <?php /* 강의 자료 — 무료/프리미엄 공통 */ ?>
         <?php if (!empty($files)): ?>
-        <?php
-        // 무료·프리미엄 모두 신청(수강) 완료 후 열람 가능
-        $canAccessFiles = $isEnrolled;
-        $fileBlockMsg   = !$member
-            ? '로그인 후 이용 가능'
-            : (!$isEnrolled ? ($isFree ? '신청 후 이용 가능' : '구매 후 열람 가능') : '');
-        ?>
         <div class="cd-files-wrap">
           <button class="cd-files-label" onclick="toggleFiles(this)" aria-expanded="false">
             <p>
@@ -414,7 +509,47 @@ $files = $class['files'] ?? [];
       </div><!-- /cd-box -->
     </div><!-- /cd-right -->
 
-  </div><!-- /cd-wrap -->  
+  </div><!-- /cd-wrap -->
+
+
+</div>
+
+<!-- ====== 모바일 하단 고정 바 ====== -->
+<div class="cd-fixed-bar">
+  <div class="cd-fixed-bar-inner">
+
+    <div class="cd-fixed-info">
+      <?php if ($isPremium && $discountRate > 0): ?>
+        <span class="cd-fixed-price-per"><?= $discountRate ?>%↓</span>
+        <span class="cd-fixed-price"><?= number_format($effectivePrice) ?>원</span>
+      <?php elseif ($isPremium): ?>
+        <span class="cd-fixed-price"><?= number_format($effectivePrice) ?>원</span>
+      <?php else: ?>
+        <span class="cd-fixed-label">무료강의</span>
+      <?php endif; ?>
+    </div>
+
+    <div class="cd-fixed-btn-wrap">
+      <?php if ($btnStatus === 'login_required'): ?>
+        <button class="cd-fixed-btn <?= $isFree ? 'cd-fixed-btn--free' : '' ?>" onclick="requireLogin()">
+          <?= $isFree ? '무료강의 신청하기' : '결제하기' ?>
+        </button>
+      <?php elseif ($btnStatus === 'enrolled'): ?>
+        <button class="cd-fixed-btn cd-fixed-btn--done" disabled><?= $isFree ? '신청 완료' : '구매 완료' ?></button>
+      <?php elseif ($btnStatus === 'closed'): ?>
+        <button class="cd-fixed-btn cd-fixed-btn--done" disabled><?= $isFree ? '신청 마감' : '판매 종료' ?></button>
+      <?php elseif ($btnStatus === 'waiting'): ?>
+        <button class="cd-fixed-btn cd-fixed-btn--done" disabled>신청 대기 중</button>
+      <?php else: ?>
+        <?php if ($isFree): ?>
+          <button class="cd-fixed-btn cd-fixed-btn--free" onclick="openFreeModal()">무료강의 신청하기</button>
+        <?php else: ?>
+          <button class="cd-fixed-btn" onclick="openPayModal()">결제하기</button>
+        <?php endif; ?>
+      <?php endif; ?>
+    </div>
+
+  </div>
 </div>
 
 <?php /* ════════════════════════════════════════
@@ -772,15 +907,15 @@ const TARGET_TS   = <?= $saleEndTs ?> * 1000;
 const EXPIRE_LABEL = IS_FREE ? '신청 마감' : '판매 종료';
 (function tick() {
   const diff = TARGET_TS - Date.now();
-  if (diff <= 0) { document.getElementById('countdown').textContent = EXPIRE_LABEL; return; }
-  const d = Math.floor(diff / 86400000);
-  const h = Math.floor((diff % 86400000) / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
-  const s = Math.floor((diff % 60000) / 1000);
-  document.getElementById('countdown').textContent =
-    (d > 0 ? d + '일 ' : '') + String(h).padStart(2,'0') + '시간 ' +
-    String(m).padStart(2,'0') + '분 ' + String(s).padStart(2,'0') + '초';
-  setTimeout(tick, 1000);
+  const text = diff <= 0 ? EXPIRE_LABEL :
+    (d => (d > 0 ? d + '일 ' : '') +
+      String(Math.floor((diff % 86400000) / 3600000)).padStart(2,'0') + '시간 ' +
+      String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0') + '분 ' +
+      String(Math.floor((diff % 60000) / 1000)).padStart(2,'0') + '초'
+    )(Math.floor(diff / 86400000));
+  // cd-right · cd-mobile-info 양쪽 동기화
+  document.querySelectorAll('.cd-countdown').forEach(el => el.textContent = text);
+  if (diff > 0) setTimeout(tick, 1000);
 })();
 <?php endif; ?>
 
@@ -850,20 +985,14 @@ function toggleWish() {
   .then(r => r.json())
   .then(data => {
     if (!data.success) { alert(data.error || '오류가 발생했습니다.'); return; }
-    const btn  = document.getElementById('wishBtn');
-    const icon = document.getElementById('wishIcon');
-    const text = document.getElementById('wishText');
-    if (data.wished) {
-      btn.classList.add('wished');
-      //icon.textContent = '❤️';
-      icon.src = '/assets/img/icon_like_on.svg';
-      text.textContent = ' 찜완료';
-    } else {
-      btn.classList.remove('wished');
-      //icon.textContent = '🤍';
-      icon.src = '/assets/img/icon_like_off.svg';
-      text.textContent = ' 찜하기';
-    }
+    // cd-right · cd-mobile-info 양쪽 동기화
+    document.querySelectorAll('.wish-sync').forEach(btn => btn.classList.toggle('wished', data.wished));
+    document.querySelectorAll('.wish-sync-icon').forEach(icon => {
+      icon.src = data.wished ? '/assets/img/icon_like_on.svg' : '/assets/img/icon_like_off.svg';
+    });
+    document.querySelectorAll('.wish-sync-text').forEach(text => {
+      text.textContent = data.wished ? ' 찜완료' : ' 찜하기';
+    });
   });
 }
 

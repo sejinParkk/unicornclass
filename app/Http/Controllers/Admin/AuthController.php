@@ -49,6 +49,7 @@ class AuthController
         if (!$admin || !password_verify($password, $admin['password'])) {
             $csrfToken = Csrf::token();
             $error     = '아이디 또는 비밀번호가 올바르지 않습니다.';
+
             require VIEW_PATH . '/pages/admin/login.php';
             return;
         }

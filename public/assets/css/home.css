@@ -36,7 +36,7 @@
 /* ==========================================================================
    ② 섹션 공통 헤더
    ========================================================================== */
-.home-section {padding:60px 0;}
+.home-section {padding:60px 0;overflow:hidden;}
 #section-free {padding-top:74px;}
 #section-reviews {padding:120px 0;background: #F6F8F9;}
 .home-section--gray { padding:120px 0;background: #2F3133; }
@@ -57,7 +57,7 @@
 #swiper-inst .swiper-slide:nth-child(even) {margin-top:20px;}
 
 .home_swiper_area {position:relative;}
-.home_swp_controll {display:flex;align-items:center;justify-content:flex-end;gap:16px;position:absolute;right:0;top:-82px;z-index:10;}
+.home_swp_controll {display:flex;align-items:center;justify-content:flex-end;gap:16px;position:absolute;right:60px;top:-82px;z-index:10;}
 .home_swp_controll .swiper-button-prev,
 .home_swp_controll .swiper-button-next {width: 36px !important;height: 36px !important;position:relative;top:auto;left:auto;right:auto;margin:0;}
 .home_swp_controll .swiper-button-prev {background:url(../img/home_swp_prev.svg) no-repeat center;}
@@ -81,13 +81,15 @@
 /* ==========================================================================
    ④ 이벤트/공지 배너 슬라이더
    ========================================================================== */
-.home-banner-section {padding: 80px 0 120px;}
+.home-banner-section {padding: 80px 0 120px;overflow:hidden;}
 .home-banner-swiper {padding:0 60px;}
 
 /* 슬라이드 컨테이너 */
-.home-banner-slide {display:flex;align-items:center;justify-content:center;width:100%;height:260px;border-radius:20px;overflow:hidden;}
+.home-banner-slide {display:flex;align-items:center;justify-content:center;width:100%;/*height:260px;*/border-radius:20px;overflow:hidden;}
 .home-banner-slide a {display:flex;align-items:center;justify-content:center;width:100%;height:100%;overflow:hidden;}
-.home-banner-slide > img {width:100%;}
+.home-banner-slide .banner-img-pc,
+.home-banner-slide .banner-img-mob {display:block;width:100%;height:auto;}
+.home-banner-slide .banner-img-mob {display:none;}
 .home-banner-ph {display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#efefef;overflow:hidden;padding:0 20px;}
 .home-banner-ph img {max-width:100%;}
 
@@ -116,7 +118,7 @@
    ⑤ 수강생 후기
    ========================================================================== */
 .home-review-swiper { padding:0 60px; }
-.home-review-card {width:435px;background: #fff;border:none;border-radius: 24px;padding: 34px 24px 28px;box-shadow: 0 4px 16px rgba(0,0,0,.08);cursor: pointer;text-align: left;transition: box-shadow .15s, transform .15s;}
+.home-review-card {max-width:100%;width:435px;background: #fff;border:none;border-radius: 24px;padding: 34px 24px 28px;box-shadow: 0 4px 16px rgba(0,0,0,.08);cursor: pointer;text-align: left;transition: box-shadow .15s, transform .15s;}
 /* .home-review-card:hover {
   box-shadow: 0 6px 20px rgba(0,0,0,.1);
   transform: translateY(-2px);
@@ -258,25 +260,130 @@
 /* ==========================================================================
    반응형
    ========================================================================== */
-@media (max-width: 900px) {
-  .hero-title { font-size: 38px; }
-  .hero-content { padding: 0 32px 44px; }
-  .home-section { padding: 40px 20px 0; }
-  .home-banner-section { padding: 20px; }
-  .home-banner-slide { height: 220px; }
+
+/* ── 1200px ── */
+@media (max-width: 1200px) {
+  #hero { padding: 46px 40px; }
+  .home_inner { padding: 0 40px; }
+  .home-class-swiper,
+  .home-inst-swiper { padding: 0 40px; }
+  .home-review-swiper { padding: 0 40px; }
+  .home-banner-swiper { padding: 0 40px; }
+  .home_swp_controll {right:40px;}
 }
 
+/* ── 992px ── */
+@media (max-width: 992px) {
+  #hero { padding: 20px 20px; }
+  .home_inner { padding: 0 20px; }
+  .home-class-swiper,
+  .home-inst-swiper { padding: 0 20px; }
+  .home-review-swiper { padding: 0 20px; }
+  .home-banner-swiper { padding: 0 20px; }
+
+  .hero-cont-txt { font-size: 42px; }
+  .home-section { padding: 50px 0; }
+  #section-free { padding-top: 50px; }
+  #section-reviews { padding: 80px 0; }
+  .home-section--gray { padding: 80px 0; }
+  .home-banner-section { padding: 50px 0 80px; }
+  .home-banner-slide { /*height: 220px;*/ }
+
+  .home-section-header { margin-bottom: 32px; }
+  .home_swp_controll { top: -70px; right:20px; }
+  .home-section-more-area { margin-top: 50px; }
+  .home-section-more { width: 200px; max-width: 100%; }
+
+  .home-section .swiper-slide {width:380px;}
+  #swiper-inst .swiper-slide {width:300px;}
+  .home-banner-slide {width:90%;}
+}
+
+/* ── 768px ── */
+@media (max-width: 768px) {
+  #hero { padding: 16px; }
+  .hero_inner { border-radius: 24px; }
+  .hero-cont-txt { font-size: 34px; }
+
+  .home-section { padding: 40px 0; }
+  .home-banner-section { padding: 40px 0 60px; }
+  .home-banner-slide { /*height: 180px;*/ }
+  .home-banner-slide { border-radius: 16px; }
+  .home-banner-slide .banner-img-pc  { display: none; }
+  .home-banner-slide .banner-img-mob { display: block; }
+
+  .home-section-title strong { font-size: 28px; }
+  .home-section-en { font-size: 16px; margin-top: 12px; }
+  .home-section-more-area { margin-top: 40px; }  
+
+  .home_swp_controll {position:relative;top:0;right:auto;justify-content:center;margin-top:30px;gap:10px;}
+  .home_swp_controll .swiper-button-prev, .home_swp_controll .swiper-button-next {width:26px !important;height:26px !important;background-size:cover;}
+  .home_swp_controll .swiper-pagination-bullet {width:10px;height:10px;}
+}
+
+/* ── 640px ── */
 @media (max-width: 640px) {
-  #hero { min-height: 320px; }
-  .hero-title { font-size: 28px; letter-spacing: -1px; }
-  .hero-sub   { font-size: 14px; }
-  .hero-cta   { font-size: 13px; padding: 10px 20px; }
-  .hero-content { padding: 0 20px 36px; }
-  .home-section { padding: 32px 16px 0; }
-  .home-section-title { font-size: 17px; }
+  #hero { padding: 12px; min-height: 260px; }
+  .hero_inner { border-radius: 20px; aspect-ratio: 4/3; max-height: none; }
+  .hero-content {left:30px;bottom:30px;}
+  .hero-cont-txt { font-size: 26px; margin-top:12px; }
+
+  .home-section { padding: 32px 0; }
+  #section-free { padding-top: 32px; }
+  #section-reviews { padding: 50px 0; }
+  .home-section--gray { padding: 50px 0; }
+  .home-banner-section { padding: 32px 0 50px; }
+  .home-banner-slide { /*height: 150px;*/ border-radius: 14px; }
+
+  .home-section-header {margin-bottom:26px;}
+  .home-section-title img {height:26px;}
+  .home-section-title strong { font-size: 24px; margin:0 4px 0 6px;}
   .home-section-en { display: none; }
-  .home-banner-section { padding: 16px; }
-  .home-banner-slide { height: 160px; }
+  .home-section-more { height: 48px; }
+  .home-section-more span { font-size: 14px; }
+  .home-section-more img {width:6px;}
+  .home-section-more-area { margin-top: 30px; }
+
+  .home_swp_controll { display: none; }
 
   .popup-modal { width: 100%; }
+
+  .home-section .swiper-slide {width:300px;}
+  #swiper-inst .swiper-slide {width:260px;}
+  .card-tags {margin-bottom:12px;}
+  .ctags {width:46px;height:23px;font-size:12px;}
+  .card-title {font-size:17px;}
+  .card-meta {font-size:14px;margin-top:10px;}
+  .ctag {left:12px;top:12px;height:29px;}
+  .ctag span {font-size:12px;}
+
+  .rv-class-title {font-size:17px;}
+  .rv-head {margin:15px 0;font-size:13px;}
+  .rv-bar {margin:0 5px;}
+  .rv-content {font-size:14px;-webkit-line-clamp:1;}
+  .rv-class-name {font-size:13px;}
+  .review-modal_wrap {padding:26px 20px 20px;}
+  .review-modal-close {top:0;right:0;}
+  .rm-body {margin-top:15px;}
+  .rv-class-info {padding-top:20px;margin-top:20px;}
+}
+
+/* ── 480px ── */
+@media (max-width: 480px) {
+  #hero { padding: 10px; }
+  .hero-cont-txt { font-size: 22px; }
+  .home-banner-slide { /*height: 120px; border-radius: 12px;*/ }
+
+  .home-section-title strong { font-size: 20px; }
+  .home-review-card { padding: 24px 16px 20px; }
+}
+
+/* ── 360px ── */
+@media (max-width: 360px) {
+  .hero-cont-txt { font-size: 18px; }
+  .home-banner-slide { /*height: 100px;*/ }
+  .home-section-title strong { font-size: 18px; }
+
+  .home-section .swiper-slide {width:240px;}
+  #swiper-inst .swiper-slide {width:200px;}  
 }
